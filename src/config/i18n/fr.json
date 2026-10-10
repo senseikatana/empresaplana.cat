@@ -1,15 +1,15 @@
 {
 	"ai": {
 		"title": "Assistant IA",
-		"description": "Generez du texte avec le Model Gateway InsForge et OpenRouter.",
-		"notice": "N'incluez pas de donnees personnelles ni de secrets : le texte est envoye a OpenRouter. Les reponses peuvent contenir des erreurs. Maximum 4000 caracteres ; une demande toutes les 30 secondes par utilisateur et processus.",
+		"description": "Générez du texte avec le Model Gateway InsForge et OpenRouter.",
+		"notice": "N'incluez pas de données personnelles ni de secrets : le texte est envoyé à OpenRouter. Les réponses peuvent contenir des erreurs. Maximum 4000 caractères ; une demande toutes les 30 secondes par utilisateur et processus.",
 		"prompt": "Instructions pour l'IA",
-		"submit": "Generer du texte",
-		"result": "Reponse",
-		"invalid": "Saisissez entre 1 et 4000 caracteres.",
+		"submit": "Générer du texte",
+		"result": "Réponse",
+		"invalid": "Saisissez entre 1 et 4000 caractères.",
 		"notConfigured": "OPENROUTER_API_KEY manque sur le serveur. Configurez-la avec la CLI InsForge.",
 		"rateLimit": "Attendez 30 secondes avant d'envoyer une autre demande.",
-		"upstream": "La generation a echoue. Verifiez la connexion et le solde OpenRouter avant de reessayer."
+		"upstream": "La génération a échoué. Vérifiez la connexion et le solde OpenRouter avant de réessayer."
 	},
 	"meta": {
 		"title": "Empresa Plana | Transport en commun de voyageurs",
