@@ -25,7 +25,6 @@ export default defineConfig({
 			// permite los subdominios aleatorios que cloudflared genera al reiniciar.
 			allowedHosts: [
 				"localhost",
-				"face-discrete-presents-criterion.trycloudflare.com",
 				".trycloudflare.com",
 			],
 		},

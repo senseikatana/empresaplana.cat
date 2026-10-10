@@ -169,7 +169,40 @@ Canonical tokens live in `src/assets/DESIGN.md` (mirror of the Stitch
   `RouteAccordion` / `TransferAccordion` / `ThroughAccordion` components.
   Form defaults: Tarragona → Salou.
 
+## Management CRUD
+
+- `/[lang]/dashboard/gestion/{rutas,autobuses,paradas,horarios,conductores,
+  notificaciones,reportes,oficinas,presupuestos,lineas,horarios-linea,conexiones}`
+  reads live InsForge data with search, pagination, detail, create, edit and
+  confirmed deletion. No browser-local demo store is used.
+- `src/lib/management-schemas.ts` owns zod validation, field metadata and
+  capability selection. `src/lib/management.ts` provides typed Prisma adapters,
+  reference validation and serializable writes.
+- `/api/management/[resource]`: GET (page/limit/q), POST. The `[id]` endpoint
+  supports GET, PATCH and DELETE. APIs remain unprefixed. Managers can read;
+  mutations follow existing capabilities (currently admin only).
+- Deletion refuses linked records instead of cascading or silently removing
+  assignments. Connection stops must exist on both lines, and edits cannot
+  remove the last timetable containing a connected stop.
+- Fleet routes/schedules are separate from public search lines/schedules.
+  Search timetable origin, destination, departure, arrival and duration are
+  derived from ordered stop JSON. Times currently cover a single calendar day.
+  Google Sheets sync overwrites these search tables; preserve edits in Sheets.
+- `CRUD_TEST_BASE_URL=http://127.0.0.1:4322 bun test tests/management.integration.test.ts`
+  exercises all twelve entities against a local running server and InsForge,
+  creating only isolated test records and deleting them afterwards. Optional
+  `CRUD_TEST_USERNAME`/`CRUD_TEST_PASSKEY` select an existing admin; defaults
+  are the seeded development account. Never run against a production URL.
+
 ## Auth & users
+
+- Better Auth verification, reset and invitation emails use `src/lib/email.ts`
+  and Resend's transactional API, not Resend Events or InsForge native Auth SMTP.
+  Set server-only `RESEND_API_KEY` and `AUTH_EMAIL_FROM`; deploy:insforge includes
+  both in the Compute runtime. `bun run email:test` sends to `RESEND_TEST_TO`;
+  `--dry-run` reports readiness without sending. The onboarding@resend.dev sender
+  only permits the Resend account owner's inbox; use a verified sender domain
+  for other recipients and production.
 
 - `src/lib/passkey.ts` — scrypt hashing (`salt:hash`, node:crypto, no deps).
 - `src/lib/auth.ts` — JWT session via `jose` (HS256, `AUTH_SECRET`, 7d) in

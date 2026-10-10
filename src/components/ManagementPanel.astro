@@ -46,6 +46,7 @@ const href = (action: "edit" | "view", id: string | number) => `${base}?${new UR
 const pageHref = (page: number) => `${base}?${new URLSearchParams({ q: query, page: String(page), limit: String(limit) })}`;
 const inputClass = "mt-2 min-h-11 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm text-on-surface focus:border-coastal-teal focus:outline-none focus:ring-2 focus:ring-coastal-teal/20 disabled:opacity-70";
 const readOnly = mode === "view";
+const saved = Astro.url.searchParams.get("saved");
 ---
 <section class="mx-auto max-w-7xl" data-management-panel data-api={api} data-return={pageHref(page)}>
 	<div class="flex flex-wrap items-center justify-between gap-4">
@@ -57,6 +58,7 @@ const readOnly = mode === "view";
 	{["lineas", "horarios-linea", "conexiones"].includes(resource) && <p class="mt-3 rounded-lg bg-surface-container-low p-4 text-sm text-on-surface-variant">{common.syncNote}</p>}
 	{!writable && <p class="mt-3 text-sm text-on-surface-variant">{common.readOnly}</p>}
 	<p id="management-status" role="status" aria-live="polite" class:list={["mt-4 rounded-lg bg-error-container p-4 text-sm text-on-error-container", { hidden: !error }]}>{error ? copy.errors[error] ?? copy.errors.database_unavailable : ""}</p>
+	{!error && saved && ["created", "updated", "deleted"].includes(saved) && <p role="status" class="mt-4 rounded-lg bg-primary-fixed p-4 text-sm text-deep-navy">{common[saved]}</p>}
 	{!error && mode !== "list" && (
 		<form id="management-form" data-record-id={record?.id} class="mt-6 rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-ambient">
 			<h2 class="text-xl font-semibold text-deep-navy">{readOnly ? common.view : record ? common.edit : common.add}</h2>
@@ -114,6 +116,11 @@ const readOnly = mode === "view";
 	const panel = document.querySelector("[data-management-panel]");
 	const status = document.getElementById("management-status");
 	const form = document.getElementById("management-form");
+	function finish(operation) {
+		const target = new URL(panel.dataset.return, window.location.origin);
+		target.searchParams.set("saved", operation);
+		window.location.assign(target);
+	}
 	function showError(code, field, issues) {
 		if (!status) return;
 		status.textContent = messages[code] ?? messages.database_unavailable;
@@ -152,7 +159,7 @@ const readOnly = mode === "view";
 			});
 			const result = await response.json();
 			if (!response.ok) { showError(result.error, result.field, result.issues); return; }
-			window.location.assign(panel.dataset.return);
+			finish(id ? "updated" : "created");
 		} catch {
 			showError("network_error");
 		} finally {
@@ -167,7 +174,7 @@ const readOnly = mode === "view";
 				const response = await fetch(`${panel.dataset.api}/${encodeURIComponent(button.dataset.deleteId)}`, { method: "DELETE" });
 				const result = await response.json();
 				if (!response.ok) { showError(result.error, result.field); return; }
-				window.location.assign(panel.dataset.return);
+				finish("deleted");
 			} catch {
 				showError("network_error");
 			} finally {
