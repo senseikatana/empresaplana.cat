@@ -14,7 +14,7 @@
     "sync:sheets": "bun src/scripts/sync-sheets.mjs",
     "export:sheets": "bun src/scripts/export-sheets.mjs",
     "bootstrap:sheets": "bun src/scripts/bootstrap-sheets.mjs",
-    "test": "astro check",
+    "test": "astro check && bun test",
     "format": "biome format --write .",
     "format:check": "biome format .",
     "lint": "biome lint .",

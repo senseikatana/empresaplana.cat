@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const USUARIO_ROLES = ["client", "worker", "admin"] as const;
+const USUARIO_ROLES = ["client", "worker", "manager", "admin"] as const;
 
 export const roleSchema = z.enum(USUARIO_ROLES);
 
@@ -25,10 +25,8 @@ export const createUserSchema = z.object({
 		.transform((value) => value.toLowerCase()),
 	passkey: z
 		.string()
-		.regex(
-			/^[A-Za-z0-9]{8}$/,
-			"El passkey debe tener 8 caracteres alfanuméricos",
-		),
+		.min(12, "La contraseña debe tener al menos 12 caracteres")
+		.max(128, "La contraseña no puede superar 128 caracteres"),
 	username: z
 		.string()
 		.trim()
@@ -46,6 +44,7 @@ export const updateUserSchema = createUserSchema
 export const loginSchema = z.object({
 	username: z.string().trim().min(1, "Username obligatorio"),
 	passkey: z.string().min(1, "Passkey obligatorio"),
+	redirect: z.string().max(2048).optional(),
 });
 
 export function formatValidationError(error: z.ZodError) {

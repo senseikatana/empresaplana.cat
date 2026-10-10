@@ -9,7 +9,7 @@ import {
 	formatValidationError,
 } from "@/lib/validation/users";
 
-const USUARIO_ROLES = ["client", "worker", "admin"] as const;
+const USUARIO_ROLES = ["client", "worker", "manager", "admin"] as const;
 
 export const prerender = false;
 

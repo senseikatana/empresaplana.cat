@@ -10,7 +10,11 @@
 			"locations": "Locations",
 			"downloads": "Downloads",
 			"contact": "Contact",
-			"bookNow": "BOOK NOW"
+			"bookNow": "BOOK NOW",
+			"login": "Sign in",
+			"register": "Create account",
+			"profile": "My profile",
+			"companyDashboard": "Company dashboard"
 		},
 		"lang": {
 			"ca": "CA",
@@ -126,11 +130,16 @@
 			"asClient": "Sign in as Customer",
 			"asWorker": "Sign in as Worker",
 			"asBoss": "Sign in as Boss",
+			"loginTitle": "Welcome back",
+			"imageTitle": "Your mobility, in one place",
+			"imageDescription": "Check service information and manage your account with Empresa Plana.",
+			"connectionError": "Could not connect. Please try again.",
 			"invalid": "Invalid username or password."
 		},
 		"role": {
 			"client": "Customer",
 			"worker": "Worker",
+			"manager": "Manager",
 			"admin": "Administrator"
 		},
 		"status": {
@@ -239,6 +248,7 @@
 				"drivers": "Drivers",
 				"notifications": "Notifications",
 				"reports": "Reports",
+				"users": "Users",
 				"integrations": "Integrations"
 			},
 			"common": {
@@ -457,11 +467,33 @@
 			"username": "Username",
 			"email": "Email",
 			"password": "Password",
+			"passwordHint": "Use at least 12 characters.",
 			"submit": "Create account",
 			"haveAccount": "Already have an account?",
 			"login": "Log in",
 			"taken": "That username or email is already registered.",
 			"invalid": "Check the entered details."
+		},
+		"team": {
+			"title": "Team access",
+			"subtitle": "Manage accounts and assign manager permissions. Only administrators can change roles.",
+			"search": "Search by name, username, or email",
+			"name": "Person",
+			"email": "Email",
+			"role": "Role",
+			"action": "Save role",
+			"loading": "Loading accounts…",
+			"empty": "There are no accounts to show.",
+			"loadError": "Accounts could not be loaded. Try again.",
+			"saveError": "This role could not be saved.",
+			"saved": "Role updated.",
+			"lastAdmin": "At least one active administrator must remain.",
+			"roles": {
+				"client": "Customer",
+				"worker": "Worker",
+				"manager": "Manager",
+				"admin": "Administrator"
+			}
 		},
 		"panel": {
 			"home": "Home",
@@ -476,6 +508,12 @@
 			"backToSite": "Back to site",
 			"accountTitle": "Account",
 			"accountSubtitle": "Manage your personal data and account security.",
+			"profileIntro": "This is your private space. Only you can view and edit your personal details.",
+			"accountRole": "Account type",
+			"memberSince": "Account created",
+			"currentPassword": "Current password",
+			"passwordHint": "Confirm your current password to change your email or password.",
+			"saveError": "Changes could not be saved. Check the details and try again.",
 			"name": "Name",
 			"email": "Email",
 			"password": "Password",

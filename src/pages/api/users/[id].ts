@@ -53,6 +53,14 @@ export const PATCH: APIRoute = async ({ params, request, cookies }) => {
 
 	const existing = await prisma().user.findUnique({ where: { id } });
 	if (!existing) return Response.json({ error: "not_found" }, { status: 404 });
+	if (existing.role === "admin" && data.role && data.role !== "admin") {
+		const adminCount = await prisma().user.count({
+			where: { role: "admin" },
+		});
+		if (adminCount <= 1) {
+			return Response.json({ error: "last_admin_required" }, { status: 409 });
+		}
+	}
 
 	if (data.email) {
 		const emailClash = await prisma().user.findFirst({
@@ -84,7 +92,8 @@ export const PATCH: APIRoute = async ({ params, request, cookies }) => {
 	if (data.email !== undefined) updateData.email = data.email;
 	if (data.username !== undefined) updateData.username = data.username;
 	if (data.role !== undefined) updateData.role = data.role;
-	if (data.passkey !== undefined) updateData.passkey = hashPasskey(data.passkey);
+	if (data.passkey !== undefined)
+		updateData.passkey = hashPasskey(data.passkey);
 
 	const updated = await prisma().user.update({
 		where: { id },
@@ -104,8 +113,19 @@ export const DELETE: APIRoute = async ({ params, cookies }) => {
 	if (id === user.id)
 		return Response.json({ error: "cannot_delete_self" }, { status: 400 });
 
-	const row = await prisma().user.findUnique({ where: { id }, select: { id: true } });
+	const row = await prisma().user.findUnique({
+		where: { id },
+		select: { id: true, role: true },
+	});
 	if (!row) return Response.json({ error: "not_found" }, { status: 404 });
+	if (row.role === "admin") {
+		const adminCount = await prisma().user.count({
+			where: { role: "admin" },
+		});
+		if (adminCount <= 1) {
+			return Response.json({ error: "last_admin_required" }, { status: 409 });
+		}
+	}
 
 	await prisma().user.delete({ where: { id } });
 	return Response.json({ ok: true });

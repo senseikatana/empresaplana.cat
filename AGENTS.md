@@ -145,8 +145,17 @@ Canonical tokens live in `src/assets/DESIGN.md` (mirror of the Stitch
 - API: `POST /api/auth/login|logout`, `GET /api/auth/me`, `GET|POST
   /api/users` (admin), `GET|PATCH|DELETE /api/users/[id]` (admin; can't
   delete yourself). `passkey_hash` is never exposed.
-- Demo users (seed, passkey `12345678`): `admin`, `trabajador`, `cliente`.
-  Google Auth is planned as a future addition.
+- Roles are `client`, `worker`, `manager`, and `admin`. Only managers and
+  admins may access `/dashboard`; only admins may manage team roles or open
+  integrations. Server middleware enforces these restrictions.
+- Public registration always creates a `client`. Signed-in users manage only
+  their own profile at `/perfil`; admins promote team members through
+  `/dashboard/gestion/usuarios`. This admin-only role assignment is a product
+  assumption until explicitly changed.
+- New and changed passwords must be 12–128 characters. Existing seeded
+  development users (passkey `12345678`: `admin`, `trabajador`, `cliente`)
+  remain able to log in for backwards-compatible local testing.
+- Google Auth is planned as a future addition.
 
 ## Bus tracking (Glovo-style)
 

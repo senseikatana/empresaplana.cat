@@ -10,7 +10,11 @@
 			"locations": "Localitzacions",
 			"downloads": "Descàrregues",
 			"contact": "Contacte",
-			"bookNow": "RESERVA ARA"
+			"bookNow": "RESERVA ARA",
+			"login": "Accedeix",
+			"register": "Crea un compte",
+			"profile": "El meu perfil",
+			"companyDashboard": "Panell d'empresa"
 		},
 		"lang": {
 			"ca": "CA",
@@ -126,11 +130,16 @@
 			"asClient": "Entra com a Client",
 			"asWorker": "Entra com a Treballador",
 			"asBoss": "Entra com a Cap",
+			"loginTitle": "Benvingut de nou",
+			"imageTitle": "La teva mobilitat, al teu espai",
+			"imageDescription": "Consulta informació de servei i gestiona el teu compte amb Empresa Plana.",
+			"connectionError": "No s'ha pogut connectar. Torna-ho a provar.",
 			"invalid": "Usuari o contrasenya no vàlids."
 		},
 		"role": {
 			"client": "Client",
 			"worker": "Treballador",
+			"manager": "Gerent",
 			"admin": "Administrador"
 		},
 		"status": {
@@ -239,6 +248,7 @@
 				"drivers": "Conductors",
 				"notifications": "Notificacions",
 				"reports": "Reportes",
+				"users": "Usuaris",
 				"integrations": "Integracions"
 			},
 			"common": {
@@ -457,11 +467,33 @@
 			"username": "Usuari",
 			"email": "Correu electrònic",
 			"password": "Contrasenya",
+			"passwordHint": "Fes servir almenys 12 caràcters.",
 			"submit": "Crea el compte",
 			"haveAccount": "Ja tens compte?",
 			"login": "Inicia sessió",
 			"taken": "Aquest usuari o correu ja està registrat.",
 			"invalid": "Revisa les dades introduïdes."
+		},
+		"team": {
+			"title": "Accés de l'equip",
+			"subtitle": "Gestiona els comptes i assigna permisos de gerència. Només els administradors poden canviar rols.",
+			"search": "Cerca per nom, usuari o correu",
+			"name": "Persona",
+			"email": "Correu electrònic",
+			"role": "Rol",
+			"action": "Desa el rol",
+			"loading": "Carregant comptes…",
+			"empty": "No hi ha comptes per mostrar.",
+			"loadError": "No s'han pogut carregar els comptes. Torna-ho a provar.",
+			"saveError": "No s'ha pogut desar aquest rol.",
+			"saved": "Rol actualitzat.",
+			"lastAdmin": "Cal mantenir almenys un administrador actiu.",
+			"roles": {
+				"client": "Client",
+				"worker": "Treballador",
+				"manager": "Gerent",
+				"admin": "Administrador"
+			}
 		},
 		"panel": {
 			"home": "Inici",
@@ -476,6 +508,12 @@
 			"backToSite": "Torna a la web",
 			"accountTitle": "Compte",
 			"accountSubtitle": "Gestiona les teves dades personals i la seguretat del compte.",
+			"profileIntro": "Aquest espai és privat. Només tu pots consultar i editar les teves dades personals.",
+			"accountRole": "Tipus de compte",
+			"memberSince": "Compte creat",
+			"currentPassword": "Contrasenya actual",
+			"passwordHint": "Per canviar el correu o la contrasenya, confirma la contrasenya actual.",
+			"saveError": "No s'han pogut desar els canvis. Revisa les dades i torna-ho a provar.",
 			"name": "Nom",
 			"email": "Correu electrònic",
 			"password": "Contrasenya",
