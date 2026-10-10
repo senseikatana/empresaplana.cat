@@ -1,3 +1,4 @@
+import { isLocale, localizedPath } from "@/config/i18n/routing";
 import type { Locale, SiteInfoProps } from "@/interfaces";
 
 const SITE_BASE_URL = "https://empresaplana.cat";
@@ -8,7 +9,7 @@ export const SITE_INFO = {
 	description:
 		"Empresa Plana: horaris d'autobús, rutes, trasllats a l'aeroport i serveis discrecionals a la Costa Daurada, Camp de Tarragona i Barcelona.",
 	baseUrl: SITE_BASE_URL,
-	defaultLang: "ca",
+	defaultLang: "es",
 	author: "Empresa Plana",
 	themeColor: "#013990",
 	keywords: [
@@ -40,5 +41,7 @@ export function getSiteInfo(page: Partial<SiteInfoProps> = {}): SiteInfoProps {
 }
 
 export function getCanonicalUrl(pathname: string): string {
-	return `${SITE_BASE_URL}${pathname.startsWith("/") ? pathname : `/${pathname}`}`;
+	const path = pathname.startsWith("/") ? pathname : `/${pathname}`;
+	const [, language] = path.split("/");
+	return `${SITE_BASE_URL}${isLocale(language) ? localizedPath(path, language) : path}`;
 }

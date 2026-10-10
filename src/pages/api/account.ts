@@ -7,25 +7,27 @@ import { formatValidationError } from "@/lib/validation/users";
 
 export const prerender = false;
 
-const updateAccountSchema = z.object({
-	name: z
-		.string()
-		.trim()
-		.min(1, "Nombre obligatorio")
-		.max(60, "Máximo 60 caracteres")
-		.optional(),
-	fullName: z
-		.string()
-		.trim()
-		.min(1, "Nombre completo obligatorio")
-		.max(120, "Máximo 120 caracteres")
-		.optional(),
-	phone: z
-		.string()
-		.trim()
-		.regex(/^$|^\+?[0-9\s-]{6,20}$/, "Teléfono inválido")
-		.optional(),
-}).strict();
+const updateAccountSchema = z
+	.object({
+		name: z
+			.string()
+			.trim()
+			.min(1, "Nombre obligatorio")
+			.max(60, "Máximo 60 caracteres")
+			.optional(),
+		fullName: z
+			.string()
+			.trim()
+			.min(1, "Nombre completo obligatorio")
+			.max(120, "Máximo 120 caracteres")
+			.optional(),
+		phone: z
+			.string()
+			.trim()
+			.regex(/^$|^\+?[0-9\s-]{6,20}$/, "Teléfono inválido")
+			.optional(),
+	})
+	.strict();
 
 // ── GET /api/account ────────────────────────────────────────────────────────
 export const GET: APIRoute = async ({ cookies }) => {

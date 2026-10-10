@@ -1,6 +1,6 @@
 import type { Locale } from "@/interfaces/common";
 
-export const DEFAULT_LOCALE: Locale = "ca";
+export const DEFAULT_LOCALE: Locale = "es";
 export const LOCALES: readonly Locale[] = ["ca", "es", "en", "fr"];
 
 export function isLocale(value: string | undefined | null): value is Locale {
@@ -32,5 +32,6 @@ export function localizedPath(path: string, locale: Locale): string {
 		return path;
 	}
 	url.searchParams.delete("lang");
+	if (locale === DEFAULT_LOCALE) return `${pathname}${url.search}${url.hash}`;
 	return `/${locale}${pathname === "/" ? "" : pathname}${url.search}${url.hash}`;
 }

@@ -9,7 +9,12 @@ import {
 
 describe("locale filesystem routing", () => {
 	it("creates home and nested paths for every supported locale", () => {
-		for (const locale of ["ca", "es", "en", "fr"] as const) {
+		assert.equal(localizedPath("/", "es"), "/");
+		assert.equal(
+			localizedPath("/dashboard/gestion/usuarios", "es"),
+			"/dashboard/gestion/usuarios",
+		);
+		for (const locale of ["ca", "en", "fr"] as const) {
 			assert.equal(localizedPath("/", locale), `/${locale}`);
 			assert.equal(
 				localizedPath("/dashboard/gestion/usuarios", locale),
@@ -28,6 +33,8 @@ describe("locale filesystem routing", () => {
 			"/dashboard/gestion",
 		);
 		assert.equal(unlocalizedPath("/es"), "/");
+		assert.equal(localizedPath("/ca/rutas-horarios?lang=ca#r", "es"), "/rutas-horarios#r");
+		assert.equal(localizedPath("/en", "es"), "/");
 	});
 	it("leaves API, assets, external links and fragments unchanged", () => {
 		for (const path of [
@@ -42,9 +49,9 @@ describe("locale filesystem routing", () => {
 			assert.equal(localizedPath(path, "es"), path);
 		}
 	});
-	it("validates supported languages and retains the default Catalan fallback", () => {
+	it("validates supported languages and falls back to Spanish by default", () => {
 		assert.equal(isLocale("de"), false);
 		assert.equal(getLocale("ES"), "es");
-		assert.equal(getLocale("de"), "ca");
+		assert.equal(getLocale("de"), "es");
 	});
 });

@@ -19,5 +19,7 @@ if (args.includes("--dry-run")) {
 		subject: "Prueba de correo | Empresa Plana",
 		text: "Este correo es una prueba del envío transaccional de Empresa Plana con Resend. Los correos de autenticación se gestionan en InsForge.",
 	});
-	console.log(`Resend accepted the test email (${id}). Inspect it with: bun run email:manage get ${id}`);
+	console.log(
+		`Resend accepted the test email (${id}). Inspect it with: bun run email:manage get ${id}`,
+	);
 }

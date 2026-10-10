@@ -54,10 +54,11 @@ Run everything from this directory:
   Local tracking JSON and Astro filesystem sessions are ephemeral across container replacement;
   do not treat them as durable storage. Native auth sessions are managed by InsForge.
   The service runs in Frankfurt with 512 MB RAM and scales to zero when idle.
-  All UI routes use a locale prefix: `/es`, `/es/rutas-horarios`,
-  `/es/dashboard/login`, `/es/perfil`. Supported prefixes are `ca`, `es`, `en`, `fr`.
-  APIs remain unprefixed at `/api/*`. Unprefixed legacy UI URLs redirect with HTTP 308,
-  preserving the requested query language (Catalan by default) and other query parameters.
+  Spanish (`DEFAULT_LOCALE`) is served WITHOUT prefix: `/`, `/rutas-horarios`,
+  `/dashboard/login`, `/perfil` (middleware rewrites internally to `/es/...`).
+  Other locales keep their prefix: `/ca`, `/en`, `/fr`. `/es/...` redirects 308 to
+  the unprefixed URL; `?lang=xx` on an unprefixed URL redirects 308 to that locale.
+  APIs remain unprefixed at `/api/*`. Build links with `localizedPath()`.
   Use `localizedPath()` from `src/config/i18n/routing.ts` for navigation and redirects.
   Read `Astro.params.lang`, not a query parameter, for the page language.
   InsForge CLI domain attachment targets frontend deployments, not Compute services;

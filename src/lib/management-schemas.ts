@@ -408,9 +408,7 @@ export function initialManagementValues(
 		...(resource === "presupuestos" ? { status: "received" } : {}),
 		...(resource === "conexiones" ? { waitMin: 0 } : {}),
 		...(resource === "documentos" ? { docType: "itv" } : {}),
-		...(resource === "incidencias"
-			? { severity: "low", status: "open" }
-			: {}),
+		...(resource === "incidencias" ? { severity: "low", status: "open" } : {}),
 		...(resource === "mantenimiento"
 			? { kind: "preventive", status: "scheduled", cost: 0 }
 			: {}),

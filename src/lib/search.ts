@@ -102,7 +102,7 @@ export async function searchRoutes(
 	});
 	const loaded: LoadedSchedule[] = schedules.map((row) => ({
 		lineId: row.lineId,
-		stops: (row.stopsJson as unknown as Stop[]),
+		stops: row.stopsJson as unknown as Stop[],
 	}));
 
 	const directMap = new Map<number, LineSummary>();

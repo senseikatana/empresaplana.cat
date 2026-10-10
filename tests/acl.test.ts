@@ -53,26 +53,26 @@ describe("post-login destinations", () => {
 		assert.equal(dashboardHomeForRole("worker"), "/perfil");
 		assert.equal(
 			postLoginDestination("client", "/dashboard/gestion"),
-			"/ca/perfil",
+			"/perfil",
 		);
 	});
 
 	it("preserves safe requested paths only for authorized company roles", () => {
 		assert.equal(
 			postLoginDestination("manager", "/dashboard/gestion/mapa?lang=ca"),
-			"/ca/dashboard/gestion/mapa",
+			"/dashboard/gestion/mapa",
 		);
 		assert.equal(
 			postLoginDestination("manager", "/dashboard/gestion/usuarios"),
-			"/ca/dashboard/gestion",
+			"/dashboard/gestion",
 		);
 		assert.equal(
 			postLoginDestination("admin", "https://attacker.example"),
-			"/ca/dashboard/gestion",
+			"/dashboard/gestion",
 		);
 		assert.equal(
 			postLoginDestination("admin", "//attacker.example"),
-			"/ca/dashboard/gestion",
+			"/dashboard/gestion",
 		);
 	});
 	it("preserves locale and authorization on prefixed paths", () => {
@@ -87,7 +87,7 @@ describe("post-login destinations", () => {
 		assert.equal(canAccessDashboardPath("admin", "/es/perfil"), false);
 		assert.equal(
 			postLoginDestination("manager", "/es/dashboard/gestion/usuarios", "es"),
-			"/es/dashboard/gestion",
+			"/dashboard/gestion",
 		);
 		assert.equal(
 			postLoginDestination(
@@ -95,11 +95,11 @@ describe("post-login destinations", () => {
 				"/es/dashboard/gestion/mapa?filter=active#map",
 				"es",
 			),
-			"/es/dashboard/gestion/mapa?filter=active#map",
+			"/dashboard/gestion/mapa?filter=active#map",
 		);
 		assert.equal(
 			postLoginDestination("worker", "/es/dashboard", "es"),
-			"/es/perfil",
+			"/perfil",
 		);
 	});
 });

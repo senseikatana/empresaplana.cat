@@ -52,8 +52,18 @@ export const PATCH: APIRoute = async ({ params, request, cookies }) => {
 
 	const existing = await prisma().user.findUnique({ where: { id } });
 	if (!existing) return Response.json({ error: "not_found" }, { status: 404 });
-	if (existing.insforgeId && data.email !== undefined && data.email !== existing.email) {
-		return Response.json({ error: "native_email_managed", message: "Email is managed by InsForge Auth." }, { status: 409 });
+	if (
+		existing.insforgeId &&
+		data.email !== undefined &&
+		data.email !== existing.email
+	) {
+		return Response.json(
+			{
+				error: "native_email_managed",
+				message: "Email is managed by InsForge Auth.",
+			},
+			{ status: 409 },
+		);
 	}
 	if (existing.role === "admin" && data.role && data.role !== "admin") {
 		const adminCount = await prisma().user.count({

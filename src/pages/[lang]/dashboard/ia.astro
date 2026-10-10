@@ -50,7 +50,7 @@ Astro.response.headers.set("Cache-Control", "no-store");
 		<p class="mt-2 text-on-surface-variant">{t.description}</p>
 		<p id="ai-notice" class="mt-6 rounded-lg bg-surface-container-low p-4 text-sm text-on-surface-variant">{t.notice}</p>
 		{!ENV.openRouterApiKey && <p role="alert" class="mt-4 text-error">{t.notConfigured}</p>}
-		<form method="post" action={Astro.url.pathname} class="mt-6 space-y-4">
+		<form method="post" action={localizedPath(Astro.url.pathname, locale)} class="mt-6 space-y-4">
 			<label for="ai-prompt" class="block font-semibold">{t.prompt}</label>
 			<textarea id="ai-prompt" name="prompt" required maxlength="4000" rows="7" autocomplete="off" aria-describedby="ai-notice" class="w-full rounded-lg border border-outline-variant bg-surface-container-lowest p-4 text-on-surface focus-visible:outline-2 focus-visible:outline-coastal-teal">{prompt}</textarea>
 			<button type="submit" disabled={!ENV.openRouterApiKey} class="rounded-lg bg-deep-navy px-6 py-3 font-semibold text-white hover:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coastal-teal disabled:cursor-not-allowed disabled:opacity-50">{t.submit}</button>
