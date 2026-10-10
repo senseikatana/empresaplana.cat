@@ -7,7 +7,7 @@
 	},
 	"scripts": {
 		"dev": "astro dev",
-		"build": "astro build",
+		"build": "bun run test && astro build",
 		"preview": "astro preview",
 		"start": "node dist/server/entry.mjs",
 		"deploy:insforge": "node src/scripts/deploy-insforge.mjs",
@@ -16,8 +16,11 @@
 		"tunnel": "cloudflared tunnel --url http://localhost:4321",
 		"astro": "astro",
 		"typecheck": "astro check",
-		"test": "bun run check && bun run typecheck && bun run test:unit",
-		"test:unit": "bun test tests",
+		"test": "bun run check && bun run typecheck && bun run test:unit && bun run test:e2e",
+		"test:unit": "bun test tests --path-ignore-patterns '**/*.integration.test.ts'",
+		"test:e2e": "playwright test --config test/playwright.config.ts",
+		"test:e2e:ui": "bun run test:e2e --ui",
+		"test:integration": "bun test tests/management.integration.test.ts",
 		"format": "biome check --write .",
 		"format:check": "biome format .",
 		"lint": "biome lint .",
@@ -51,6 +54,7 @@
 		"zod": "^4.6.5"
 	},
 	"devDependencies": {
+		"@playwright/test": "^1.58.2",
 		"@astrojs/check": "^0.9.10",
 		"@biomejs/biome": "^2.5.15",
 		"@types/bun": "^1.4.2",

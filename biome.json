@@ -6,6 +6,8 @@
 			"src/**/*.tsx",
 			"src/**/*.mjs",
 			"tests/**/*.ts",
+			"test/**/*.ts",
+			"test/**/*.mjs",
 			"astro.config.mjs",
 			"prisma.config.ts",
 			"package.json",

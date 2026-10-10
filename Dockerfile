@@ -9,6 +9,7 @@ COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile --ignore-scripts
 COPY . .
 RUN DATABASE_URL=postgresql://build:build@localhost:5432/build bun run db:generate
+RUN bunx playwright install --with-deps chromium
 RUN bun run build
 
 FROM base AS production-dependencies

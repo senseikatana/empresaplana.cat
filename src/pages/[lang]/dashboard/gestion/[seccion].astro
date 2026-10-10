@@ -56,20 +56,20 @@ if (resource) {
 }
 
 // Section labels mapping — same keys as the Nuxt reference
-const sectionKeys: Record<string, string> = {
-	mapa: "app.gestion.nav.map",
-	rutas: "app.gestion.nav.routes",
-	autobuses: "app.gestion.nav.buses",
-	paradas: "app.gestion.nav.stops",
-	horarios: "app.gestion.nav.schedules",
-	conductores: "app.gestion.nav.drivers",
-	notificaciones: "app.gestion.nav.notifications",
-	reportes: "app.gestion.nav.reports",
-	integraciones: "app.gestion.nav.integrations",
+const sectionKeys: Partial<Record<string, keyof typeof dict.app.gestion.nav>> = {
+	mapa: "map",
+	rutas: "routes",
+	autobuses: "buses",
+	paradas: "stops",
+	horarios: "schedules",
+	conductores: "drivers",
+	notificaciones: "notifications",
+	reportes: "reports",
+	integraciones: "integrations",
 };
 
 const key = sectionKeys[seccion];
-const title = resource ? dict.management.entities[resource] : key ? String(dict.app.gestion.nav[key.replace("app.gestion.nav.", "")] ?? seccion) : seccion;
+const title = resource ? dict.management.entities[resource] : key ? dict.app.gestion.nav[key] : seccion;
 ---
 
 <DashboardLayout title={title} locale={locale} user={user}>

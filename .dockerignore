@@ -5,6 +5,11 @@
 !bun.lock
 !astro.config.mjs
 !tsconfig.json
+!biome.json
+!tests/
+!tests/**
+!test/
+!test/**
 !prisma.config.ts
 !prisma/
 !prisma/schema.prisma

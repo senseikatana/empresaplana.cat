@@ -38,6 +38,8 @@ sheets-export/
 .nuxt/
 .output/
 coverage/
+playwright-report/
+test-results/
 
 # IDEs
 .vscode/

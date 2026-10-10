@@ -1,5 +1,6 @@
 /// <reference types="bun" />
 import { afterEach, expect, spyOn, test } from "bun:test";
+import { rejects } from "node:assert/strict";
 import { ENV } from "../src/config/config.env";
 import { aiPromptSchema, generateAIText } from "../src/lib/ai";
 
@@ -17,7 +18,7 @@ test("validates trimmed prompts and the exact character limit", () => {
 
 test("reports missing server credentials", async () => {
 	ENV.openRouterApiKey = undefined;
-	await expect(generateAIText("Hello", 9001)).rejects.toMatchObject({
+	await rejects(generateAIText("Hello", 9001), {
 		code: "not_configured",
 	});
 });
@@ -59,7 +60,7 @@ test("limits output, returns text and blocks repeated requests", async () => {
 			text: "Test answer",
 			model: "openai/gpt-5.5",
 		});
-		await expect(generateAIText("Hello", 9002)).rejects.toMatchObject({
+		await rejects(generateAIText("Hello", 9002), {
 			code: "rate_limit",
 		});
 		expect(fetchSpy).toHaveBeenCalledTimes(1);
@@ -73,7 +74,7 @@ test("does not treat an empty completion as success", async () => {
 	const fetchSpy = mockCompletion(null);
 	const logSpy = spyOn(console, "error").mockImplementation(() => {});
 	try {
-		await expect(generateAIText("Hello", 9003)).rejects.toMatchObject({
+		await rejects(generateAIText("Hello", 9003), {
 			code: "upstream",
 		});
 		expect(logSpy).toHaveBeenCalled();
