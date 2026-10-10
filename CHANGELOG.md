@@ -7,76 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.0.0] - 2026-10-10
+## [0.4.1] - 2026-10-10
 
-What's news:
+Highlights: feat: add verify workflow and update AGENTS.md and docs/RELEASING.md.
 
-- [ ] fix!: improve Better Auth for Google and GitHub OAuth
-  - `.env.example`
+- [x] 🚀 feat: add verify workflow and update AGENTS.md and docs/RELEASING.md
+  - `.github/workflows/verify.yml`
   - `AGENTS.md`
-  - `README.md`
-  - `bun.lock`
-  - `package.json`
-  - `prisma/schema.prisma`
-  - `src/components/auth/SocialAuthButtons.astro`
-  - `src/config/i18n/ca.json`
-  - `src/config/i18n/en.json`
-  - `src/config/i18n/es.json`
-  - `src/config/i18n/fr.json`
-  - `src/lib/better-auth.ts`
-  - `src/lib/oauth-env.ts`
-  - `src/lib/oauth-users.ts`
-  - `src/lib/passkey.ts`
-  - `src/pages/api/auth/[...all].ts`
-  - `src/pages/api/auth/exchange.ts`
-  - `src/pages/api/auth/logout.ts`
-  - `src/pages/dashboard/login.astro`
-  - `src/pages/dashboard/register.astro`
-- [ ] ]7;file://localhost/home/senseikatana/Proyectos/empresaplana-astrobun add v1.4.3 (c6da4a4d3) feat: auth and i18n implemented
-  - `AGENTS.md`
-  - `PRODUCT.md`
-  - `README.md`
-  - `package.json`
-  - `src/components/PublicHeader.astro`
-  - `src/config/i18n/ca.json`
-  - `src/config/i18n/en.json`
-  - `src/config/i18n/es.json`
-  - `src/config/i18n/fr.json`
-  - `src/interfaces/common.ts`
-  - `src/layouts/AuthLayout.astro`
-  - `src/layouts/DashboardLayout.astro`
-  - `src/lib/db.ts`
-  - `src/lib/validation/users.ts`
-  - `src/pages/api/account.ts`
-  - `src/pages/api/auth/login.ts`
-  - `src/pages/api/auth/register.ts`
-  - `src/pages/api/users/[id].ts`
-  - `src/pages/api/users/index.ts`
-  - `src/pages/dashboard/gestion/usuarios.astro`
-  - `src/pages/dashboard/index.astro`
-  - `src/pages/dashboard/login.astro`
-  - `src/pages/dashboard/register.astro`
-  - `src/pages/index.astro`
-  - `src/pages/perfil.astro`
-  - `tests/acl.test.ts`
-- [ ] ]7;file://localhost/home/senseikatana/Proyectos/empresaplana-astrobun add v1.4.3 (c6da4a4d3) feat: add PRODUCT.md and auth
-  - `PRODUCT.md`
-  - `package.json`
-  - `src/interfaces/auth.ts`
-  - `src/lib/acl.ts`
-  - `src/lib/auth.ts`
-  - `src/middleware/index.ts`
-- [ ] feat: refresh standalone Astro website
-  - `bun.lock`
-  - `package.json`
-  - `public/images/empresa-plana-fleet.jpg`
-  - `src/interfaces/home.ts`
-  - `src/interfaces/i18n.ts`
-  - `src/lib/logger.ts`
-  - `src/pages/api/auth/register.ts`
-  - `src/pages/api/users/index.ts`
-  - `src/pages/index.astro`
-- [ ] bun add v1.4.2 (744846f84) feat: update documentation for agents
+  - `docs/RELEASING.md`
+- [x] 🐛 fix: update CI workflows to use latest actions and tools
+- [x] 🚀 feat: configure ci with verify workflow
+- [x] 🐛 fix: update release scripts and documentation to reflect strict versioning (#13)
+- [x] 🚀 feat: update design tokens and management CRUD documentation
+- [x] 🚀 feat: update package.json version to 0.1.0 (#11)
 
 ## [0.4.0] - 2026-10-10
 
@@ -592,8 +535,8 @@ Highlights: fix: deploy:cloudflare: deploy the Worker using wrangler.cloudflare.
   - `wrangler.cloudflare.jsonc`
 - [x] ♻️ refactor(auth): centralize Better Auth configuration
 - [x] 🐛 fix!: improve Better Auth for Google and GitHub OAuth
-- [x] 🔹 ]7;file://localhost/home/senseikatana/Proyectos/empresaplana-astrobun add v1.4.3 (c6da4a4d3) feat: auth and i18n implemented
-- [x] 🔹 ]7;file://localhost/home/senseikatana/Proyectos/empresaplana-astrobun add v1.4.3 (c6da4a4d3) feat: add PRODUCT.md and auth
+- [x] 🔹 bun add v1.4.3 (c6da4a4d3) feat: auth and i18n implemented
+- [x] 🔹 bun add v1.4.3 (c6da4a4d3) feat: add PRODUCT.md and auth
 - [x] 🚀 feat: refresh standalone Astro website
 
 ## [0.1.3] - 2026-10-10
@@ -615,8 +558,8 @@ Maintenance release with 1 change.
   - `src/pages/dashboard/login.astro`
   - `src/pages/dashboard/register.astro`
 - [x] 🐛 fix!: improve Better Auth for Google and GitHub OAuth
-- [x] 🔹 ]7;file://localhost/home/senseikatana/Proyectos/empresaplana-astrobun add v1.4.3 (c6da4a4d3) feat: auth and i18n implemented
-- [x] 🔹 ]7;file://localhost/home/senseikatana/Proyectos/empresaplana-astrobun add v1.4.3 (c6da4a4d3) feat: add PRODUCT.md and auth
+- [x] 🔹 bun add v1.4.3 (c6da4a4d3) feat: auth and i18n implemented
+- [x] 🔹 bun add v1.4.3 (c6da4a4d3) feat: add PRODUCT.md and auth
 - [x] 🚀 feat: refresh standalone Astro website
 - [x] 🔹 bun add v1.4.2 (744846f84) feat: update documentation for agents
 
@@ -645,7 +588,7 @@ Highlights: feat: refresh standalone Astro website and fix!: improve Better Auth
   - `src/pages/api/auth/logout.ts`
   - `src/pages/dashboard/login.astro`
   - `src/pages/dashboard/register.astro`
-- [x] 🔹 ]7;file://localhost/home/senseikatana/Proyectos/empresaplana-astrobun add v1.4.3 (c6da4a4d3) feat: auth and i18n implemented
+- [x] 🔹 bun add v1.4.3 (c6da4a4d3) feat: auth and i18n implemented
   - `AGENTS.md`
   - `PRODUCT.md`
   - `README.md`
@@ -672,7 +615,7 @@ Highlights: feat: refresh standalone Astro website and fix!: improve Better Auth
   - `src/pages/index.astro`
   - `src/pages/perfil.astro`
   - `tests/acl.test.ts`
-- [x] 🔹 ]7;file://localhost/home/senseikatana/Proyectos/empresaplana-astrobun add v1.4.3 (c6da4a4d3) feat: add PRODUCT.md and auth
+- [x] 🔹 bun add v1.4.3 (c6da4a4d3) feat: add PRODUCT.md and auth
   - `PRODUCT.md`
   - `package.json`
   - `src/interfaces/auth.ts`
