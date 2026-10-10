@@ -13,8 +13,8 @@ const routeId = required(40);
 const time = z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/, "HH:MM");
 const optionalTime = z.union([time, z.literal("")]);
 const date = z.union([z.iso.date(), z.literal("")]);
-const lat = z.number().finite().min(-90).max(90);
-const lng = z.number().finite().min(-180).max(180);
+const lat = z.number().min(-90).max(90);
+const lng = z.number().min(-180).max(180);
 const point = z.object({ lat, lng }).strict();
 const status = z.enum([
 	"active",

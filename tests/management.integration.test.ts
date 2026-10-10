@@ -193,7 +193,7 @@ describe.skipIf(!base)("management API against InsForge", () => {
 					{ town: hub, name: "Test", time: "08:20" },
 				],
 			});
-			const lineScheduleB = await create("horarios-linea", {
+			await create("horarios-linea", {
 				lineId: lineB.id,
 				stopsJson: [
 					{ town: hub, name: "Test", time: "08:25" },

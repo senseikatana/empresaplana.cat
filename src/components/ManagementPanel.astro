@@ -41,7 +41,13 @@ const columnKeys: Record<ResourceName, string[]> = {
 	"horarios-linea": ["lineId", "originTown", "destinationTown", "departureTime", "arrivalTime", "duration"],
 	conexiones: ["fromLineId", "atStop", "toLineId", "waitMin"],
 };
-const cell = (value: unknown): string => value === null || value === undefined ? "—" : typeof value === "boolean" ? (value ? common.yes : common.no) : typeof value === "object" ? JSON.stringify(value) : String(value);
+const cell = (value: unknown, key?: string): string => {
+	if (value === null || value === undefined) return "—";
+	if (typeof value === "boolean") return value ? common.yes : common.no;
+	if (value instanceof Date) return value.toISOString();
+	if (["status", "type", "action"].includes(key ?? "") && typeof value === "string") return copy.fields[value] ?? value;
+	return typeof value === "object" ? JSON.stringify(value) : String(value);
+};
 const href = (action: "edit" | "view", id: string | number) => `${base}?${new URLSearchParams({ [action]: String(id), q: query, page: String(page) })}`;
 const pageHref = (page: number) => `${base}?${new URLSearchParams({ q: query, page: String(page), limit: String(limit) })}`;
 const inputClass = "mt-2 min-h-11 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm text-on-surface focus:border-coastal-teal focus:outline-none focus:ring-2 focus:ring-coastal-teal/20 disabled:opacity-70";
@@ -100,7 +106,7 @@ const saved = Astro.url.searchParams.get("saved");
 		<div class="mt-4 overflow-x-auto rounded-xl border border-outline-variant bg-surface-container-lowest shadow-ambient">
 			<table class="w-full text-left text-sm">
 				<thead class="bg-surface-container-low text-on-surface-variant"><tr><th scope="col" class="p-4">ID</th>{columnKeys[resource].map((key) => <th scope="col" class="p-4">{copy.fields[key]}</th>)}<th scope="col" class="p-4">{common.actions}</th></tr></thead>
-				<tbody class="divide-y divide-outline-variant">{rows.map((row) => <tr><td class="p-4 font-mono text-xs">{row.id}</td>{columnKeys[resource].map((key) => <td class="max-w-xs break-words p-4">{cell(row[key])}</td>)}<td class="p-4"><div class="flex gap-3"><a class="font-semibold text-deep-navy" href={href("view", row.id)}>{common.view}</a>{writable && <><a class="font-semibold text-deep-navy" href={href("edit", row.id)}>{common.edit}</a><button type="button" data-delete-id={row.id} class="font-semibold text-error disabled:opacity-60">{common.delete}</button></>}</div></td></tr>)}
+				<tbody class="divide-y divide-outline-variant">{rows.map((row) => <tr><td class="p-4 font-mono text-xs">{row.id}</td>{columnKeys[resource].map((key) => <td class="max-w-xs break-words p-4">{cell(row[key], key)}</td>)}<td class="p-4"><div class="flex gap-3"><a class="font-semibold text-deep-navy" href={href("view", row.id)}>{common.view}</a>{writable && <><a class="font-semibold text-deep-navy" href={href("edit", row.id)}>{common.edit}</a><button type="button" data-delete-id={row.id} class="font-semibold text-error disabled:opacity-60">{common.delete}</button></>}</div></td></tr>)}
 					{!error && rows.length === 0 && <tr><td colspan={columnKeys[resource].length + 2} class="p-8 text-center text-on-surface-variant">{common.empty}</td></tr>}
 				</tbody>
 			</table>
