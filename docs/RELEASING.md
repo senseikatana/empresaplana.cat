@@ -11,34 +11,25 @@ Runs Biome, `astro check`, unit tests, Playwright E2E and `release:check`. It
 gate validates code, not `dist/`. `bun run build` still runs the gate first and
 then builds.
 
-`bun run verify:fast` is the subset for `pre-commit`: Biome plus `astro check`,
-about 15 seconds.
-
-Where the gate runs, in order of how early it catches a problem:
+There is no CI in this project. `.github/` is gitignored on purpose.
 
 | Where | Command | Cost |
 | --- | --- | --- |
 | `.husky/pre-commit` | `lint-staged` | ~1s |
 | `.husky/pre-push` | `check` | ~1s |
-| `.github/workflows/verify.yml` | `verify` | ~40s |
+| `bun run verify` | full gate | ~40s |
 
-The full gate runs in CI and nowhere else. Running it in the local hooks as well
-duplicated every check and stalled each push for ~35s before CI did exactly the
-same work. Local hooks stay fast enough that nobody reaches for `--no-verify`;
-CI is where correctness is enforced.
-
-CI runs `bun run db:generate` before `astro check`. Because `generated/` is
-gitignored, a clean checkout has no Prisma client, and without that step
-`astro check` reports around 44 cascading errors — implicit `any` and missing
-properties — that do not exist locally.
-
-The CI job is named **gate**. Mark it as a required status check in the branch
-protection for `main` and that is what blocks a red merge. A gate blocks
-*merging*, not opening the PR — if you need the PR itself blocked, add the check
-to a ruleset instead.
+The hooks stay fast on purpose: a gate that runs on every push trains people to
+reach for `--no-verify`, and then it protects nothing. So run `bun run verify`
+explicitly, before deploying and before tagging.
 
 `bun run deploy:insforge` runs `verify` first, so production cannot be reached
 from a red tree.
+
+On a fresh clone, run `bun run db:generate` before `astro check`. `generated/` is
+gitignored, so a clean checkout has no Prisma client, and without that step the
+type check reports around 44 cascading errors — implicit `any` and missing
+properties — that do not exist locally.
 
 ## The version
 
@@ -57,9 +48,9 @@ from drifting apart.
 bun run release:check
 ```
 
-Exits non-zero when `package.json` disagrees with the latest git tag. Run it in
-CI — the manifest is the source most likely to drift, because nothing else bumps
-it automatically.
+Exits non-zero when `package.json` disagrees with the latest git tag. It is part
+of `bun run verify`, so run the gate before tagging — the manifest is the source
+most likely to drift, because nothing bumps it automatically.
 
 The git tag is the authority. It records what actually shipped, it is created
 deliberately, and it is immutable in practice. `CHANGELOG.md` is prose a human

@@ -313,21 +313,17 @@ the updated HTML/PNG from Stitch into a scratch directory outside the repo, then
 E2E, and `release:check`. It **never builds** — `astro build` is deliberately
 outside the gate, because the gate validates the code, not `dist/`.
 
-It runs in three places, so a red result stops the change at the earliest point:
+There is no CI. Hooks stay fast; the full gate is run explicitly:
 
 - `.husky/pre-commit` — `lint-staged` only. Formats staged files; about 1s.
 - `.husky/pre-push` — `bun run check` (Biome) only. About 1s.
-- `.github/workflows/verify.yml` — the full `verify`, in the job named **gate**,
-  the required status check that blocks merging into `main`.
+- `bun run verify` — the full gate. Run it before deploying and before tagging.
+- `deploy:insforge` runs `verify` first, so production cannot be reached from a
+  red tree.
 
-**The full gate runs in CI and nowhere else.** Running it in the local hooks as
-well duplicated every check and stalled each push for ~35s before CI did exactly
-the same work. `deploy:insforge` still runs `verify` first, so production cannot
-be reached from a red tree.
-
-CI runs `bun run db:generate` before `astro check`. `generated/` is gitignored,
-so a clean checkout has no Prisma client; without that step `astro check`
-reports ~44 cascading errors that do not exist locally.
+Because `generated/` is gitignored, a fresh clone has no Prisma client. Run
+`bun run db:generate` after cloning, or `astro check` reports ~44 cascading
+errors that do not exist once the client is generated.
 
 ### Commit hooks
 
