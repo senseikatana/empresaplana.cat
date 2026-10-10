@@ -1,5 +1,6 @@
 import type { MiddlewareHandler } from "astro";
 import { getSession } from "@/lib/auth";
+import { auth } from "@/config/auth.config";
 import {
 	canAccessDashboardPath,
 	dashboardHomeForRole,
@@ -26,6 +27,12 @@ function isPublicAuthPath(pathname: string): boolean {
 }
 
 export const onRequest: MiddlewareHandler = async (context, next) => {
+	const betterAuthSession = await auth.api.getSession({
+		headers: context.request.headers,
+	});
+	context.locals.user = betterAuthSession?.user ?? null;
+	context.locals.session = betterAuthSession?.session ?? null;
+
 	const { pathname } = context.url;
 	const isProfilePath = pathname === "/perfil";
 
@@ -46,8 +53,6 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
 		);
 		return context.redirect(`/dashboard/login?redirect=${redirect}`);
 	}
-
-	context.locals.session = session;
 
 	if (
 		DASHBOARD_PATTERN.test(pathname) &&

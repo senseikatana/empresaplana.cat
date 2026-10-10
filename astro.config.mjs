@@ -1,7 +1,7 @@
 // @ts-check
 
 import { fileURLToPath } from "node:url";
-import node from "@astrojs/node";
+import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
@@ -9,7 +9,7 @@ import { defineConfig } from "astro/config";
 // https://astro.build/config
 export default defineConfig({
 	output: "server",
-	adapter: node({ mode: "standalone" }),
+	adapter: cloudflare(),
 	integrations: [react()],
 	security: {
 		checkOrigin: false,
@@ -21,9 +21,13 @@ export default defineConfig({
 	vite: {
 		plugins: [tailwindcss()],
 		server: {
-			// Acepta los tunnels de cloudflared (subdominios *.trycloudflare.com
-			// aleatorios en cada arranque). Sin esto Vite bloquea el Host header.
-			allowedHosts: [".trycloudflare.com"],
+			// El dominio específico hace explícito el túnel actual; el sufijo
+			// permite los subdominios aleatorios que cloudflared genera al reiniciar.
+			allowedHosts: [
+				"localhost",
+				"face-discrete-presents-criterion.trycloudflare.com",
+				".trycloudflare.com",
+			],
 		},
 		resolve: {
 			alias: {

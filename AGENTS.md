@@ -6,7 +6,7 @@ exported as HTML into `stitch-export/`, then transformed into Astro pages.
 
 ## Stack
 
-- Astro 7 + `@astrojs/node` adapter + `@astrojs/react` (islands)
+- Astro 7 + `@astrojs/cloudflare` adapter + `@astrojs/react` (islands), deployed to Cloudflare Workers
 - Package manager: **bun** (`bun.lock` present)
 - Node >= 22.12
 - Database: **InsForge** (Postgres, proyecto `empresaplana.cat`) via
@@ -28,12 +28,17 @@ Run everything from this directory:
 - `bun run dev` — dev server on port 4321
 - `bun run build` — builds `dist/` (server entry + client assets)
 - `bun run preview` — serves the production build
+- `bun run deploy:cloudflare` — builds and deploys the Worker using
+  `wrangler.cloudflare.jsonc`
 
 ## Rendering mode
 
-- `astro.config.mjs` sets `output: "server"` with the Node adapter
-  (`mode: "standalone"`). Astro 7 removed `output: "hybrid"`; `server` renders
-  every route on request.
+- `astro.config.mjs` sets `output: "server"` with the Cloudflare adapter.
+  Astro 7 removed `output: "hybrid"`; `server` renders every route on request.
+- `wrangler.cloudflare.jsonc` targets the stable custom domain
+  `empresaplana.samuraicoder.dev`; configure runtime secrets in Cloudflare,
+  never in this file. The deployment also uses Cloudflare KV for Astro
+  sessions and Images for image processing.
 - `security: { checkOrigin: false }` — the API endpoints are consumed by
   non-browser clients (no `Origin` header). CSRF is mitigated by the session
   cookie's `sameSite: "lax"` (browsers don't send it on cross-site POSTs).
@@ -197,3 +202,24 @@ Canonical tokens live in `src/assets/DESIGN.md` (mirror of the Stitch
 2. Transform each HTML: strip `<head>`, keep `<body>` inner content, then wrap
    in `BaseLayout` with `export const prerender = false;`.
 3. Run `bun run build` and verify all routes.
+
+<!-- INSFORGE:START -->
+## InsForge backend
+
+This project uses [InsForge](https://insforge.dev): an all-in-one, open-source Postgres-based backend (BaaS) that gives this app a database, authentication, file storage, edge functions, realtime, an AI model gateway, and payments through one platform.
+
+- **Project:** **empresaplana-astro** (API base `https://gcmw58vt.eu-central.insforge.app`)
+- **Skills:** these InsForge skills are installed for supported coding agents. Reach for them before implementing any InsForge feature instead of guessing the API:
+  - `insforge`: app code with the `@insforge/sdk` client (database CRUD, auth, storage, edge functions, realtime, AI, email, and Stripe payments).
+  - `insforge-cli`: backend and infrastructure via the `insforge` CLI (projects, SQL, migrations, RLS policies, storage buckets, functions, secrets, payment setup, schedules, deploys).
+  - `insforge-debug`: diagnosing failures (SDK/HTTP errors, RLS denials, auth and OAuth issues) and running security or performance audits.
+  - `insforge-integrations`: wiring external auth providers (Clerk, Auth0, WorkOS, Better Auth, etc.) for JWT-based RLS, or the OKX x402 payment facilitator.
+  - `find-skills`: discovering additional skills on demand.
+- **Credentials:** app code reads keys from `.env.local`; the CLI reads `.insforge/project.json`. Never hardcode or commit keys.
+
+Key patterns:
+
+- Database inserts take an array: `insert([{ ... }])`.
+- Reference users with `auth.users(id)`; use `auth.uid()` in RLS policies.
+- For storage uploads, persist both the returned `url` and `key`.
+<!-- INSFORGE:END -->

@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 export async function ensureOAuthUser(
 	email: string,
 	providerName: string | null | undefined,
+	emailVerified = true,
+	username?: string | null,
 ): Promise<number> {
 	const normalizedEmail = email.trim().toLowerCase();
 	const matches = await prisma().user.findMany({
@@ -15,38 +17,46 @@ export async function ensureOAuthUser(
 		throw new Error("Multiple application users share this verified email.");
 	}
 	if (matches[0]) {
-		await prisma().user.update({
-			where: { id: matches[0].id },
-			data: { emailVerified: true },
-		});
+		if (emailVerified) {
+			await prisma().user.update({
+				where: { id: matches[0].id },
+				data: { emailVerified: true },
+			});
+		}
 		return matches[0].id;
 	}
 
 	const name =
 		providerName?.trim().slice(0, 60) || normalizedEmail.split("@")[0];
-	const prefix =
+	const prefix = username?.trim() ||
 		normalizedEmail
 			.split("@")[0]
 			.replace(/[^a-z0-9_.]/gi, "")
 			.slice(0, 8)
 			.padEnd(3, "_") || "user";
 
-	for (let attempt = 0; attempt < 8; attempt += 1) {
-		const suffix = crypto.randomUUID().replaceAll("-", "").slice(0, 6);
-		const username = `${prefix}_${suffix}`.slice(0, 15);
-		const usernameExists = await prisma().user.findUnique({
-			where: { username },
-			select: { id: true },
-		});
-		if (usernameExists) continue;
+	const requestedUsernameExists = username
+		? await prisma().user.findUnique({
+				where: { username },
+				select: { id: true },
+			})
+		: null;
+	if (requestedUsernameExists) {
+		throw new Error("Username is already in use.");
+	}
+
+	for (let attempt = 0; attempt < (username ? 1 : 8); attempt += 1) {
+		const generatedUsername = username
+			? prefix
+			: `${prefix}_${crypto.randomUUID().replaceAll("-", "").slice(0, 6)}`.slice(0, 15);
 
 		const user = await prisma().user.create({
 			data: {
-				username,
+				username: generatedUsername,
 				name,
 				fullName: name.slice(0, 120),
 				email: normalizedEmail,
-				emailVerified: true,
+				emailVerified,
 				phone: "",
 				role: "client",
 			},

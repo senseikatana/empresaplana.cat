@@ -51,9 +51,7 @@ const labels = { google: googleLabel, github: githubLabel };
 }
 
 <script>
-	import { createAuthClient } from "better-auth/client";
-
-	const authClient = createAuthClient();
+	import { authClient } from "@/lib/auth-client";
 
 	document.querySelectorAll<HTMLButtonElement>("[data-oauth-provider]").forEach((button) => {
 		button.addEventListener("click", async () => {

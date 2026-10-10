@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+Highlights: fix: deploy:cloudflare: deploy the Worker using wrangler.cloudflare.jsonc.
+
+- [x] 🐛 fix: deploy:cloudflare: deploy the Worker using wrangler.cloudflare.jsonc
+  - `.env.example`
+  - `.gitignore`
+  - `AGENTS.md`
+  - `astro.config.mjs`
+  - `bun.lock`
+  - `migrations/20261010092222_initial-prisma-schema.sql`
+  - `package.json`
+  - `prisma/schema.prisma`
+  - `src/components/auth/SocialAuthButtons.astro`
+  - `src/config/auth.config.ts`
+  - `src/config/config.env.ts`
+  - `src/env.d.ts`
+  - `src/lib/auth-client.ts`
+  - `src/lib/email.ts`
+  - `src/lib/oauth-users.ts`
+  - `src/middleware/index.ts`
+  - `src/pages/api/auth/[...all].ts`
+  - `wrangler.cloudflare.jsonc`
+
 ## [1.0.0] - 2026-10-10
 
 What's news:
