@@ -90,9 +90,13 @@ Canonical tokens live in `src/assets/DESIGN.md` (mirror of the Stitch
   "dotenv/config"` (Astro NO carga `.env` en `process.env` automáticamente).
 - `src/lib/get-public-user.ts` — helper que devuelve `PublicUser` (cast de
   role incluido) para las páginas del dashboard.
-- Seed: `bun run db:seed` (`prisma/seed.ts`) — usuarios demo upsert. La
-  flota completa se siembra desde `withnuxt/prisma/seed.ts` contra la misma
-  DB InsForge compartida.
+- Seed: `bun run db:seed` (`prisma/seed.ts`) creates demo users.
+  `bun run db:seed --demo` additionally loads fictional fleet, timetables,
+  offices, budgets, favorites, reports and chat using non-destructive upserts.
+  Demo records use negative IDs or `demo-` prefixes and visible DEMO labels.
+  These schedules are not official and must not be used for travel.
+  Auth sessions, verifications and organizations are created by Better Auth
+  during normal use, not fabricated by the seed.
 
 ## Google Sheets sync
 
@@ -186,6 +190,13 @@ Canonical tokens live in `src/assets/DESIGN.md` (mirror of the Stitch
   Supabase when real persistence is needed.
 
 ## Gotchas
+
+- `/dashboard/ia` provides text generation for managers/admins using Better Auth
+  and the existing application session guard. InsForge supplies `OPENROUTER_API_KEY`;
+  server-side OpenAI SDK calls use OpenRouter, never the deprecated InsForge AI SDK.
+  Prompts are not stored and are sent to OpenRouter; do not include personal data.
+  Requests cap input at 4000 characters and output at 800 tokens, with a 30-second
+  per-user cooldown in each Node process (not a distributed quota).
 
 - Design tokens live ONLY in `src/styles/global.css` (`@theme`) — add colors,
   spacing, fonts or text sizes there, never ad-hoc `bg-[#...]` values.

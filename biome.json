@@ -10,7 +10,6 @@
 			"astro.config.mjs",
 			"drizzle.config.ts",
 			"index.ts",
-			"router.ts",
 			"package.json",
 			"tsconfig.json",
 			"biome.json"
