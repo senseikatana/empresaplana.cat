@@ -53,7 +53,16 @@ if (Astro.request.method === "POST") {
 				state.destination,
 				state.searchType === "transfer",
 			);
-		} catch {
+		} catch (cause) {
+			console.error("[route-search] Timetable query failed", {
+				name: cause instanceof Error ? cause.name : "UnknownError",
+				compilation:
+					cause instanceof WebAssembly.CompileError ? cause.message : undefined,
+				code:
+					typeof cause === "object" && cause !== null && "code" in cause
+						? cause.code
+						: undefined,
+			});
 			error = dict.routes.results.databaseError;
 		}
 	}

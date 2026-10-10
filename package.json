@@ -9,7 +9,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "deploy:cloudflare": "bun run build && wrangler deploy --config wrangler.cloudflare.jsonc",
+    "start": "node dist/server/entry.mjs",
     "tunnel": "cloudflared tunnel --url http://localhost:4321",
     "astro": "astro",
     "sync:sheets": "bun src/scripts/sync-sheets.mjs",
@@ -29,6 +29,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@astrojs/node": "^11.1.7",
     "@astrojs/react": "^7.0.1",
     "@better-auth/infra": "^0.4.17",
     "@better-auth/passkey": "1.7.7",
@@ -51,7 +52,6 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
-    "@astrojs/cloudflare": "^14.3.4",
     "@biomejs/biome": "^2.5.15",
     "@types/node": "^26.6.5",
     "@types/pg": "^8.23.1",
@@ -61,8 +61,7 @@
     "lint-staged": "^17.6.0",
     "prisma": "^7.10.0",
     "tsx": "^4.23.15",
-    "typescript": "^6.0.3",
-    "wrangler": "^4.149.0"
+    "typescript": "^6.0.3"
   },
   "author": "Sergio Jurado",
   "description": "Empresa Plana website, powered by Astro",

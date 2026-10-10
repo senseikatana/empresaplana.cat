@@ -13,7 +13,7 @@ export function prisma(): PrismaClient {
 		const url = connectionString();
 		if (!url) {
 			throw new Error(
-				"DATABASE_URL is not configured. Set it in .env (local) or Cloudflare.",
+				"DATABASE_URL is not configured. Set it in .env (local) or the server environment.",
 			);
 		}
 		const adapter = new PrismaPg({ connectionString: url });
