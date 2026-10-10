@@ -9,74 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0] - 2026-10-10
 
-What's news:
+### Added
+- Native InsForge authentication and improved Google/GitHub OAuth flow
+- Locale-aware routing and expanded i18n coverage across public and dashboard pages
+- Fleet operations management for documents, incidents, and maintenance
+- Updated standalone Astro site and dashboard experience for the public-facing product
 
-- [ ] fix!: improve Better Auth for Google and GitHub OAuth
-  - `.env.example`
-  - `AGENTS.md`
-  - `README.md`
-  - `bun.lock`
-  - `package.json`
-  - `prisma/schema.prisma`
-  - `src/components/auth/SocialAuthButtons.astro`
-  - `src/config/i18n/ca.json`
-  - `src/config/i18n/en.json`
-  - `src/config/i18n/es.json`
-  - `src/config/i18n/fr.json`
-  - `src/lib/better-auth.ts`
-  - `src/lib/oauth-env.ts`
-  - `src/lib/oauth-users.ts`
-  - `src/lib/passkey.ts`
-  - `src/pages/api/auth/[...all].ts`
-  - `src/pages/api/auth/exchange.ts`
-  - `src/pages/api/auth/logout.ts`
-  - `src/pages/dashboard/login.astro`
-  - `src/pages/dashboard/register.astro`
-- [ ] ]7;file://localhost/home/senseikatana/Proyectos/empresaplana-astrobun add v1.4.3 (c6da4a4d3) feat: auth and i18n implemented
-  - `AGENTS.md`
-  - `PRODUCT.md`
-  - `README.md`
-  - `package.json`
-  - `src/components/PublicHeader.astro`
-  - `src/config/i18n/ca.json`
-  - `src/config/i18n/en.json`
-  - `src/config/i18n/es.json`
-  - `src/config/i18n/fr.json`
-  - `src/interfaces/common.ts`
-  - `src/layouts/AuthLayout.astro`
-  - `src/layouts/DashboardLayout.astro`
-  - `src/lib/db.ts`
-  - `src/lib/validation/users.ts`
-  - `src/pages/api/account.ts`
-  - `src/pages/api/auth/login.ts`
-  - `src/pages/api/auth/register.ts`
-  - `src/pages/api/users/[id].ts`
-  - `src/pages/api/users/index.ts`
-  - `src/pages/dashboard/gestion/usuarios.astro`
-  - `src/pages/dashboard/index.astro`
-  - `src/pages/dashboard/login.astro`
-  - `src/pages/dashboard/register.astro`
-  - `src/pages/index.astro`
-  - `src/pages/perfil.astro`
-  - `tests/acl.test.ts`
-- [ ] ]7;file://localhost/home/senseikatana/Proyectos/empresaplana-astrobun add v1.4.3 (c6da4a4d3) feat: add PRODUCT.md and auth
-  - `PRODUCT.md`
-  - `package.json`
-  - `src/interfaces/auth.ts`
-  - `src/lib/acl.ts`
-  - `src/lib/auth.ts`
-  - `src/middleware/index.ts`
-- [ ] feat: refresh standalone Astro website
-  - `bun.lock`
-  - `package.json`
-  - `public/images/empresa-plana-fleet.jpg`
-  - `src/interfaces/home.ts`
-  - `src/interfaces/i18n.ts`
-  - `src/lib/logger.ts`
-  - `src/pages/api/auth/register.ts`
-  - `src/pages/api/users/index.ts`
-  - `src/pages/index.astro`
-- [ ] bun add v1.4.2 (744846f84) feat: update documentation for agents
+### Changed
+- Reworked auth and user-management flows for the app shell and dashboard
+- Updated deployment, environment, and package configuration for the Bun + Astro stack
+- Refreshed the project documentation and release metadata for the 1.0.0 release
+
+### Fixed
+- Locale prefix handling and redirect behavior for UI routes
+- General package and tooling alignment for the Astro/Bun setup
 
 ## [0.3.0] - 2026-10-10
 
