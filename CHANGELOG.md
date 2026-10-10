@@ -78,6 +78,86 @@ What's news:
   - `src/pages/index.astro`
 - [ ] bun add v1.4.2 (744846f84) feat: update documentation for agents
 
+## [0.2.1] - 2026-10-10
+
+Highlights: feat: management-panel: add documents, incidents, and maintenance sections, plus 2 more changes.
+
+- [x] 🚀 feat: management-panel: add documents, incidents, and maintenance sections
+  - `src/components/ManagementPanel.astro`
+  - `src/layouts/DashboardLayout.astro`
+  - `src/lib/management.ts`
+  - `src/pages/[lang]/dashboard/gestion/index.astro`
+- [x] 🚀 feat: adds fleet operations migration, including VehicleDocument, Incident, (#7)
+  - `migrations/20261010130218_fleet-operations.sql`
+  - `prisma/schema.prisma`
+  - `src/lib/management-schemas.ts`
+- [x] 🚀 feat: native InsForge auth, Vue islands, theme/language menu, service alerts
+  - `.env.example`
+  - `AGENTS.md`
+  - `README.md`
+  - `astro.config.mjs`
+  - `bun.lock`
+  - `insforge.toml`
+  - `migrations/20261010112209_insforge-auth-native.sql`
+  - `migrations/20261010121912_create-service-alerts.sql`
+  - `package.json`
+  - `prisma/schema.prisma`
+  - `prisma/seed.ts`
+  - `src/components/BusTrackingPanel.tsx`
+  - `src/components/BusTrackingPanel.vue`
+  - `src/components/HeaderPreferences.astro`
+  - `src/components/PublicHeader.astro`
+  - `src/components/ThemeInit.astro`
+  - `src/components/auth/SocialAuthButtons.astro`
+  - `src/config/auth.config.ts`
+  - `src/config/config.env.ts`
+  - `src/config/i18n/ca.json`
+  - `src/config/i18n/en.json`
+  - `src/config/i18n/es.json`
+  - `src/config/i18n/fr.json`
+  - `src/env.d.ts`
+  - `src/interfaces/bus-tracking.ts`
+  - `src/interfaces/i18n.ts`
+  - `src/layouts/BaseLayout.astro`
+  - `src/layouts/DashboardLayout.astro`
+  - `src/lib/auth-client.ts`
+  - `src/lib/auth-request.ts`
+  - `src/lib/auth.ts`
+  - `src/lib/email.ts`
+  - `src/lib/insforge-auth.ts`
+  - `src/lib/oauth-users.ts`
+  - `src/lib/passkey.ts`
+  - `src/lib/validation/users.ts`
+  - `src/middleware/index.ts`
+  - `src/pages/[lang]/dashboard/login.astro`
+  - `src/pages/[lang]/dashboard/register.astro`
+  - `src/pages/[lang]/dashboard/reset.astro`
+  - `src/pages/[lang]/dashboard/verify.astro`
+  - `src/pages/[lang]/perfil.astro`
+  - `src/pages/[lang]/rastreig.astro`
+  - `src/pages/api/account.ts`
+  - `src/pages/api/auth/[...all].ts`
+  - `src/pages/api/auth/exchange.ts`
+  - `src/pages/api/auth/login.ts`
+  - `src/pages/api/auth/logout.ts`
+  - `src/pages/api/auth/oauth.ts`
+  - `src/pages/api/auth/refresh.ts`
+  - `src/pages/api/auth/register.ts`
+  - `src/pages/api/auth/reset.ts`
+  - `src/pages/api/auth/verify.ts`
+  - `src/pages/api/users/[id].ts`
+  - `src/pages/api/users/index.ts`
+  - `src/scripts/deploy-insforge.mjs`
+  - `src/scripts/manage-emails.ts`
+  - `src/scripts/seed-users.mjs`
+  - `src/scripts/test-email.ts`
+  - `src/styles/global.css`
+  - `tests/management.integration.test.ts`
+  - `tsconfig.json`
+- [x] 🐛 fix: cell rendering and management schemas
+- [x] 🚀 feat: adds CRUD and Auth features to Management API and UI
+- [x] 🚀 feat: update configuration files for InsForge
+
 ## [0.2.0] - 2026-10-10
 
 Highlights: feat: adds CRUD and Auth features to Management API and UI and fix: cell rendering and management schemas, plus 5 more changes.
