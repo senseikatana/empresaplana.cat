@@ -1,0 +1,34 @@
+[
+  {
+    "id": "595f0afb-bbdd-4bbe-9f0a-8ccfd7c4298c",
+    "email": "strive-quotes@protonmail.com",
+    "full_name": "Sergio ",
+    "is_admin": false,
+    "created_at": "2026-09-16 09:50:19.133904+00",
+    "role": "operario",
+    "department": null,
+    "position": null,
+    "employee_id": null,
+    "avatar_url": null,
+    "phone": null,
+    "emergency_contact": null,
+    "shift": null,
+    "area": null
+  },
+  {
+    "id": "62a20f6c-b801-4014-bac3-57b6c0784e22",
+    "email": "admin@empresaplana.cat",
+    "full_name": "Administrador",
+    "is_admin": true,
+    "created_at": "2026-09-16 09:50:55.269401+00",
+    "role": "directivo",
+    "department": "Dirección",
+    "position": "Director general",
+    "employee_id": "EP-001",
+    "avatar_url": null,
+    "phone": "+34 977 553 680",
+    "emergency_contact": "Marta Plana · +34 600 000 111",
+    "shift": "Lun–Vie 8:00–17:00",
+    "area": "Oficinas centrales"
+  }
+]

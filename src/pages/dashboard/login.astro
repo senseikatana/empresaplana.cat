@@ -1,0 +1,162 @@
+---
+import DashboardLayout from "@/layouts/DashboardLayout.astro";
+import { getSession } from "@/lib/auth";
+import { getLocale, getDictionary } from "@/config/i18n";
+
+export const prerender = false;
+
+const session = await getSession(Astro.cookies);
+if (session) {
+	return Astro.redirect("/dashboard");
+}
+
+const locale = getLocale(Astro.url.searchParams.get("lang"));
+const dict = getDictionary(locale);
+
+const redirect = Astro.url.searchParams.get("redirect") ?? "/dashboard";
+---
+
+<DashboardLayout title={String(dict.app.auth.welcome)} locale={locale} user={null}>
+	<div class="flex min-h-screen items-center justify-center bg-surface-container px-4 -mt-stack-lg">
+		<div class="w-full max-w-sm bg-surface-container-lowest rounded-xl shadow-ambient border border-surface-variant p-6">
+			<!-- Header -->
+			<h1 class="text-xl font-bold text-deep-navy">{dict.app.auth.welcome}</h1>
+			<p class="text-sm text-on-surface-variant">{dict.app.auth.subtitle}</p>
+
+			<!-- Login form -->
+			<form id="login-form" class="flex flex-col gap-4 mt-4" method="POST" action="/api/auth/login">
+				<input type="hidden" name="redirect" value={redirect} />
+
+				<div>
+					<label for="username" class="font-label-md text-label-md text-on-surface-variant block mb-1">
+						{dict.app.auth.username}
+					</label>
+					<input
+						id="username"
+						name="username"
+						type="text"
+						autocomplete="username"
+						placeholder="admin"
+						required
+						class="w-full rounded-lg border border-surface-variant bg-surface px-3 py-2 font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-coastal-teal"
+					/>
+				</div>
+
+				<div>
+					<label for="passkey" class="font-label-md text-label-md text-on-surface-variant block mb-1">
+						{dict.app.auth.passkey}
+					</label>
+					<input
+						id="passkey"
+						name="passkey"
+						type="password"
+						autocomplete="current-password"
+						placeholder="••••••••"
+						required
+						class="w-full rounded-lg border border-surface-variant bg-surface px-3 py-2 font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-coastal-teal"
+					/>
+				</div>
+
+				<div id="login-error" class="hidden rounded-lg bg-error-container text-on-error-container px-4 py-2 text-sm">
+					{dict.app.auth.invalid}
+				</div>
+
+				<button
+					type="submit"
+					class="w-full rounded-lg bg-deep-navy text-on-primary font-button text-button py-2.5 hover:bg-primary transition-colors disabled:opacity-50"
+				>
+					{dict.app.auth.login}
+				</button>
+			</form>
+
+			<!-- Demo accounts -->
+			<div class="mt-6 border-t border-surface-variant pt-4">
+				<p class="text-xs text-on-surface-variant mb-2">{dict.app.auth.demoHint}</p>
+				<div class="flex flex-col gap-2">
+					<button
+						type="button"
+						class="demo-btn w-full text-left px-4 py-2.5 rounded-lg bg-surface-container-low border border-surface-variant font-label-md text-label-md text-deep-navy hover:bg-surface-container transition-colors"
+						data-username="cliente"
+					>
+						{dict.app.auth.asClient}
+					</button>
+					<button
+						type="button"
+						class="demo-btn w-full text-left px-4 py-2.5 rounded-lg bg-surface-container-low border border-surface-variant font-label-md text-label-md text-deep-navy hover:bg-surface-container transition-colors"
+						data-username="trabajador"
+					>
+						{dict.app.auth.asWorker}
+					</button>
+					<button
+						type="button"
+						class="demo-btn w-full text-left px-4 py-2.5 rounded-lg bg-surface-container-low border border-surface-variant font-label-md text-label-md text-deep-navy hover:bg-surface-container transition-colors"
+						data-username="admin"
+					>
+						{dict.app.auth.asBoss}
+					</button>
+				</div>
+			</div>
+
+			<!-- Register link -->
+			<div class="mt-4 text-center">
+				<a href="/dashboard/register" class="text-sm text-on-surface-variant">
+					{dict.app.register?.haveAccount ?? "No tens compte?"}
+					<span class="font-medium text-deep-navy">{dict.app.register?.login ?? "Registra't"}</span>
+				</a>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		const form = document.getElementById("login-form") as HTMLFormElement;
+		const errorDiv = document.getElementById("login-error");
+
+		form?.addEventListener("submit", async (e) => {
+			e.preventDefault();
+			errorDiv?.classList.add("hidden");
+
+			const formData = new FormData(form);
+			const username = formData.get("username") as string;
+			const passkey = formData.get("passkey") as string;
+			const redirect = (formData.get("redirect") as string) || "/dashboard";
+
+			try {
+				const res = await fetch("/api/auth/login", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ username, passkey }),
+				});
+
+				if (res.ok) {
+					window.location.href = redirect;
+				} else {
+					errorDiv?.classList.remove("hidden");
+				}
+			} catch {
+				errorDiv?.classList.remove("hidden");
+			}
+		});
+
+		// Demo buttons
+		document.querySelectorAll(".demo-btn").forEach((btn) => {
+			btn.addEventListener("click", async () => {
+				const username = (btn as HTMLElement).dataset.username;
+				const passkey = "12345678";
+				try {
+					const res = await fetch("/api/auth/login", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ username, passkey }),
+					});
+					if (res.ok) {
+						window.location.href = "/dashboard";
+					} else {
+						errorDiv?.classList.remove("hidden");
+					}
+				} catch {
+					errorDiv?.classList.remove("hidden");
+				}
+			});
+		});
+	</script>
+</DashboardLayout>

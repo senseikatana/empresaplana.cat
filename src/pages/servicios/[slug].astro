@@ -1,0 +1,59 @@
+---
+import ServiceDetail from "@/components/ServiceDetail.astro";
+import { SERVICES } from "@/data";
+
+const fallback = {
+	"autocares-adaptados": {
+		title: "Autocares adaptados",
+		tagline: "Movilidad accesible, segura y cómoda para todos los pasajeros.",
+		sectionTitle: "Características del servicio",
+		body: [
+			"Disponemos de vehículos adaptados y personal preparado para facilitar los desplazamientos de personas con movilidad reducida.",
+			"Planificamos cada servicio según las necesidades del grupo, cuidando el embarque, el trayecto y la llegada al destino.",
+		],
+	},
+	transfers: {
+		title: "Transfers Aeropuerto - Hotel",
+		tagline: "Traslados directos y cómodos desde los aeropuertos de Barcelona y Reus.",
+		sectionTitle: "Incluye",
+		body: [
+			"Organizamos traslados para grupos desde el aeropuerto hasta su hotel o alojamiento en la Costa Daurada.",
+			"Adaptamos horarios, puntos de recogida y vehículos para que el viaje sea sencillo desde el primer momento.",
+		],
+	},
+	"transporte-escolar": {
+		title: "Transporte escolar",
+		tagline: "Seguridad, puntualidad y tranquilidad para colegios y familias.",
+		sectionTitle: "Características del servicio",
+		body: [
+			"Diseñamos rutas escolares regulares, excursiones y desplazamientos para eventos deportivos.",
+			"Nuestra flota y nuestros conductores trabajan con protocolos orientados a la seguridad y al confort de los estudiantes.",
+		],
+	},
+	"transportes-discrecionales": {
+		title: "Transportes discrecionales",
+		tagline: "Soluciones de movilidad a medida para eventos, grupos y empresas.",
+		sectionTitle: "Características del servicio",
+		body: [
+			"Ofrecemos autocares con conductor para viajes, congresos, celebraciones y desplazamientos corporativos.",
+			"Nos encargamos de planificar la ruta y coordinamos el servicio para que cada grupo viaje con comodidad.",
+		],
+	},
+	"servicios-a-empresas-i-fabriques": {
+		title: "Servicios a empresas y fábricas",
+		tagline: "Transportes regulares y servicios a medida para empresas, equipos y clientes.",
+		sectionTitle: "Características del servicio",
+		body: [
+			"Organizamos rutas regulares adaptadas a los turnos y horarios de cada empresa, con paradas y puntos de encuentro definidos.",
+			"También acompañamos a clientes, directivos y equipos en congresos, reuniones, eventos y traslados desde el aeropuerto.",
+		],
+	},
+};
+
+const slug = Astro.params.slug ?? "";
+const stored = SERVICES.find((service) => service.slug === slug)?.locales.es;
+const content = stored ?? fallback[slug as keyof typeof fallback];
+if (!content) return Astro.redirect("/servicios-discrecionales");
+---
+
+<ServiceDetail {...content} canonicalUrl={`https://empresaplana.cat/servicios/${slug}`} />

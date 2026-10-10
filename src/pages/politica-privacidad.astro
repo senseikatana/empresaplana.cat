@@ -1,0 +1,12 @@
+---
+import LegalPolicy from "@/components/LegalPolicy.astro";
+import { getDictionary } from "@/config/i18n";
+
+const policy = getDictionary("es").legal.privacyPolicy;
+const sections: { title: string; body: string }[] = Object.entries(policy.sectionTitles).map(([key, title]) => ({
+	title,
+	body: policy.sections[key as keyof typeof policy.sections],
+}));
+---
+
+<LegalPolicy title={policy.heading} intro={sections[0].body} sections={sections} />

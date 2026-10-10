@@ -1,0 +1,68 @@
+{
+	"intro": {
+		"es": {
+			"title": "DESPREOCÚPESE DEL TRANSPORTE",
+			"body": "A través de BusPlana le ofrecemos transfers desde los aeropuertos de Barcelona y Reus y desde la Estación del AVE del Camp de Tarragona a todos los puntos de la Costa Dorada, así como excursiones organizadas para que disfrute al máximo de sus vacaciones. Entre en Busplana.com para más información."
+		},
+		"ca": {
+			"title": "DESPREOCUPI'S DEL TRANSPORT",
+			"body": "A través de BusPlana l'oferim transfers des dels aeropuertos de Barcelona i Reus, o des de l'Estació de l'AVE del Camp de Tarragona fins a tots els punts de la Costa Daurada, així com excursions organitzades perquè gaudeixi al màxim de les seves vacances. Entri a www.busplana.com per a més informació."
+		}
+	},
+	"services": [
+		{
+			"id": 2,
+			"slug": "servicios-a-empreses-i-fabriques",
+			"locales": {
+				"ca": {
+					"title": "Serveis a Empreses i Fàbriques",
+					"tagline": "Autobusos per traslladar regularment als treballadors cap a les seves instal·lacions i acompanyar els seus clients en esdeveniments especials.",
+					"sectionTitle": "CARACTERÍSTIQUES DEL SERVEI",
+					"body": [
+						"Disposem dels autobusos que necessita per als seus desplaçaments d'empresa. Serveis d'autobusos a mida per traslladar regularment als seus treballadors cap a les instal·lacions de la seva empresa, oficines i fàbriques, així com en accions especials per als desplaçaments dels seus clients, directius o treballadors.",
+						"Les empreses que faciliten el transport dels seus treballadors els ofereixen un gran valor afegit i guanyen en comoditat, puntualitat i estalvi. Amb els autobusos d'Empresa Plana podem establir rutes regulars a petició de les empreses, adaptades als torns i horaris dels treballadors, amb la implantació de parades i punts de trobada que donin resposta a les necessitats de cada corporació.",
+						"L'ús de transport col·lectiu per al trasllat diari dels seus treballadors des de diferents parades i municipis permet prescindir de l'ús de vehicles particulars i contribuir així a la sostenibilitat i consciència mediambiental. També disposem de serveis discrecionals per atendre necessitats puntuals amb els que acompanyar els seus clients en esdeveniments especials: viatges de negocis, serveis transfer des de l'aeroport, i trasllats entre diferents punts per atendre reunions, congressos i altres esdeveniments especials.",
+						"Importants empreses del territori confien ja en els nostres serveis."
+					],
+					"imageUrl": "https://www.empresaplana.cat/uploads/serveis/6-2.png",
+					"imageCaption": "Autobusos per traslladar regularment als treballadors cap a les seves instal·lacions i acompanyar els seus clients en esdeveniments especials."
+				}
+			}
+		},
+		{
+			"id": 5,
+			"slug": "viajes-fin-de-curso",
+			"locales": {
+				"es": {
+					"title": "Viajes fin de curso",
+					"tagline": "Viajes nacionales e internacionales en autocar, con los que disfrutarán de un viaje de fin de curso inolvidable.",
+					"sectionTitle": "CARACTERÍSTICAS DEL SERVICIO",
+					"body": [
+						"Si busca el alquiler de autocar para viaje de fin de curso, en Empresa Plana disponemos de autocares para largos desplazamientos con los que podrán disfrutar de un apasionante viaje de fin de curso con sus amigos y compañeros. Viajar en autobús es ideal para poder visitar varias ciudades, organizar y agilizar los desplazamientos en grupo.",
+						"Si para fin de curso desean viajar por España en autobús, hasta Portugal, Francia u otros países de Europa, en Empresa Plana ponemos a su alcance autocares con sistemas de reproducción audiovisual, amplios maleteros y WC a bordo. Para los trayectos más largos, habilitaremos a varios conductores que se alternarán durante el recorrido."
+					],
+					"imageUrl": "https://www.empresaplana.cat/uploads/serveis/8.1.png",
+					"imageCaption": "Viajes nacionales e internacionales en autocar, con los que disfrutarán de un viaje de fin de curso inolvidable."
+				}
+			}
+		},
+		{
+			"id": 9,
+			"slug": "comidas-y-celebraciones",
+			"locales": {
+				"es": {
+					"title": "Bodas y celebraciones",
+					"tagline": "Traslados en grupo en autocar para ocasiones especiales. Garantice la comodidad y puntualidad de sus invitados.",
+					"sectionTitle": "CARACTERÍSTICAS DEL SERVICIO",
+					"body": [
+						"Si necesita trasladar a un grupo de personas para asistir a bodas y celebraciones, puede hacerlo con nuestro servicio de alquiler de autocares con conductor. Un servicio discrecional con el que los invitados podrán desplazarse en autocar partiendo de uno o varios puntos de origen, adecuando los horarios y rutas para que todos puedan disfrutar del evento con la tranquilidad de no tener que preocuparse por la conducción.",
+						"Prepararemos la ruta que mejor se ajuste a sus necesidades, con desplazamientos urbanos e interurbanos hasta el restaurante, sala de eventos, hotel o palacio de congresos en el que tenga lugar el evento.",
+						"Este servicio es muy adecuado tanto para empresas e instituciones, como para celebraciones familiares y de asociaciones."
+					],
+					"imageUrl": "https://www.empresaplana.cat/uploads/serveis/bodas-y-celebraciones-2021-2.png",
+					"imageCaption": "Traslados en grupo en autocar para ocasiones especiales. Garantice la comodidad y puntualidad de sus invitados."
+				}
+			}
+		}
+	]
+}

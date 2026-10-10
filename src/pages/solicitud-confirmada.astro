@@ -1,0 +1,30 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Solicitud recibida - Empresa Plana">
+  <main
+    class="mx-auto flex min-h-[70vh] w-full max-w-container items-center justify-center px-margin-mobile py-stack-lg md:px-margin-desktop"
+  >
+    <section
+      class="max-w-xl rounded-xl border border-outline-variant bg-surface-container-lowest p-stack-lg text-center shadow-ambient"
+    >
+      <div
+        class="mx-auto mb-stack-md grid size-16 place-items-center rounded-full bg-coastal-teal text-3xl text-white"
+      >
+        ✓
+      </div>
+      <h1 class="mb-stack-sm text-display-lg font-bold text-deep-navy">
+        Gracias por tu solicitud
+      </h1>
+      <p class="mb-stack-lg text-body-lg text-on-surface-variant">
+        Hemos recibido correctamente tus datos. Nuestro equipo se pondrá en
+        contacto contigo próximamente.
+      </p>
+      <a
+        class="inline-flex rounded bg-energetic-orange px-stack-md py-stack-sm font-semibold text-white"
+        href="/">Volver al inicio</a
+      >
+    </section>
+  </main>
+</BaseLayout>

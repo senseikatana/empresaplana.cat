@@ -1,0 +1,62 @@
+[
+  {
+    "id": "0d440273-05e8-44a7-9f9f-dc07c7741a0f",
+    "name": "Joan Puig",
+    "email": "jpuig@empresaplana.cat",
+    "phone": "600123456",
+    "license_type": "D",
+    "status": "active",
+    "hire_date": "2015-03-10",
+    "created_at": "2026-09-16 08:16:18.36055+00"
+  },
+  {
+    "id": "fdbd3705-d1db-45b2-b9df-d79a84b88769",
+    "name": "Maria Soler",
+    "email": "msoler@empresaplana.cat",
+    "phone": "600234567",
+    "license_type": "D",
+    "status": "active",
+    "hire_date": "2017-09-15",
+    "created_at": "2026-09-16 08:16:18.36055+00"
+  },
+  {
+    "id": "eeac1e26-cf0f-4b5b-b192-d1730b8d903f",
+    "name": "Pere Vidal",
+    "email": "pvidal@empresaplana.cat",
+    "phone": "600345678",
+    "license_type": "D",
+    "status": "active",
+    "hire_date": "2019-01-20",
+    "created_at": "2026-09-16 08:16:18.36055+00"
+  },
+  {
+    "id": "03b08784-c3be-44a5-be3a-351c6d98288e",
+    "name": "Jordi Font",
+    "email": "jfont@empresaplana.cat",
+    "phone": "600567890",
+    "license_type": "D",
+    "status": "active",
+    "hire_date": "2021-04-12",
+    "created_at": "2026-09-16 08:16:18.36055+00"
+  },
+  {
+    "id": "49225fbc-086f-4c91-9121-904368564821",
+    "name": "Laura Mata",
+    "email": "lmata@empresaplana.cat",
+    "phone": "600678901",
+    "license_type": "D",
+    "status": "sick",
+    "hire_date": "2020-11-30",
+    "created_at": "2026-09-16 08:16:18.36055+00"
+  },
+  {
+    "id": "0cc9bc65-a3e4-4db9-ab0f-b4f059d63059",
+    "name": "Ana Maria Popescu",
+    "email": "anamaria@empresaplana.cat",
+    "phone": "625523545",
+    "license_type": "D+E",
+    "status": "active",
+    "hire_date": "2011-01-03",
+    "created_at": "2026-09-16 08:16:18.36055+00"
+  }
+]

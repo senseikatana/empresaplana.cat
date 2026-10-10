@@ -1,0 +1,162 @@
+---
+import DashboardLayout from "@/layouts/DashboardLayout.astro";
+import { getSession } from "@/lib/auth";
+import { getPublicUser } from "@/lib/get-public-user";
+import { getLocale, getDictionary } from "@/config/i18n";
+
+export const prerender = false;
+
+const session = await getSession(Astro.cookies);
+if (!session) {
+	return Astro.redirect("/dashboard/login");
+}
+
+const locale = getLocale(Astro.url.searchParams.get("lang"));
+const dict = getDictionary(locale);
+
+const userData = await getPublicUser(session.id);
+---
+
+<DashboardLayout title={dict.app.panel.accountTitle} locale={locale} user={userData}>
+	<div class="max-w-lg">
+		<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-deep-navy">
+			{dict.app.panel.accountTitle}
+		</h1>
+		<p class="font-body-md text-body-md text-on-surface-variant mt-1">
+			{dict.app.panel.accountSubtitle}
+		</p>
+
+		<div class="bg-surface-container-lowest rounded-xl shadow-ambient border border-surface-variant p-6 mt-6">
+			<form id="account-form" class="flex flex-col gap-4">
+				<div>
+					<label for="name" class="font-label-md text-label-md text-on-surface-variant block mb-1">
+						{dict.app.panel.name}
+					</label>
+					<input
+						id="name"
+						name="name"
+						type="text"
+						value={userData?.name ?? ""}
+						class="w-full rounded-lg border border-surface-variant bg-surface px-3 py-2 font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-coastal-teal"
+					/>
+				</div>
+
+				<div>
+					<label for="email" class="font-label-md text-label-md text-on-surface-variant block mb-1">
+						{dict.app.panel.email}
+					</label>
+					<input
+						id="email"
+						name="email"
+						type="email"
+						value={userData?.email ?? ""}
+						class="w-full rounded-lg border border-surface-variant bg-surface px-3 py-2 font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-coastal-teal"
+					/>
+				</div>
+
+				<div>
+					<label for="phone" class="font-label-md text-label-md text-on-surface-variant block mb-1">
+						{dict.app.panel.phone}
+					</label>
+					<input
+						id="phone"
+						name="phone"
+						type="tel"
+						value={userData?.phone ?? ""}
+						class="w-full rounded-lg border border-surface-variant bg-surface px-3 py-2 font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-coastal-teal"
+					/>
+				</div>
+
+				<div class="border-t border-surface-variant pt-4 mt-2">
+					<p class="font-label-md text-label-md text-on-surface-variant mb-3">{dict.app.panel.password}</p>
+					<div>
+						<label for="currentPasskey" class="font-body-md text-body-md text-on-surface-variant block mb-1">
+							{dict.app.panel.password}
+						</label>
+						<input
+							id="currentPasskey"
+							name="currentPasskey"
+							type="password"
+							autocomplete="current-password"
+							class="w-full rounded-lg border border-surface-variant bg-surface px-3 py-2 font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-coastal-teal"
+						/>
+					</div>
+
+					<div class="mt-3">
+						<label for="newPassword" class="font-body-md text-body-md text-on-surface-variant block mb-1">
+							{dict.app.panel.newPassword}
+						</label>
+						<input
+							id="newPassword"
+							name="newPassword"
+							type="password"
+							autocomplete="new-password"
+							class="w-full rounded-lg border border-surface-variant bg-surface px-3 py-2 font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-coastal-teal"
+						/>
+					</div>
+				</div>
+
+				<div id="account-saved" class="hidden rounded-lg bg-secondary-fixed/30 text-on-surface px-4 py-2 text-sm">
+					{dict.app.panel.saved}
+				</div>
+
+				<div id="account-error" class="hidden rounded-lg bg-error-container text-on-error-container px-4 py-2 text-sm">
+				</div>
+
+				<button
+					type="submit"
+					class="rounded-lg bg-deep-navy text-on-primary font-button text-button px-6 py-2.5 hover:bg-primary transition-colors"
+				>
+					{dict.app.panel.save}
+				</button>
+			</form>
+		</div>
+	</div>
+
+	<script define:vars={{ originalEmail: userData?.email ?? "" }}>
+		const form = document.getElementById("account-form");
+		const savedDiv = document.getElementById("account-saved");
+		const errorDiv = document.getElementById("account-error");
+
+		form?.addEventListener("submit", async (e) => {
+			e.preventDefault();
+			savedDiv?.classList.add("hidden");
+			errorDiv?.classList.add("hidden");
+
+			const fd = new FormData(form);
+			const email = fd.get("email");
+			const body = {
+				name: fd.get("name"),
+				email: email,
+				phone: fd.get("phone"),
+			};
+
+			// Include password fields only if email changed or new password provided
+			if (email !== originalEmail || fd.get("newPassword")) {
+				body.currentPasskey = fd.get("currentPasskey");
+			}
+			if (fd.get("newPassword")) {
+				body.newPassword = fd.get("newPassword");
+			}
+
+			try {
+				const res = await fetch("/api/account", {
+					method: "PATCH",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(body),
+				});
+				if (res.ok) {
+					savedDiv?.classList.remove("hidden");
+					fd.set("currentPasskey", "");
+					fd.set("newPassword", "");
+				} else {
+					errorDiv && (errorDiv.textContent = "Error en desar els canvis.");
+					errorDiv?.classList.remove("hidden");
+				}
+			} catch {
+				errorDiv && (errorDiv.textContent = "Error de connexió.");
+				errorDiv?.classList.remove("hidden");
+			}
+		});
+	</script>
+</DashboardLayout>

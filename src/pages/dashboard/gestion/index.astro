@@ -1,0 +1,59 @@
+---
+import DashboardLayout from "@/layouts/DashboardLayout.astro";
+import { getSession } from "@/lib/auth";
+import { getPublicUser } from "@/lib/get-public-user";
+import { prisma } from "@/lib/db";
+import { getLocale, getDictionary } from "@/config/i18n";
+
+export const prerender = false;
+
+const session = await getSession(Astro.cookies);
+if (!session) {
+	return Astro.redirect("/dashboard/login");
+}
+
+const locale = getLocale(Astro.url.searchParams.get("lang"));
+const dict = getDictionary(locale);
+
+const user = await getPublicUser(session.id);
+
+// Fetch fleet summary
+const [routesCount, busesCount, stopsCount, driversCount] = await Promise.all([
+	prisma().route.count(),
+	prisma().bus.count(),
+	prisma().stop.count(),
+	prisma().driver.count(),
+]);
+
+const kpis = [
+	{ label: dict.app.gestion.nav.routes, value: routesCount, icon: "route" },
+	{ label: dict.app.gestion.nav.buses, value: busesCount, icon: "directions_bus" },
+	{ label: dict.app.gestion.nav.stops, value: stopsCount, icon: "location_on" },
+	{ label: dict.app.gestion.nav.drivers, value: driversCount, icon: "badge" },
+];
+---
+
+<DashboardLayout title={dict.app.gestion.nav.panel} locale={locale} user={user}>
+	<div>
+		<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-deep-navy">
+			{dict.app.gestion.nav.panel}
+		</h1>
+		<p class="font-body-md text-body-md text-on-surface-variant mt-1">
+			{dict.app.title}
+		</p>
+
+		<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+			{kpis.map((k) => (
+				<div class="bg-surface-container-lowest rounded-xl shadow-ambient border border-surface-variant p-6">
+					<div class="flex items-center gap-3">
+						<span class="material-symbols-outlined text-coastal-teal text-[28px]">{k.icon}</span>
+						<div>
+							<p class="font-headline-lg font-bold text-deep-navy">{k.value}</p>
+							<p class="font-label-md text-label-md text-on-surface-variant">{k.label}</p>
+						</div>
+					</div>
+				</div>
+			))}
+		</div>
+	</div>
+</DashboardLayout>

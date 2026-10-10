@@ -1,0 +1,50 @@
+---
+import DashboardLayout from "@/layouts/DashboardLayout.astro";
+import { getSession } from "@/lib/auth";
+import { getPublicUser } from "@/lib/get-public-user";
+import { getLocale, getDictionary } from "@/config/i18n";
+
+export const prerender = false;
+
+const session = await getSession(Astro.cookies);
+if (!session) {
+	return Astro.redirect("/dashboard/login");
+}
+
+const locale = getLocale(Astro.url.searchParams.get("lang"));
+const dict = getDictionary(locale);
+
+const user = await getPublicUser(session.id);
+
+const shortcuts = [
+	{ href: "/dashboard/cliente/cuenta", icon: "person", label: dict.app.panel.account },
+	{ href: "/dashboard/cliente/favoritas", icon: "star", label: dict.app.panel.favorites },
+	{ href: "/dashboard/cliente/cotizaciones", icon: "request_quote", label: dict.app.panel.quotes },
+	{ href: "/dashboard/mensajes", icon: "forum", label: dict.app.panel.messages },
+];
+---
+
+<DashboardLayout title={dict.app.panel.home} locale={locale} user={user}>
+	<div>
+		<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-deep-navy">
+			{dict.app.auth.welcome}, {user?.name ?? session.username}
+		</h1>
+		<p class="font-body-md text-body-md text-on-surface-variant mt-1">
+			{dict.app.role[session.role]}
+		</p>
+
+		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+			{shortcuts.map((s) => (
+				<a
+					href={s.href}
+					class="bg-surface-container-lowest rounded-xl shadow-ambient border border-surface-variant p-6 flex flex-col items-start gap-4 hover:border-coastal-teal/40 transition-colors"
+				>
+					<div class="w-12 h-12 rounded-full bg-primary-fixed text-primary-container flex items-center justify-center">
+						<span class="material-symbols-outlined icon-filled">{s.icon}</span>
+					</div>
+					<span class="font-label-md text-label-md text-deep-navy">{s.label}</span>
+				</a>
+			))}
+		</div>
+	</div>
+</DashboardLayout>

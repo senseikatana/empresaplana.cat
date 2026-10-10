@@ -1,0 +1,52 @@
+[
+  {
+    "id": "d62eaa13-b511-4e67-b9a2-838a851f9098",
+    "vehicle_id": "5d38e48d-7610-4306-8350-d4c8fb5009a1",
+    "service_date": "2026-09-15",
+    "type": "corrective",
+    "description": "Engine diagnostic and repair",
+    "cost": "1200.00",
+    "status": "in_progress",
+    "created_at": "2026-09-16 08:16:18.36055+00"
+  },
+  {
+    "id": "78555609-8179-491f-8431-5213ee5c5dbe",
+    "vehicle_id": "c5c7f9e9-1019-408b-ac82-dc1c99d2548f",
+    "service_date": "2026-10-01",
+    "type": "preventive",
+    "description": "Oil change and filter replacement",
+    "cost": "350.00",
+    "status": "scheduled",
+    "created_at": "2026-09-16 08:16:18.36055+00"
+  },
+  {
+    "id": "68def2cc-b45f-4f27-87af-e94cea400648",
+    "vehicle_id": "4ed67bdf-9362-4f5b-aede-22d08bb7b56c",
+    "service_date": "2026-10-10",
+    "type": "preventive",
+    "description": "Tire rotation and inspection",
+    "cost": "200.00",
+    "status": "scheduled",
+    "created_at": "2026-09-16 08:16:18.36055+00"
+  },
+  {
+    "id": "807d17ab-7da1-4711-aa60-839a091b3bea",
+    "vehicle_id": "4ed67bdf-9362-4f5b-aede-22d08bb7b56c",
+    "service_date": "2026-08-30",
+    "type": "preventive",
+    "description": "Annual inspection passed",
+    "cost": "150.00",
+    "status": "completed",
+    "created_at": "2026-09-16 08:16:18.36055+00"
+  },
+  {
+    "id": "0357f4e0-3397-490f-a8e1-59fbe711236b",
+    "vehicle_id": "c5c7f9e9-1019-408b-ac82-dc1c99d2548f",
+    "service_date": "2026-09-09",
+    "type": "preventive",
+    "description": "4 autobuses deben ser revisados, no les funciona el aire, y hay que hacer cambios de aceite y liquidos, revisar neumaticos",
+    "cost": "255",
+    "status": "scheduled",
+    "created_at": "2026-09-16 09:07:02.392844+00"
+  }
+]

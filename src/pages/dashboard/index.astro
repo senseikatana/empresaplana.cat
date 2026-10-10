@@ -1,0 +1,21 @@
+---
+import { getSession } from "@/lib/auth";
+import type { UsuarioRole } from "@/interfaces/auth";
+
+export const prerender = false;
+
+const session = await getSession(Astro.cookies);
+if (!session) {
+	return Astro.redirect("/dashboard/login");
+}
+
+// Redirect by role
+const roleHome: Record<UsuarioRole, string> = {
+	admin: "/dashboard/gestion",
+	worker: "/dashboard/trabajador",
+	client: "/dashboard/cliente",
+};
+
+const home = roleHome[session.role] ?? "/dashboard/cliente";
+return Astro.redirect(home);
+---

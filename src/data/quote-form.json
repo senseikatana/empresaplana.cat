@@ -1,0 +1,226 @@
+{
+	"title": {
+		"es": "SOLICITA PRESUPUESTO",
+		"ca": "SOL·LICITA PRESSUPOST",
+		"en": "REQUEST QUOTATION"
+	},
+	"sections": {
+		"contact": {
+			"es": "Datos de contacto",
+			"ca": "Dades de contacte",
+			"en": "Contact information"
+		},
+		"service": {
+			"es": "Descripción del servicio",
+			"ca": "Descripció del servei",
+			"en": "Service description"
+		}
+	},
+	"fields": [
+		{
+			"id": "name",
+			"type": "text",
+			"required": true,
+			"group": "contact",
+			"labels": {
+				"es": "Nombre",
+				"ca": "Nom",
+				"en": "Name"
+			}
+		},
+		{
+			"id": "email",
+			"type": "email",
+			"required": true,
+			"group": "contact",
+			"labels": {
+				"es": "E-mail",
+				"ca": "E-mail",
+				"en": "E-mail"
+			}
+		},
+		{
+			"id": "phone",
+			"type": "tel",
+			"required": true,
+			"group": "contact",
+			"labels": {
+				"es": "Teléfono",
+				"ca": "Telèfon",
+				"en": "Phone number"
+			}
+		},
+		{
+			"id": "company",
+			"type": "text",
+			"required": false,
+			"group": "contact",
+			"labels": {
+				"es": "Empresa",
+				"ca": "Empresa",
+				"en": "Company"
+			}
+		},
+		{
+			"id": "reason",
+			"type": "select",
+			"required": true,
+			"group": "service",
+			"labels": {
+				"es": "Motivo",
+				"ca": "Motiu",
+				"en": "Reason"
+			},
+			"placeholder": {
+				"es": "Seleccione un motivo",
+				"ca": "Seleccioni un motiu",
+				"en": "Select a reason"
+			}
+		},
+		{
+			"id": "description",
+			"type": "textarea",
+			"required": true,
+			"group": "service",
+			"labels": {
+				"es": "Descripción del servicio",
+				"ca": "Descripció del servei",
+				"en": "Service description"
+			}
+		},
+		{
+			"id": "departureCity",
+			"type": "text",
+			"required": false,
+			"group": "service",
+			"labels": {
+				"es": "Ciudad de salida",
+				"ca": "Ciutat de sortida",
+				"en": "Departure city"
+			}
+		},
+		{
+			"id": "departureDay",
+			"type": "date",
+			"required": false,
+			"group": "service",
+			"labels": {
+				"es": "Día de salida",
+				"ca": "Dia de sortida",
+				"en": "Departure Day"
+			}
+		},
+		{
+			"id": "departureTime",
+			"type": "time",
+			"required": false,
+			"group": "service",
+			"labels": {
+				"es": "Hora de salida",
+				"ca": "Hora de sortida",
+				"en": "Departure Time"
+			}
+		},
+		{
+			"id": "arrivalCity",
+			"type": "text",
+			"required": false,
+			"group": "service",
+			"labels": {
+				"es": "Ciudad de llegada",
+				"ca": "Ciutat d'arribada",
+				"en": "Arrival city"
+			}
+		},
+		{
+			"id": "arrivalDay",
+			"type": "date",
+			"required": false,
+			"group": "service",
+			"labels": {
+				"es": "Día de llegada",
+				"ca": "Dia d'arribada",
+				"en": "Arrival Day"
+			}
+		},
+		{
+			"id": "arrivalTime",
+			"type": "time",
+			"required": false,
+			"group": "service",
+			"labels": {
+				"es": "Hora de llegada",
+				"ca": "Hora d'arribada",
+				"en": "Arrival Time"
+			}
+		},
+		{
+			"id": "people",
+			"type": "number",
+			"required": false,
+			"group": "service",
+			"labels": {
+				"es": "Nº de personas",
+				"ca": "Núm. de persones",
+				"en": "Number of people"
+			}
+		}
+	],
+	"reasons": [
+		{
+			"id": "endOfYearTrip",
+			"labels": {
+				"es": "Viaje fin de curso",
+				"ca": "Viatge fi de curs",
+				"en": "End of year trip"
+			}
+		},
+		{
+			"id": "sportsDisplacements",
+			"labels": {
+				"es": "Desplazamientos deportivos",
+				"ca": "Desplaçaments esportius",
+				"en": "Sports displacements"
+			}
+		},
+		{
+			"id": "familyCelebrations",
+			"labels": {
+				"es": "Celebraciones familiares",
+				"ca": "Celebracions familiars",
+				"en": "Family celebrations"
+			}
+		},
+		{
+			"id": "conventions",
+			"labels": {
+				"es": "Convenciones",
+				"ca": "Convencions",
+				"en": "Conventions"
+			}
+		},
+		{
+			"id": "workMeetings",
+			"labels": {
+				"es": "Reuniones de trabajo",
+				"ca": "Reunions de treball",
+				"en": "Work meetings"
+			}
+		}
+	],
+	"consent": {
+		"es": "He leído y acepto la política de privacidad",
+		"ca": "He llegit i accepto la política de privacitat",
+		"en": "I have read and I accept the privacy policy"
+	},
+	"submit": {
+		"es": "SOLICITAR PRESUPUESTO",
+		"ca": "SOL·LICITAR PRESSUPOST",
+		"en": "REQUEST A QUOTATION"
+	},
+	"success": {
+		"es": "Mensaje enviado correctamente. Gracias",
+		"ca": "Missatge enviat correctament. Gràcies",
+		"en": "Message sent successfully. Thank you"
+	}
+}

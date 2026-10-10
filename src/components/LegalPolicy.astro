@@ -1,0 +1,41 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
+type Section = { title: string; body: string };
+type Props = { title: string; intro: string; sections: Section[] };
+const { title, intro, sections } = Astro.props as Props;
+---
+
+<BaseLayout title={`${title} - Empresa Plana`} description={intro}>
+  <main
+    class="mx-auto w-full max-w-container px-margin-mobile py-stack-lg md:px-margin-desktop"
+  >
+    <section
+      class="mx-auto max-w-4xl rounded-xl border border-outline-variant bg-surface-container-lowest p-stack-md shadow-ambient md:p-stack-lg"
+    >
+      <p
+        class="mb-stack-sm text-label-md font-semibold uppercase text-energetic-orange"
+      >
+        Información legal
+      </p>
+      <h1 class="mb-stack-sm text-display-lg font-bold text-deep-navy">
+        {title}
+      </h1>
+      <p class="mb-stack-lg text-body-md text-on-surface-variant">{intro}</p>
+      <div class="space-y-stack-lg">
+        {
+          sections.map((section) => (
+            <section class="border-t border-outline-variant pt-stack-md">
+              <h2 class="mb-stack-sm text-headline-md font-bold text-deep-navy">
+                {section.title}
+              </h2>
+              <p class="whitespace-pre-line text-body-md leading-relaxed text-on-surface">
+                {section.body}
+              </p>
+            </section>
+          ))
+        }
+      </div>
+    </section>
+  </main>
+</BaseLayout>

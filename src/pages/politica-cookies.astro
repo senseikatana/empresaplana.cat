@@ -1,0 +1,14 @@
+---
+import LegalPolicy from "@/components/LegalPolicy.astro";
+import { getDictionary } from "@/config/i18n";
+
+const policy = getDictionary("es").legal.cookiePolicy;
+const sections = [
+	{ title: policy.definitionTitle, body: `${policy.definition}\n\n${policy.definitionBody}` },
+	{ title: policy.typesTitle, body: `${policy.typesByTime}\n\n${policy.sessionCookies}\n\n${policy.persistentCookies}\n\n${policy.typesByPurpose}\n\n${policy.ownCookies}\n\n${policy.thirdPartyCookies}\n\n${policy.technicalCookies}\n\n${policy.analyticsCookies}\n\n${policy.advertisingCookies}` },
+	{ title: policy.thirdPartyTitle, body: policy.googleCookies },
+	{ title: policy.configureTitle, body: `${policy.configure}\n\n${policy.configureHelp}` },
+];
+---
+
+<LegalPolicy title={policy.heading} intro={policy.definition} sections={sections} />

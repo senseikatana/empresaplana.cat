@@ -1,0 +1,279 @@
+// Empresa Plana — Prisma schema (Astro project)
+// Fuente de verdad: Postgres (Prisma Postgres). El panel admin es el CMS.
+
+generator client {
+	provider      = "prisma-client"
+	output        = "../generated/prisma"
+	compilerBuild = "fast"
+}
+
+datasource db {
+	provider = "postgresql"
+}
+
+// ── Auth / Usuarios ────────────────────────────────────────────────────────
+
+model User {
+	id             Int             @id @default(autoincrement())
+	username       String          @unique @db.VarChar(60)
+	passkey        String          @db.VarChar(128)
+	name           String          @db.VarChar(60)
+	fullName       String          @db.VarChar(120)
+	email          String          @db.VarChar(200)
+	phone          String          @db.VarChar(30)
+	role           String          @default("client") @db.VarChar(20)
+	totpSecret     String?         @db.VarChar(100)
+	emailVerified  Boolean         @default(false)
+	createdAt      DateTime        @default(now())
+	updatedAt      DateTime        @default(now()) @updatedAt
+	budgets        Budget[]
+	favorites      FavoriteRoute[]
+	recentSearches RecentSearch[]
+	messages       Message[]
+
+	@@index([role])
+}
+
+model FavoriteRoute {
+	id        Int      @id @default(autoincrement())
+	userId    Int
+	routeId   String   @db.VarChar(40)
+	createdAt DateTime @default(now())
+	user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+	@@unique([userId, routeId])
+	@@index([userId])
+}
+
+model RecentSearch {
+	id         Int      @id @default(autoincrement())
+	userId     Int
+	origin     String   @db.VarChar(120)
+	destination String @db.VarChar(120)
+	createdAt  DateTime @default(now())
+	user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+	@@index([userId])
+}
+
+// ── Flota ──────────────────────────────────────────────────────────────────
+
+model Route {
+	id          String   @id @db.VarChar(40)
+	code        String   @unique @db.VarChar(20)
+	name        String   @db.VarChar(200)
+	origin      String   @db.VarChar(120)
+	destination String   @db.VarChar(120)
+	driverId    Int?
+	color       String   @default("#013990") @db.VarChar(10)
+	status      String   @default("active") @db.VarChar(20)
+	path        Json     @default("[]")
+	stops       Stop[]
+	createdAt   DateTime @default(now())
+	updatedAt   DateTime @updatedAt
+
+	@@index([status])
+}
+
+model Bus {
+	id        Int      @id @default(autoincrement())
+	number    String   @unique @db.VarChar(20)
+	plate     String   @db.VarChar(20)
+	company   String   @default("Empresa Plana") @db.VarChar(100)
+	capacity  Int      @default(50)
+	routeId   String?  @db.VarChar(40)
+	status    String   @default("active") @db.VarChar(20)
+	gps       Json     @default("{}")
+	createdAt DateTime @default(now())
+	updatedAt DateTime @updatedAt
+
+	@@index([status])
+	@@index([routeId])
+}
+
+model Stop {
+	id        Int      @id @default(autoincrement())
+	name      String   @db.VarChar(200)
+	address   String   @default("") @db.VarChar(300)
+	lat       Float
+	lng       Float
+	routes    Route[]
+	createdAt DateTime @default(now())
+}
+
+model Schedule {
+	id        Int      @id @default(autoincrement())
+	routeId   String   @db.VarChar(40)
+	departure String   @db.VarChar(10)
+	arrival   String   @db.VarChar(10)
+	frequency String   @default("60 min") @db.VarChar(30)
+	days      String   @default("Lun–Dom") @db.VarChar(50)
+	status    String   @default("active") @db.VarChar(20)
+	createdAt DateTime @default(now())
+	updatedAt DateTime @updatedAt
+
+	@@index([routeId])
+	@@index([status])
+}
+
+model Driver {
+	id         Int      @id @default(autoincrement())
+	name       String   @db.VarChar(120)
+	phone      String   @default("") @db.VarChar(30)
+	license    String   @default("") @db.VarChar(30)
+	busNumber  String?  @db.VarChar(20)
+	routeId    String?  @db.VarChar(40)
+	shiftDays  String?  @db.VarChar(30)
+	shiftHours String?  @db.VarChar(30)
+	status     String   @default("active") @db.VarChar(20)
+	createdAt  DateTime @default(now())
+	updatedAt  DateTime @updatedAt
+
+	@@index([status])
+}
+
+model Notification {
+	id        Int      @id @default(autoincrement())
+	type      String   @db.VarChar(20)
+	title     String   @db.VarChar(200)
+	desc      String   @db.VarChar(1000)
+	createdAt DateTime @default(now())
+	read      Boolean  @default(false)
+	routeId   String?  @db.VarChar(40)
+
+	@@index([read])
+	@@index([type])
+}
+
+model Activity {
+	id     Int      @id @default(autoincrement())
+	at     DateTime @default(now())
+	action String   @db.VarChar(500)
+	user   String   @default("Sistema") @db.VarChar(100)
+}
+
+// ── Presupuestos / Reportes ────────────────────────────────────────────────
+
+model Budget {
+	id            String   @id @db.VarChar(40)
+	userId        Int
+	clientName    String   @db.VarChar(200)
+	email         String   @db.VarChar(200)
+	phone         String   @db.VarChar(30)
+	company       String?  @db.VarChar(200)
+	reasonId      String   @db.VarChar(60)
+	description   String?  @db.VarChar(2000)
+	departureCity String   @default("") @db.VarChar(120)
+	departureDay  String   @default("") @db.VarChar(12)
+	departureTime String   @default("") @db.VarChar(10)
+	arrivalCity   String   @default("") @db.VarChar(120)
+	arrivalDay    String   @default("") @db.VarChar(12)
+	arrivalTime   String   @default("") @db.VarChar(10)
+	people        String   @default("") @db.VarChar(10)
+	status        String   @default("received") @db.VarChar(20)
+	createdAt     DateTime @default(now())
+	updatedAt     DateTime @updatedAt
+	user          User     @relation(fields: [userId], references: [id])
+
+	@@index([userId])
+	@@index([status])
+}
+
+model Report {
+	id          Int     @id @default(autoincrement())
+	lineId      String  @db.VarChar(40)
+	stop        String  @default("") @db.VarChar(200)
+	action      String  @db.VarChar(20)
+	minutesLate Int?
+	comment     String? @db.VarChar(500)
+	createdAt   DateTime @default(now())
+
+	@@index([lineId])
+	@@index([createdAt])
+}
+
+// ── Oficinas de atención al cliente ─────────────────────────────────────────
+
+model Office {
+	id         Int       @id @default(autoincrement())
+	name       String    @db.VarChar(160)
+	address    String    @db.VarChar(300)
+	city       String    @db.VarChar(80)
+	postalCode String    @default("") @db.VarChar(10)
+	phone      String    @default("") @db.VarChar(30)
+	purpose    String    @default("") @db.VarChar(300)
+	lat        Float?
+	lng        Float?
+	order      Int       @default(0)
+	createdAt  DateTime  @default(now())
+	updatedAt  DateTime  @updatedAt
+}
+
+// ── Mensajería (chat real-time) ─────────────────────────────────────────────
+
+model Conversation {
+	id           Int       @id @default(autoincrement())
+	type         String    @db.VarChar(20)
+	createdAt    DateTime  @default(now())
+	updatedAt    DateTime  @updatedAt
+	participants ConversationParticipant[]
+	messages     Message[]
+}
+
+model ConversationParticipant {
+	id             Int      @id @default(autoincrement())
+	conversationId Int
+	userId         Int
+	role           String   @db.VarChar(20)
+	conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+	@@unique([conversationId, userId])
+	@@index([userId])
+}
+
+model Message {
+	id             Int          @id @default(autoincrement())
+	conversationId Int
+	senderId       Int
+	senderRole     String       @db.VarChar(20)
+	body           String       @db.VarChar(2000)
+	readAt         DateTime?
+	createdAt      DateTime     @default(now())
+	conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+	sender         User         @relation(fields: [senderId], references: [id])
+
+	@@index([conversationId, createdAt])
+}
+
+// ── Astro legacy: line search tables ────────────────────────────────────────
+
+model Line {
+	id       Int      @id @default(autoincrement())
+	name     String   @db.VarChar(200)
+	pdfUrl   String   @db.VarChar(500)
+	schedules SchedulesOnLine[]
+}
+
+model SchedulesOnLine {
+	id               Int    @id @default(autoincrement())
+	lineId           Int
+	originTown       String @db.VarChar(120)
+	destinationTown  String @db.VarChar(120)
+	departureTime    String @db.VarChar(10)
+	arrivalTime      String @db.VarChar(10)
+	duration         String @db.VarChar(20)
+	stopsJson        Json
+	line             Line   @relation(fields: [lineId], references: [id], onDelete: Cascade)
+
+	@@index([lineId])
+}
+
+model LineConnection {
+	id         Int    @id @default(autoincrement())
+	fromLineId Int
+	atStop     String @db.VarChar(200)
+	toLineId   Int
+	waitMin    Int    @default(0)
+
+	@@index([fromLineId])
+}

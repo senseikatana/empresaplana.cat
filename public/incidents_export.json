@@ -1,0 +1,22 @@
+[
+  {
+    "id": "375567e9-d7e8-4781-801f-900b762c2db0",
+    "vehicle_id": "5d38e48d-7610-4306-8350-d4c8fb5009a1",
+    "driver_id": null,
+    "incident_date": "2026-09-05",
+    "description": "Scheduled maintenance - brake pad replacement needed",
+    "severity": "low",
+    "status": "open",
+    "created_at": "2026-09-16 08:16:18.36055+00"
+  },
+  {
+    "id": "07d9db52-7fb4-4656-a496-bfde9b6e42c5",
+    "vehicle_id": "a5626622-419d-415c-b306-bd712ed333d3",
+    "driver_id": "0cc9bc65-a3e4-4db9-ab0f-b4f059d63059",
+    "incident_date": "2026-08-28",
+    "description": "Minor collision in parking area - no passengers on board",
+    "severity": "high",
+    "status": "resolved",
+    "created_at": "2026-09-16 08:16:18.36055+00"
+  }
+]

@@ -1,0 +1,186 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [Unreleased]
+
+What's news:
+
+- [ ] feat: update documentation for agents
+  - `.env.example`
+  - `.gitignore`
+  - `AGENTS.md`
+  - `DESIGN.md`
+  - `LICENSE`
+  - `README.md`
+  - `astro.config.mjs`
+  - `biome.json`
+  - `bun.lock`
+  - `eslint.config.mjs`
+  - `package.json`
+  - `prisma.config.ts`
+  - `prisma/schema.prisma`
+  - `prisma/seed.ts`
+  - `public/CNAME`
+  - `public/database-structure.png`
+  - `public/drivers_export.json`
+  - `public/favicon.ico`
+  - `public/favicon.svg`
+  - `public/incidents_export.json`
+  - `public/maintenance_export.json`
+  - `public/manifest.webmanifest`
+  - `public/profiles_export.json`
+  - `public/robots.txt`
+  - `public/routes_export.json`
+  - `public/schedules_export.json`
+  - `public/sw.js`
+  - `public/tabla-app.xlsx`
+  - `public/users_export.json`
+  - `public/vehicles_export.json`
+  - `router.ts`
+  - `src/assets/astro.svg`
+  - `src/assets/background.svg`
+  - `src/components/BusTrackingPanel.tsx`
+  - `src/components/LegalPolicy.astro`
+  - `src/components/QuoteForm.astro`
+  - `src/components/RouteAccordion.astro`
+  - `src/components/ServiceDetail.astro`
+  - `src/components/ThroughAccordion.astro`
+  - `src/components/TownSelect.astro`
+  - `src/components/TransferAccordion.astro`
+  - `src/config/i18n/ca.json`
+  - `src/config/i18n/en.json`
+  - `src/config/i18n/es.json`
+  - `src/config/i18n/fr.json`
+  - `src/config/i18n/index.ts`
+  - `src/config/site-info.ts`
+  - `src/data/contact.json`
+  - `src/data/contact.ts`
+  - `src/data/index.ts`
+  - `src/data/popular-lines.json`
+  - `src/data/quote-form.json`
+  - `src/data/services.json`
+  - `src/data/stops.json`
+  - `src/data/towns.ts`
+  - `src/data/types.ts`
+  - `src/env.d.ts`
+  - `src/interfaces/about.ts`
+  - `src/interfaces/auth.ts`
+  - `src/interfaces/booking.ts`
+  - `src/interfaces/bus-tracking.ts`
+  - `src/interfaces/common.ts`
+  - `src/interfaces/data.ts`
+  - `src/interfaces/discretionary.ts`
+  - `src/interfaces/home.ts`
+  - `src/interfaces/i18n.ts`
+  - `src/interfaces/index.ts`
+  - `src/interfaces/layout.ts`
+  - `src/interfaces/legal-page.ts`
+  - `src/interfaces/legal.ts`
+  - `src/interfaces/locations.ts`
+  - `src/interfaces/mobile-app.ts`
+  - `src/interfaces/routes.ts`
+  - `src/interfaces/search.ts`
+  - `src/interfaces/towns.ts`
+  - `src/interfaces/tracking-store.ts`
+  - `src/interfaces/types.ts`
+  - `src/interfaces/users.ts`
+  - `src/layouts/BaseLayout.astro`
+  - `src/layouts/DashboardLayout.astro`
+  - `src/lib/acl.ts`
+  - `src/lib/auth.ts`
+  - `src/lib/chat.ts`
+  - `src/lib/db.ts`
+  - `src/lib/get-public-user.ts`
+  - `src/lib/logger.ts`
+  - `src/lib/passkey.ts`
+  - `src/lib/search.ts`
+  - `src/lib/tracking-store.ts`
+  - `src/lib/users.ts`
+  - `src/lib/validation/users.ts`
+  - `src/middleware/index.ts`
+  - `src/pages/api/account.ts`
+  - `src/pages/api/auth/login.ts`
+  - `src/pages/api/auth/logout.ts`
+  - `src/pages/api/auth/me.ts`
+  - `src/pages/api/auth/register.ts`
+  - `src/pages/api/budget.ts`
+  - `src/pages/api/budgets.ts`
+  - `src/pages/api/bus-tracking/reports.ts`
+  - `src/pages/api/bus-tracking/reviews.ts`
+  - `src/pages/api/chat/[id].ts`
+  - `src/pages/api/chat/index.ts`
+  - `src/pages/api/favorites.ts`
+  - `src/pages/api/fleet/notifications.ts`
+  - `src/pages/api/fleet/routes.ts`
+  - `src/pages/api/fleet/summary.ts`
+  - `src/pages/api/health.ts`
+  - `src/pages/api/offices.ts`
+  - `src/pages/api/users/[id].ts`
+  - `src/pages/api/users/index.ts`
+  - `src/pages/aviso-legal-variante.astro`
+  - `src/pages/aviso-legal.astro`
+  - `src/pages/dashboard/cliente/cotizaciones.astro`
+  - `src/pages/dashboard/cliente/cuenta.astro`
+  - `src/pages/dashboard/cliente/favoritas.astro`
+  - `src/pages/dashboard/cliente/index.astro`
+  - `src/pages/dashboard/gestion/[seccion].astro`
+  - `src/pages/dashboard/gestion/index.astro`
+  - `src/pages/dashboard/index.astro`
+  - `src/pages/dashboard/login.astro`
+  - `src/pages/dashboard/mensajes.astro`
+  - `src/pages/dashboard/register.astro`
+  - `src/pages/dashboard/trabajador/incidencias.astro`
+  - `src/pages/dashboard/trabajador/index.astro`
+  - `src/pages/dashboard/trabajador/lineas.astro`
+  - `src/pages/dashboard/trabajador/reportes.astro`
+  - `src/pages/donde-estamos-mobile-app.astro`
+  - `src/pages/donde-estamos-mobile.astro`
+  - `src/pages/donde-estamos-oficina-seleccionada.astro`
+  - `src/pages/donde-estamos.astro`
+  - `src/pages/home-variant-1.astro`
+  - `src/pages/home-variant-2.astro`
+  - `src/pages/index.astro`
+  - `src/pages/marketing-kit.astro`
+  - `src/pages/mobile.astro`
+  - `src/pages/politica-cookies.astro`
+  - `src/pages/politica-privacidad.astro`
+  - `src/pages/rastreig.astro`
+  - `src/pages/rutas-horarios-mobile-app.astro`
+  - `src/pages/rutas-horarios-sin-resultados.astro`
+  - `src/pages/rutas-horarios.astro`
+  - `src/pages/screens.astro`
+  - `src/pages/servicios-discrecionales-mobile-app.astro`
+  - `src/pages/servicios-discrecionales.astro`
+  - `src/pages/servicios/[slug].astro`
+  - `src/pages/solicitar-presupuesto.astro`
+  - `src/pages/solicitud-confirmada.astro`
+  - `src/scripts/bootstrap-sheets.mjs`
+  - `src/scripts/demo-sheets.mjs`
+  - `src/scripts/export-sheets.mjs`
+  - `src/scripts/lib/db.mjs`
+  - `src/scripts/lib/sheets-format.mjs`
+  - `src/scripts/seed-users.mjs`
+  - `src/scripts/seed.mjs`
+  - `src/scripts/sync-sheets.mjs`
+  - `src/styles/global.css`
+  - `tsconfig.json`
+
+## [1.0.0] - 2026-07-26
+
+### Added
+- Initial release of the project.
+- Complete folder structure and baseline configuration.
+- Comprehensive `.gitignore`, `LICENSE`, and documentation files.
+- Responsive design layout and UI components.
+
+### Changed
+- Standardized project configurations and clean commit workflow.
+
+### Fixed
+- Resolved nested repository issues and gitlink submodule conflicts.

@@ -1,0 +1,93 @@
+{
+	"lines": [
+		{
+			"id": "barcelonaAirport",
+			"icon": "airport",
+			"name": "Barcelona-Aeropuerto",
+			"origin": "Barcelona",
+			"destination": "Tarragona-La Pineda-Salou-Cambrils",
+			"pdfUrls": {
+				"es": "https://empresaplana.cat/uploads/boxes-lineas-configuration/barcelona-tarragona-salou-granadella-2026-ta-14.pdf",
+				"ca": "https://www.empresaplana.cat/uploads/boxes-lineas-configuration/barcelona-tarragona-salou-granadella-2026-ta-13.pdf",
+				"en": "https://www.empresaplana.cat/uploads/boxes-lineas-configuration/barcelona-tarragona-salou-granadella-2026-ta-15.pdf"
+			}
+		},
+		{
+			"id": "tarragonaBarcelona",
+			"name": "Tarragona-Barcelona",
+			"origin": "Tarragona",
+			"destination": "Barcelona",
+			"pdfUrls": {
+				"es": "https://empresaplana.cat/uploads/boxes-lineas-configuration/barcelona-aeroport-tarragona-2906-al-0111-13.pdf",
+				"ca": "https://www.empresaplana.cat/uploads/boxes-lineas-configuration/barcelona-aeroport-tarragona-2906-al-0111-12.pdf",
+				"en": "https://www.empresaplana.cat/uploads/boxes-lineas-configuration/barcelona-aeroport-tarragona-2906-al-0111-14.pdf"
+			}
+		},
+		{
+			"id": "costaDorada",
+			"name": "Tarragona-La Pineda-Salou-Cambrils",
+			"origin": "Tarragona",
+			"destination": "Cambrils",
+			"pdfUrls": {
+				"es": "https://empresaplana.cat/uploads/boxes-lineas-configuration/horari-de-la-costa-a-partir-30032026-2.pdf",
+				"ca": "https://www.empresaplana.cat/uploads/boxes-lineas-configuration/Horari%20de%20la%20Costa%20a%20partir%2030.03.2026.pdf",
+				"en": "https://www.empresaplana.cat/uploads/boxes-lineas-configuration/horari-de-la-costa-a-partir-30032026-3.pdf"
+			}
+		},
+		{
+			"id": "penedes",
+			"name": "L68-Vilanova i la Geltrú - Vilafranca del Penedés",
+			"origin": "Vilanova i la Geltrú",
+			"destination": "Vilafranca del Penedés",
+			"pdfUrls": {
+				"es": "https://empresaplana.cat/uploads/boxes-lineas-configuration/l68-vilanova-i-la-geltru-vilafranca-del-penedes-2.pdf",
+				"ca": "https://www.empresaplana.cat/uploads/boxes-lineas-configuration/L68%20Vilanova%20i%20la%20Geltr%C3%BA%20-%20Vilafranca%20del%20Pened%C3%A9s.pdf",
+				"en": "https://www.empresaplana.cat/uploads/boxes-lineas-configuration/l68-vilanova-i-la-geltru-vilafranca-del-penedes-3.pdf"
+			}
+		},
+		{
+			"id": "estacioCamp",
+			"name": "Tarragona-Estació del Camp",
+			"origin": "Tarragona",
+			"destination": "Estació del Camp",
+			"pdfUrls": {
+				"es": "https://empresaplana.cat/uploads/boxes-lineas-configuration/tarragona-estacio-del-camp-9.pdf",
+				"ca": "https://www.empresaplana.cat/uploads/boxes-lineas-configuration/Tarragona%20Estaci%C3%B3%20del%20Camp.pdf",
+				"en": "https://www.empresaplana.cat/uploads/boxes-lineas-configuration/tarragona-estacio-del-camp-10.pdf"
+			}
+		},
+		{
+			"id": "ametllaTortosa",
+			"name": "L'Ametlla de Mar - El Perelló - L'Ampolla - Camarles - L'Aldea - Tortosa",
+			"origin": "L'Ametlla de Mar",
+			"destination": "Tortosa",
+			"pdfUrls": {
+				"es": "https://empresaplana.cat/uploads/boxes-lineas-configuration/horari-lametlla-de-mar-el-perello-lampolla-camarles-laldea-tortosa-escolar-no-escolar-2024-2.pdf",
+				"ca": "https://www.empresaplana.cat/uploads/boxes-lineas-configuration/Horari%20L'Ametlla%20de%20Mar-El%20Perell%C3%B3-L'Ampolla-Camarles-L'Aldea-Tortosa%20ESCOLAR%20-%20NO%20ESCOLAR%202024.pdf",
+				"en": "https://www.empresaplana.cat/uploads/boxes-lineas-configuration/horari-lametlla-de-mar-el-perello-lampolla-camarles-laldea-tortosa-escolar-no-escolar-2024-3.pdf"
+			}
+		},
+		{
+			"id": "reusSalou",
+			"name": "e5 Reus-Salou",
+			"origin": "Reus",
+			"destination": "Salou",
+			"pdfUrls": {
+				"es": "https://empresaplana.cat/uploads/boxes-lineas-configuration/reus-salou-periode-01052026-a-31102026-2.pdf",
+				"ca": "https://www.empresaplana.cat/uploads/boxes-lineas-configuration/REUS-SALOU%20Per%C3%ADode%2001.05.2026%20a%2031.10.2026.pdf",
+				"en": "https://www.empresaplana.cat/uploads/boxes-lineas-configuration/reus-salou-periode-01052026-a-31102026-3.pdf"
+			}
+		},
+		{
+			"id": "tarragonaVilasecaSalou",
+			"name": "Tarragona-Vila-seca-Salou",
+			"origin": "Tarragona",
+			"destination": "Salou",
+			"pdfUrls": {
+				"es": "https://empresaplana.cat/uploads/boxes-lineas-configuration/tarragona-vilaseca-salou-2.pdf",
+				"ca": "https://www.empresaplana.cat/uploads/boxes-lineas-configuration/tarragona-vilaseca-salou.pdf",
+				"en": "https://www.empresaplana.cat/uploads/boxes-lineas-configuration/tarragona-vilaseca-salou-3.pdf"
+			}
+		}
+	]
+}

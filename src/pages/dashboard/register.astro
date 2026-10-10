@@ -1,0 +1,150 @@
+---
+import DashboardLayout from "@/layouts/DashboardLayout.astro";
+import { getSession } from "@/lib/auth";
+import { getLocale, getDictionary } from "@/config/i18n";
+
+export const prerender = false;
+
+const session = await getSession(Astro.cookies);
+if (session) {
+	return Astro.redirect("/dashboard");
+}
+
+const locale = getLocale(Astro.url.searchParams.get("lang"));
+const dict = getDictionary(locale);
+
+const redirect = Astro.url.searchParams.get("redirect") ?? "/dashboard";
+---
+
+<DashboardLayout title={String(dict.app.register.title)} locale={locale} user={null}>
+	<div class="flex min-h-screen items-center justify-center bg-surface-container px-4 -mt-stack-lg">
+		<div class="w-full max-w-sm bg-surface-container-lowest rounded-xl shadow-ambient border border-surface-variant p-6">
+			<!-- Header -->
+			<h1 class="text-xl font-bold text-deep-navy">{dict.app.register.title}</h1>
+			<p class="text-sm text-on-surface-variant">{dict.app.register.subtitle}</p>
+
+			<!-- Register form -->
+			<form id="register-form" class="flex flex-col gap-4 mt-4">
+				<input type="hidden" name="redirect" value={redirect} />
+
+				<div>
+					<label for="name" class="font-label-md text-label-md text-on-surface-variant block mb-1">
+						{dict.app.register.name}
+					</label>
+					<input
+						id="name"
+						name="name"
+						type="text"
+						autocomplete="name"
+						required
+						class="w-full rounded-lg border border-surface-variant bg-surface px-3 py-2 font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-coastal-teal"
+					/>
+				</div>
+
+				<div>
+					<label for="username" class="font-label-md text-label-md text-on-surface-variant block mb-1">
+						{dict.app.register.username}
+					</label>
+					<input
+						id="username"
+						name="username"
+						type="text"
+						autocomplete="username"
+						required
+						class="w-full rounded-lg border border-surface-variant bg-surface px-3 py-2 font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-coastal-teal"
+					/>
+				</div>
+
+				<div>
+					<label for="email" class="font-label-md text-label-md text-on-surface-variant block mb-1">
+						{dict.app.register.email}
+					</label>
+					<input
+						id="email"
+						name="email"
+						type="email"
+						autocomplete="email"
+						required
+						class="w-full rounded-lg border border-surface-variant bg-surface px-3 py-2 font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-coastal-teal"
+					/>
+				</div>
+
+				<div>
+					<label for="password" class="font-label-md text-label-md text-on-surface-variant block mb-1">
+						{dict.app.register.password}
+					</label>
+					<input
+						id="password"
+						name="password"
+						type="password"
+						autocomplete="new-password"
+						required
+						class="w-full rounded-lg border border-surface-variant bg-surface px-3 py-2 font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-coastal-teal"
+					/>
+				</div>
+
+				<div id="register-error" class="hidden rounded-lg bg-error-container text-on-error-container px-4 py-2 text-sm">
+				</div>
+
+				<button
+					type="submit"
+					class="w-full rounded-lg bg-deep-navy text-on-primary font-button text-button py-2.5 hover:bg-primary transition-colors disabled:opacity-50"
+				>
+					{dict.app.register.submit}
+				</button>
+			</form>
+
+			<!-- Login link -->
+			<div class="mt-4 text-center">
+				<p class="text-sm text-on-surface-variant">
+					{dict.app.register.haveAccount}
+					<a href="/dashboard/login" class="font-medium text-deep-navy">
+						{dict.app.register.login}
+					</a>
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		const form = document.getElementById("register-form") as HTMLFormElement;
+		const errorDiv = document.getElementById("register-error");
+
+		form?.addEventListener("submit", async (e) => {
+			e.preventDefault();
+			errorDiv?.classList.add("hidden");
+
+			const formData = new FormData(form);
+			const body = {
+				name: formData.get("name"),
+				username: formData.get("username"),
+				email: formData.get("email"),
+				password: formData.get("password"),
+			};
+			const redirect = (formData.get("redirect") as string) || "/dashboard";
+
+			try {
+				const res = await fetch("/api/auth/register", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(body),
+				});
+
+				if (res.ok) {
+					window.location.href = redirect;
+				} else {
+					const data = await res.json().catch(() => ({}));
+					if (res.status === 409 || data.error === "username_exists") {
+						errorDiv!.textContent = "Aquest nom d'usuari ja existeix.";
+					} else {
+						errorDiv!.textContent = "Revisa les dades introduïdes.";
+					}
+					errorDiv?.classList.remove("hidden");
+				}
+			} catch {
+				errorDiv!.textContent = "Error de connexió.";
+				errorDiv?.classList.remove("hidden");
+			}
+		});
+	</script>
+</DashboardLayout>

@@ -1,0 +1,48 @@
+---
+import DashboardLayout from "@/layouts/DashboardLayout.astro";
+import { getSession } from "@/lib/auth";
+import { getPublicUser } from "@/lib/get-public-user";
+import { getLocale, getDictionary } from "@/config/i18n";
+
+export const prerender = false;
+
+const session = await getSession(Astro.cookies);
+if (!session) {
+	return Astro.redirect("/dashboard/login");
+}
+
+const locale = getLocale(Astro.url.searchParams.get("lang"));
+const dict = getDictionary(locale);
+
+const user = await getPublicUser(session.id);
+
+const seccion = Astro.params.seccion ?? "";
+
+// Section labels mapping — same keys as the Nuxt reference
+const sectionKeys: Record<string, string> = {
+	mapa: "app.gestion.nav.map",
+	rutas: "app.gestion.nav.routes",
+	autobuses: "app.gestion.nav.buses",
+	paradas: "app.gestion.nav.stops",
+	horarios: "app.gestion.nav.schedules",
+	conductores: "app.gestion.nav.drivers",
+	notificaciones: "app.gestion.nav.notifications",
+	reportes: "app.gestion.nav.reports",
+	integraciones: "app.gestion.nav.integrations",
+};
+
+const key = sectionKeys[seccion];
+const title = key ? String(dict.app.gestion.nav[key.replace("app.gestion.nav.", "")] ?? seccion) : seccion;
+---
+
+<DashboardLayout title={title} locale={locale} user={user}>
+	<div>
+		<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-deep-navy">
+			{title}
+		</h1>
+
+		<div class="mt-6 rounded-lg bg-surface-container-low border border-surface-variant px-4 py-3 text-on-surface-variant text-sm">
+			{dict.app.worker.noLineData}
+		</div>
+	</div>
+</DashboardLayout>

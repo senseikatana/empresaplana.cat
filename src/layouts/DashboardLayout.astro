@@ -1,0 +1,407 @@
+---
+/**
+ * DashboardLayout.astro
+ *
+ * Main dashboard shell for authenticated pages. Provides:
+ * - Responsive sidebar (collapses to hamburger on mobile)
+ * - Top navbar with language switcher + dark mode toggle
+ * - Nav items filtered by user role
+ * - User info + logout in sidebar footer
+ *
+ * Does NOT use BaseLayout - builds its own <html> structure.
+ * User data is passed as a prop from the page (fetched server-side).
+ */
+import "@/styles/global.css";
+import { hasCapability, isRole, type Role } from "@/lib/acl";
+import { LOCALES, getLocale } from "@/config/i18n";
+import type { PublicUser } from "@/interfaces/users";
+
+interface Props {
+	title: string;
+	locale: string;
+	user: PublicUser | null;
+}
+
+const { title, locale: rawLocale, user } = Astro.props;
+const currentLocale = getLocale(rawLocale);
+
+// Resolve role for nav filtering
+const role: Role | undefined = user && isRole(user.role) ? user.role : undefined;
+
+const displayName = user?.name || user?.fullName || user?.username || "";
+const roleLabel =
+	role === "admin"
+		? "Administrador"
+		: role === "worker"
+			? "Treballador"
+			: "Client";
+
+// --- Navigation items per role ---
+const clientNav = [
+	{ label: "Inici", icon: "home", href: "/dashboard/cliente" },
+	{ label: "Compte", icon: "person", href: "/dashboard/cliente/cuenta" },
+	{
+		label: "Linies preferides",
+		icon: "star",
+		href: "/dashboard/cliente/favoritas",
+	},
+	{
+		label: "Pressupostos",
+		icon: "description",
+		href: "/dashboard/cliente/cotizaciones",
+	},
+	{ label: "Missatges", icon: "chat", href: "/dashboard/mensajes" },
+];
+
+const workerNav = [
+	{
+		label: "Inici",
+		icon: "directions_bus",
+		href: "/dashboard/trabajador",
+	},
+	{ label: "Linies", icon: "route", href: "/dashboard/trabajador/lineas" },
+	{
+		label: "Incidencies",
+		icon: "report_problem",
+		href: "/dashboard/trabajador/incidencias",
+	},
+	{
+		label: "Informes",
+		icon: "assignment",
+		href: "/dashboard/trabajador/reportes",
+	},
+	{ label: "Missatges", icon: "chat", href: "/dashboard/mensajes" },
+];
+
+const adminNav = [
+	{ label: "Panell", icon: "dashboard", href: "/dashboard/gestion" },
+	{ label: "Mapa en viu", icon: "map", href: "/dashboard/gestion/mapa" },
+	{ label: "Rutes", icon: "route", href: "/dashboard/gestion/rutas" },
+	{
+		label: "Autobusos",
+		icon: "directions_bus",
+		href: "/dashboard/gestion/autobuses",
+	},
+	{
+		label: "Parades",
+		icon: "place",
+		href: "/dashboard/gestion/paradas",
+	},
+	{
+		label: "Horaris",
+		icon: "schedule",
+		href: "/dashboard/gestion/horarios",
+	},
+	{
+		label: "Conductors",
+		icon: "badge",
+		href: "/dashboard/gestion/conductores",
+	},
+	{
+		label: "Notificacions",
+		icon: "notifications",
+		href: "/dashboard/gestion/notificaciones",
+	},
+	{
+		label: "Reportes",
+		icon: "bar_chart",
+		href: "/dashboard/gestion/reportes",
+	},
+	{
+		label: "Integracions",
+		icon: "power",
+		href: "/dashboard/gestion/integraciones",
+	},
+	{ label: "Missatges", icon: "chat", href: "/dashboard/mensajes" },
+];
+
+let navItems: { label: string; icon: string; href: string }[] = [];
+if (role) {
+	if (hasCapability(role, "users:manage")) navItems = adminNav;
+	else if (hasCapability(role, "fleet:view")) navItems = workerNav;
+	else navItems = clientNav;
+}
+
+// Footer nav
+const footerNav = [
+	{ label: "Torna a la web", icon: "open_in_new", href: "/" },
+];
+
+// Current path for active state
+const currentPath = Astro.url.pathname;
+
+function isActive(href: string): boolean {
+	return currentPath === href || currentPath.startsWith(href + "/");
+}
+---
+
+<!doctype html>
+<html lang={currentLocale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} | Empresa Plana</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <style is:global>
+      .nav-item-active {
+        background-color: rgba(19, 174, 184, 0.12);
+        color: var(--brand-secondary);
+      }
+      .nav-item-active .material-symbols-outlined {
+        color: var(--brand-secondary);
+      }
+      #app-sidebar {
+        transition: transform 0.3s ease;
+      }
+    </style>
+  </head>
+  <body class="bg-surface text-on-surface font-sans min-h-screen">
+    <!-- Mobile overlay -->
+    <div
+      id="sidebar-overlay"
+      class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"
+      onclick="toggleSidebar()"
+    ></div>
+
+    <div class="flex min-h-screen">
+      <!-- Sidebar -->
+      <aside
+        id="app-sidebar"
+        class="fixed lg:sticky top-0 left-0 z-50 h-screen w-64 bg-surface-container-low border-r border-outline-variant flex flex-col -translate-x-full lg:translate-x-0 shrink-0"
+      >
+        <!-- Brand -->
+        <div class="flex items-center gap-2.5 px-4 h-16 border-b border-outline-variant shrink-0">
+          <span class="material-symbols-outlined text-xl text-deep-navy">
+            directions_bus
+          </span>
+          <span class="font-bold text-on-surface truncate">
+            Empresa Plana
+          </span>
+        </div>
+
+        <!-- Main nav -->
+        <nav class="flex-1 overflow-y-auto py-2 px-2">
+          {
+            navItems.map((item) => (
+              <a
+                href={item.href}
+                class={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors mb-0.5 ${
+                  isActive(item.href)
+                    ? "nav-item-active"
+                    : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"
+                }`}
+              >
+                <span class="material-symbols-outlined text-[20px]">
+                  {item.icon}
+                </span>
+                <span class="truncate">{item.label}</span>
+              </a>
+            ))
+          }
+        </nav>
+
+        <!-- Footer: back to site + user info -->
+        <div class="border-t border-outline-variant p-2 shrink-0">
+          {
+            footerNav.map((item) => (
+              <a
+                href={item.href}
+                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors mb-0.5"
+              >
+                <span class="material-symbols-outlined text-[20px]">
+                  {item.icon}
+                </span>
+                <span class="truncate">{item.label}</span>
+              </a>
+            ))
+          }
+          <div class="flex items-center gap-2 px-2 py-2">
+            <div
+              class="w-8 h-8 rounded-full bg-deep-navy text-white flex items-center justify-center text-sm font-semibold shrink-0"
+            >
+              {displayName.charAt(0).toUpperCase()}
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-on-surface truncate">
+                {displayName}
+              </p>
+              <p class="text-xs text-on-surface-variant">{roleLabel}</p>
+            </div>
+            <button
+              id="logout-btn"
+              class="p-1.5 rounded-md hover:bg-surface-container-high text-on-surface-variant transition-colors"
+              title="Tancar sessio"
+            >
+              <span class="material-symbols-outlined text-[18px]">
+                logout
+              </span>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main content -->
+      <main class="flex-1 min-w-0">
+        <!-- Top navbar -->
+        <header
+          class="sticky top-0 z-30 h-14 bg-surface-container-lowest/80 backdrop-blur-md border-b border-outline-variant flex items-center px-4 gap-3"
+        >
+          <!-- Hamburger (mobile) -->
+          <button
+            id="hamburger-btn"
+            class="lg:hidden p-1.5 rounded-md hover:bg-surface-container-high text-on-surface-variant"
+            onclick="toggleSidebar()"
+          >
+            <span class="material-symbols-outlined">menu</span>
+          </button>
+
+          <div class="flex-1"></div>
+
+          <!-- Language switcher -->
+          <div class="relative" id="lang-switcher">
+            <button
+              id="lang-toggle"
+              class="flex items-center gap-1 px-2 py-1.5 rounded-md text-xs font-semibold hover:bg-surface-container-high text-on-surface-variant transition-colors"
+            >
+              <span class="material-symbols-outlined text-[16px]">
+                translate
+              </span>
+              <span>{currentLocale.toUpperCase()}</span>
+              <span class="material-symbols-outlined text-[14px]">
+                expand_more
+              </span>
+            </button>
+            <div
+              id="lang-dropdown"
+              class="hidden absolute right-0 top-full mt-1 bg-surface-container-lowest border border-outline-variant rounded-lg shadow-lg py-1 min-w-[80px] z-50"
+            >
+              {
+                LOCALES.map((loc) => (
+                  <a
+                    href={`?lang=${loc}`}
+                    class={`block px-3 py-1.5 text-sm hover:bg-surface-container-high transition-colors ${
+                      loc === currentLocale
+                        ? "font-semibold text-deep-navy"
+                        : "text-on-surface-variant"
+                    }`}
+                  >
+                    {loc.toUpperCase()}
+                  </a>
+                ))
+              }
+            </div>
+          </div>
+
+          <!-- Dark mode toggle -->
+          <button
+            id="theme-toggle"
+            class="p-1.5 rounded-md hover:bg-surface-container-high text-on-surface-variant transition-colors"
+            title="Canvia el tema"
+          >
+            <span class="material-symbols-outlined text-[20px]">
+              dark_mode
+            </span>
+          </button>
+        </header>
+
+        <!-- Page content -->
+        <div class="p-4 lg:p-6">
+          <slot />
+        </div>
+      </main>
+    </div>
+
+    <!-- Client-side scripts -->
+    <script is:inline>
+      // Sidebar toggle
+      function toggleSidebar() {
+        const sidebar = document.getElementById("app-sidebar");
+        const overlay = document.getElementById("sidebar-overlay");
+        if (!sidebar || !overlay) return;
+        const isOpen = !sidebar.classList.contains("-translate-x-full");
+
+        if (isOpen) {
+          sidebar.classList.add("-translate-x-full");
+          overlay.classList.add("hidden");
+        } else {
+          sidebar.classList.remove("-translate-x-full");
+          overlay.classList.remove("hidden");
+        }
+      }
+
+      // Language dropdown toggle
+      document.getElementById("lang-toggle")?.addEventListener("click", () => {
+        const dropdown = document.getElementById("lang-dropdown");
+        if (dropdown) dropdown.classList.toggle("hidden");
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener("click", (e) => {
+        const switcher = document.getElementById("lang-switcher");
+        const dropdown = document.getElementById("lang-dropdown");
+        if (switcher && dropdown && !switcher.contains(e.target)) {
+          dropdown.classList.add("hidden");
+        }
+      });
+
+      // Dark mode toggle
+      document.getElementById("theme-toggle")?.addEventListener("click", () => {
+        const html = document.documentElement;
+        const isDark = html.classList.contains("dark");
+        const icon = document.querySelector(
+          "#theme-toggle .material-symbols-outlined",
+        );
+        if (isDark) {
+          html.classList.remove("dark");
+          if (icon) icon.textContent = "light_mode";
+          localStorage.setItem("theme", "light");
+        } else {
+          html.classList.add("dark");
+          if (icon) icon.textContent = "dark_mode";
+          localStorage.setItem("theme", "dark");
+        }
+      });
+
+      // Initialize theme from localStorage
+      (function () {
+        const saved = localStorage.getItem("theme");
+        const html = document.documentElement;
+        const icon = document.querySelector(
+          "#theme-toggle .material-symbols-outlined",
+        );
+        if (saved === "dark") {
+          html.classList.add("dark");
+          if (icon) icon.textContent = "dark_mode";
+        } else {
+          html.classList.remove("dark");
+          if (icon) icon.textContent = "light_mode";
+        }
+      })();
+
+      // Logout
+      document
+        .getElementById("logout-btn")
+        ?.addEventListener("click", async () => {
+          try {
+            await fetch("/api/auth/logout", { method: "POST" });
+          } catch {
+            // ignore
+          }
+          window.location.href = "/dashboard/login";
+        });
+    </script>
+  </body>
+</html>

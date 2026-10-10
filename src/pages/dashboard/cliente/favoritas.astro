@@ -1,0 +1,88 @@
+---
+import DashboardLayout from "@/layouts/DashboardLayout.astro";
+import { getSession } from "@/lib/auth";
+import { getPublicUser } from "@/lib/get-public-user";
+import { prisma } from "@/lib/db";
+import { getLocale, getDictionary } from "@/config/i18n";
+
+export const prerender = false;
+
+const session = await getSession(Astro.cookies);
+if (!session) {
+	return Astro.redirect("/dashboard/login");
+}
+
+const locale = getLocale(Astro.url.searchParams.get("lang"));
+const dict = getDictionary(locale);
+
+const user = await getPublicUser(session.id);
+
+const favRows = await prisma().favoriteRoute.findMany({
+	where: { userId: session.id },
+	orderBy: { createdAt: "desc" },
+});
+
+const routeIds = favRows.map((f) => f.routeId);
+const routes = routeIds.length
+	? await prisma().route.findMany({ where: { id: { in: routeIds } } })
+	: [];
+const routeById = new Map(routes.map((r) => [r.id, r]));
+const favorites = favRows.map((f) => routeById.get(f.routeId)).filter(Boolean);
+---
+
+<DashboardLayout title={dict.app.panel.favorites as string} locale={locale} user={user!}>
+	<div>
+		<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-deep-navy">
+			{dict.app.panel.favorites as string}
+		</h1>
+
+		{favorites.length === 0 && (
+			<div class="mt-6 rounded-lg bg-surface-container-low border border-surface-variant px-4 py-3 text-on-surface-variant text-sm">
+				{dict.app.panel.favoritesEmpty as string}
+			</div>
+		)}
+
+		{favorites.length > 0 && (
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+				{favorites.map((r) => r && (
+					<div class="bg-surface-container-lowest rounded-xl shadow-ambient border border-surface-variant p-6">
+						<div class="flex items-center justify-between gap-4">
+							<div>
+								<div class="flex items-center gap-2">
+									<span class="h-3 w-3 rounded-full inline-block" style={`background-color: ${r.color}`} />
+									<span class="font-label-md text-label-md font-bold text-on-surface">{r.code}</span>
+								</div>
+								<p class="font-headline-md text-headline-md font-bold text-deep-navy mt-1">{r.name}</p>
+								<p class="font-body-md text-body-md text-on-surface-variant">
+									{r.origin} → {r.destination}
+								</p>
+							</div>
+							<button
+								type="button"
+								class="fav-toggle p-2 rounded-lg hover:bg-surface-container transition-colors"
+								data-route-id={r.id}
+								aria-label="Quitar"
+							>
+								<span class="material-symbols-outlined icon-filled text-energetic-orange">star</span>
+							</button>
+						</div>
+					</div>
+				))}
+			</div>
+		)}
+	</div>
+
+	<script>
+		document.querySelectorAll(".fav-toggle").forEach((btn) => {
+			btn.addEventListener("click", async () => {
+				const routeId = (btn as HTMLElement).dataset.routeId;
+				await fetch("/api/favorites", {
+					method: "PUT",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ routeId }),
+				});
+				window.location.reload();
+			});
+		});
+	</script>
+</DashboardLayout>

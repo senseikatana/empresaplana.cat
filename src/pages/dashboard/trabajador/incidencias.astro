@@ -1,0 +1,53 @@
+---
+import DashboardLayout from "@/layouts/DashboardLayout.astro";
+import { getSession } from "@/lib/auth";
+import { getPublicUser } from "@/lib/get-public-user";
+import { prisma } from "@/lib/db";
+import { getLocale, getDictionary } from "@/config/i18n";
+
+export const prerender = false;
+
+const session = await getSession(Astro.cookies);
+if (!session) {
+	return Astro.redirect("/dashboard/login");
+}
+
+const locale = getLocale(Astro.url.searchParams.get("lang"));
+const dict = getDictionary(locale);
+
+const user = await getPublicUser(session.id);
+
+const notifications = await prisma().notification.findMany({
+	orderBy: { createdAt: "desc" },
+});
+---
+
+<DashboardLayout title={dict.app.panel.incidents} locale={locale} user={user}>
+	<div>
+		<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-deep-navy">
+			{dict.app.panel.incidents}
+		</h1>
+
+		<div class="flex flex-col gap-3 mt-6">
+			{notifications.map((n) => (
+				<div class="bg-surface-container-lowest rounded-xl shadow-ambient border border-surface-variant p-6">
+					<div class="flex items-start justify-between gap-4">
+						<div>
+							<h3 class="font-headline-md text-headline-md font-bold text-deep-navy">{n.title}</h3>
+							<p class="font-body-md text-body-md text-on-surface-variant mt-1">{n.desc}</p>
+						</div>
+						<span class="font-label-md text-label-md text-outline shrink-0">
+							{new Date(n.createdAt).toLocaleDateString()}
+						</span>
+					</div>
+				</div>
+			))}
+
+			{notifications.length === 0 && (
+				<div class="rounded-lg bg-surface-container-low border border-surface-variant px-4 py-3 text-on-surface-variant text-sm">
+					{dict.app.worker.noIncidents}
+				</div>
+			)}
+		</div>
+	</div>
+</DashboardLayout>

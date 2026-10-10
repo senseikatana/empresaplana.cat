@@ -1,0 +1,88 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
+interface ServiceContent {
+  title: string;
+  tagline: string;
+  sectionTitle: string;
+  body: string[];
+  imageUrl?: string;
+  imageCaption?: string;
+}
+
+type Props = ServiceContent & { canonicalUrl?: string };
+const {
+  title,
+  tagline,
+  sectionTitle,
+  body,
+  imageUrl,
+  imageCaption,
+  canonicalUrl,
+} = Astro.props as Props;
+---
+
+<BaseLayout
+  title={`${title} - Empresa Plana`}
+  description={tagline}
+  canonicalUrl={canonicalUrl}
+>
+  <main
+    class="mx-auto w-full max-w-container px-margin-mobile py-stack-lg md:px-margin-desktop"
+  >
+    <a
+      class="mb-stack-md inline-flex text-label-md text-deep-navy"
+      href="/servicios-discrecionales">← Volver a servicios</a
+    >
+    <section
+      class="overflow-hidden rounded-xl border border-outline-variant bg-surface-container-lowest shadow-ambient"
+    >
+      {
+        imageUrl && (
+          <img
+            class="h-64 w-full object-cover md:h-96"
+            src={imageUrl}
+            alt={imageCaption ?? title}
+          />
+        )
+      }
+      <div class="p-stack-md md:p-stack-lg">
+        <p
+          class="mb-stack-sm text-label-md font-semibold uppercase text-coastal-teal"
+        >
+          Empresa Plana
+        </p>
+        <h1 class="mb-stack-sm text-display-lg font-bold text-deep-navy">
+          {title}
+        </h1>
+        <p class="mb-stack-lg max-w-3xl text-body-lg text-on-surface-variant">
+          {tagline}
+        </p>
+        <div
+          class="grid gap-stack-md md:grid-cols-[minmax(0,2fr)_minmax(220px,1fr)]"
+        >
+          <div
+            class="space-y-stack-sm text-body-md leading-relaxed text-on-surface"
+          >
+            {body.map((paragraph) => <p>{paragraph}</p>)}
+          </div>
+          <aside class="h-fit rounded-lg bg-surface-container-low p-stack-md">
+            <h2 class="mb-stack-sm text-headline-md font-bold text-deep-navy">
+              {sectionTitle}
+            </h2>
+            <ul class="space-y-stack-sm text-body-md text-on-surface-variant">
+              <li>✓ Autocares modernos y confortables</li>
+              <li>✓ Conductores profesionales</li>
+              <li>✓ Servicio adaptado a cada grupo</li>
+              <li>✓ Atención personalizada</li>
+            </ul>
+          </aside>
+        </div>
+        <a
+          class="mt-stack-lg inline-flex rounded bg-energetic-orange px-stack-md py-stack-sm font-semibold text-white"
+          href="/solicitar-presupuesto">Solicitar presupuesto →</a
+        >
+      </div>
+    </section>
+  </main>
+</BaseLayout>

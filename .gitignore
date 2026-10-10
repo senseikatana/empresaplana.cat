@@ -1,0 +1,51 @@
+# Dependencias
+node_modules/
+.pnpm-store/
+.yarn/
+bun.lockb
+
+# Carpetas y archivos ocultos del sistema
+.*
+!.gitignore
+!.env.example
+!.prettierrc
+!.eslintrc.json
+
+# Compilaciones y logs
+dist/
+build/
+generated/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+bun-debug.log*
+
+# Archivos de entorno
+.env
+.env.local
+.env.*.local
+
+# Credenciales Google (service account JSON) y dumps de sheets
+sheets-credentials.json
+sheets-export/
+
+# Cache
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.output/
+coverage/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+

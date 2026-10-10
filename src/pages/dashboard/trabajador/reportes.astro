@@ -1,0 +1,30 @@
+---
+import DashboardLayout from "@/layouts/DashboardLayout.astro";
+import { getSession } from "@/lib/auth";
+import { getPublicUser } from "@/lib/get-public-user";
+import { getLocale, getDictionary } from "@/config/i18n";
+
+export const prerender = false;
+
+const session = await getSession(Astro.cookies);
+if (!session) {
+	return Astro.redirect("/dashboard/login");
+}
+
+const locale = getLocale(Astro.url.searchParams.get("lang"));
+const dict = getDictionary(locale);
+
+const user = await getPublicUser(session.id);
+---
+
+<DashboardLayout title={dict.app.panel.reports} locale={locale} user={user}>
+	<div>
+		<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-deep-navy">
+			{dict.app.panel.reports}
+		</h1>
+
+		<div class="mt-6 rounded-lg bg-surface-container-low border border-surface-variant px-4 py-3 text-on-surface-variant text-sm">
+			{dict.app.worker.noLineData}
+		</div>
+	</div>
+</DashboardLayout>
