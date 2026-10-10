@@ -7,7 +7,7 @@ import { ensureOAuthUser } from "@/lib/oauth-users";
 export const prerender = false;
 
 export const GET: APIRoute = async ({ request, cookies, redirect, url }) => {
-	const { auth } = await import("@/lib/better-auth");
+	const { auth } = await import("@/config/auth.config");
 	const session = await auth.api.getSession({ headers: request.headers });
 	if (!session?.user.email || session.user.emailVerified !== true) {
 		return redirect("/dashboard/login?oauth=failed", 302);

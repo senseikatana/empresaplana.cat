@@ -1,21 +1,40 @@
-import { prismaAdapter } from "@better-auth/prisma-adapter";
 import { APIError, betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { ENV } from "@/config/config.env";
 import { prisma } from "@/lib/db";
-import { socialProviders } from "@/lib/oauth-env";
 import { ensureOAuthUser } from "@/lib/oauth-users";
 
-if (!process.env.AUTH_SECRET) {
+if (!ENV.authSecret) {
 	throw new Error("AUTH_SECRET must be configured for Better Auth.");
 }
 
-if (process.env.NODE_ENV === "production" && !process.env.BETTER_AUTH_URL) {
+if (process.env.NODE_ENV === "production" && !ENV.betterAuthUrl) {
 	throw new Error("BETTER_AUTH_URL must be set to the production origin.");
 }
 
+const socialProviders = {
+	...(ENV.googleClientId && ENV.googleClientSecret
+		? {
+				google: {
+					clientId: ENV.googleClientId,
+					clientSecret: ENV.googleClientSecret,
+				},
+			}
+		: {}),
+	...(ENV.githubClientId && ENV.githubClientSecret
+		? {
+				github: {
+					clientId: ENV.githubClientId,
+					clientSecret: ENV.githubClientSecret,
+				},
+			}
+		: {}),
+};
+
 export const auth = betterAuth({
 	appName: "Empresa Plana",
-	baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:4321",
-	secret: process.env.AUTH_SECRET,
+	baseURL: ENV.betterAuthUrl ?? "http://localhost:4321",
+	secret: ENV.authSecret,
 	database: prismaAdapter(prisma(), { provider: "postgresql" }),
 	socialProviders,
 	user: {

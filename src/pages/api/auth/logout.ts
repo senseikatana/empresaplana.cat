@@ -4,7 +4,7 @@ import { clearSessionCookie } from "@/lib/auth";
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request, cookies }) => {
-	const { auth } = await import("@/lib/better-auth");
+	const { auth } = await import("@/config/auth.config");
 	const headers = new Headers(request.headers);
 	headers.delete("content-length");
 	headers.set("content-type", "application/json");

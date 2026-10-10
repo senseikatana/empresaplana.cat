@@ -156,7 +156,8 @@ Canonical tokens live in `src/assets/DESIGN.md` (mirror of the Stitch
 - New and changed passwords must be 12–128 characters. Existing seeded
   development users (passkey `12345678`: `admin`, `trabajador`, `cliente`)
   remain able to log in for backwards-compatible local testing.
-- Google and GitHub OAuth use `src/lib/better-auth.ts` and separate
+- Google and GitHub OAuth use `src/config/auth.config.ts` and environment
+  values from `src/config/config.env.ts`, with separate
   `AuthUser`/`AuthSession`/`AuthAccount`/`AuthVerification` tables. Verified
   provider emails link to an existing application account; new social users
   receive the `client` role. OAuth sessions exchange into the app's existing

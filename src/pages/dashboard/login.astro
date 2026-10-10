@@ -3,7 +3,7 @@ import AuthLayout from "@/layouts/AuthLayout.astro";
 import { getLocale, getDictionary } from "@/config/i18n";
 import { dashboardHomeForRole } from "@/lib/acl";
 import { getSession } from "@/lib/auth";
-import { oauthProviders } from "@/lib/oauth-env";
+import { oauthProviders } from "@/config/config.env";
 import SocialAuthButtons from "@/components/auth/SocialAuthButtons.astro";
 
 export const prerender = false;
