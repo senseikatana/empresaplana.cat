@@ -255,18 +255,14 @@ from the spreadsheet sync, and the local copy is demo data.
 
 Verified before writing this document:
 
-- The latest git tag is **`v0.3.1`**, and `package.json` declares **`0.3.1`**. They
-  agree, so the manifest is not lagging.
-- `CHANGELOG.md` opens with a `## [1.0.0]` section describing a release that **has
-  no corresponding tag or commits**. It is aspirational, not factual.
-- `CHANGELOG.md` also contains 8 embedded ANSI **OSC 7** terminal escape sequences
-  from a copy-paste (`ESC ] 7 ; file://... BEL`). All 8 are well-formed, but they
-  leak a stale absolute local path into the file.
-
-Treat the changelog's `[1.0.0]` section as fiction. The release tooling in
-`src/scripts/` reads git tags rather than the changelog for exactly this reason:
-the tag is the authority on what shipped, and a stray heading must not be able to
-dictate the expected version.
+- The latest git tag is **`v0.4.0`**, and `package.json` declares the same version.
+  They agree, so the manifest is not lagging.
+- This project is on a `0.x` line. There has never been a `v1.0.0`, and none is
+  planned. An earlier `## [1.0.0]` heading in `CHANGELOG.md` was a fabrication —
+  no tag, no commits, nothing shipped — and it has been removed.
+- `CHANGELOG.md` also contained ANSI **OSC 7** terminal escape sequences from a
+  copy-paste (`ESC ] 7 ; file://... BEL`), which leaked a stale absolute local
+  path into the file.
 
 `bun run release:check` fails when the manifest and the tag disagree, and warns
 when the changelog disagrees. The warning does not fail the check on purpose,
