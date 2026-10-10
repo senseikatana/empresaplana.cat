@@ -13,6 +13,7 @@ const routeId = required(40);
 const time = z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/, "HH:MM");
 const optionalTime = z.union([time, z.literal("")]);
 const date = z.union([z.iso.date(), z.literal("")]);
+const day = z.iso.date();
 const lat = z.number().min(-90).max(90);
 const lng = z.number().min(-180).max(180);
 const point = z.object({ lat, lng }).strict();
@@ -205,6 +206,43 @@ export const connectionSchema = z
 		message: "different_lines",
 	});
 
+export const vehicleDocumentSchema = z
+	.object({
+		busId: id,
+		docType: z.enum([
+			"itv",
+			"insurance",
+			"tachograph",
+			"transport_card",
+			"circulation_permit",
+			"other",
+		]),
+		reference: text(80),
+		expiresOn: day,
+		notes: text(1000).nullable(),
+	})
+	.strict();
+export const incidentSchema = z
+	.object({
+		busId: id.nullable(),
+		driverId: id.nullable(),
+		occurredOn: day,
+		severity: z.enum(["low", "medium", "high"]),
+		status: z.enum(["open", "in_progress", "resolved"]),
+		description: required(2000),
+	})
+	.strict();
+export const maintenanceSchema = z
+	.object({
+		busId: id,
+		serviceOn: day,
+		kind: z.enum(["preventive", "corrective"]),
+		status: z.enum(["scheduled", "in_progress", "completed"]),
+		description: required(2000),
+		cost: z.number().min(0).max(99999999.99),
+	})
+	.strict();
+
 export const managementSchemas = {
 	rutas: routeSchema,
 	autobuses: busSchema,
@@ -218,6 +256,9 @@ export const managementSchemas = {
 	lineas: lineSchema,
 	"horarios-linea": lineScheduleSchema,
 	conexiones: connectionSchema,
+	documentos: vehicleDocumentSchema,
+	incidencias: incidentSchema,
+	mantenimiento: maintenanceSchema,
 };
 export type ResourceName = keyof typeof managementSchemas;
 export const resourceNames = Object.keys(managementSchemas) as ResourceName[];
@@ -247,7 +288,14 @@ export interface ManagementField {
 	type: InputType;
 	nullable: boolean;
 	options?: readonly string[];
-	relation?: "routes" | "stops" | "drivers" | "buses" | "users" | "lines";
+	relation?:
+		| "routes"
+		| "stops"
+		| "drivers"
+		| "buses"
+		| "vehicles"
+		| "users"
+		| "lines";
 }
 const numberFields = new Set([
 	"capacity",
@@ -261,6 +309,8 @@ const numberFields = new Set([
 	"toLineId",
 	"waitMin",
 	"minutesLate",
+	"busId",
+	"cost",
 ]);
 const nullableFields = new Set([
 	"driverId",
@@ -272,6 +322,7 @@ const nullableFields = new Set([
 	"comment",
 	"company",
 	"description",
+	"notes",
 ]);
 const jsonFields = new Set(["path", "gps", "stopIds", "routeIds", "stopsJson"]);
 const relations: Record<string, ManagementField["relation"]> = {
@@ -281,29 +332,36 @@ const relations: Record<string, ManagementField["relation"]> = {
 	fromLineId: "lines",
 	toLineId: "lines",
 	busNumber: "buses",
+	busId: "vehicles",
 	userId: "users",
+};
+const statusOptions: Partial<Record<ResourceName, readonly string[]>> = {
+	presupuestos: budgetSchema.shape.status.options,
+	incidencias: incidentSchema.shape.status.options,
+	mantenimiento: maintenanceSchema.shape.status.options,
+};
+const selectOptions: Record<string, readonly string[]> = {
+	type: notificationSchema.shape.type.options,
+	action: reportSchema.shape.action.options,
+	docType: vehicleDocumentSchema.shape.docType.options,
+	severity: incidentSchema.shape.severity.options,
+	kind: maintenanceSchema.shape.kind.options,
 };
 export function managementFields(resource: ResourceName): ManagementField[] {
 	return Object.keys(managementSchemas[resource].shape).map((name) => {
 		let type: InputType = numberFields.has(name) ? "number" : "text";
 		if (name === "lineId" && resource === "reportes") type = "text";
 		if (jsonFields.has(name)) type = "json";
-		if (["desc", "description", "comment", "purpose"].includes(name))
+		if (["desc", "description", "comment", "purpose", "notes"].includes(name))
 			type = "textarea";
 		if (name === "email") type = "email";
-		if (name.endsWith("Day")) type = "date";
+		if (name.endsWith("Day") || name.endsWith("On")) type = "date";
 		if (name.endsWith("Time") || name === "departure" || name === "arrival")
 			type = "time";
 		if (name === "color") type = "color";
 		if (name === "read") type = "checkbox";
-		let options: readonly string[] | undefined;
-		if (name === "status")
-			options =
-				resource === "presupuestos"
-					? budgetSchema.shape.status.options
-					: status.options;
-		if (name === "type") options = notificationSchema.shape.type.options;
-		if (name === "action") options = reportSchema.shape.action.options;
+		let options: readonly string[] | undefined = selectOptions[name];
+		if (name === "status") options = statusOptions[resource] ?? status.options;
 		if (options) type = "select";
 		return {
 			name,
@@ -313,7 +371,8 @@ export function managementFields(resource: ResourceName): ManagementField[] {
 				(nullableFields.has(name) &&
 					!(name === "routeId" && resource === "horarios") &&
 					!(name === "company" && resource === "autobuses")) ||
-				(resource === "oficinas" && ["lat", "lng"].includes(name)),
+				(resource === "oficinas" && ["lat", "lng"].includes(name)) ||
+				(resource === "incidencias" && name === "busId"),
 			relation:
 				name === "lineId" && resource === "horarios-linea"
 					? "lines"
@@ -348,6 +407,13 @@ export function initialManagementValues(
 		...(resource === "oficinas" ? { order: 0 } : {}),
 		...(resource === "presupuestos" ? { status: "received" } : {}),
 		...(resource === "conexiones" ? { waitMin: 0 } : {}),
+		...(resource === "documentos" ? { docType: "itv" } : {}),
+		...(resource === "incidencias"
+			? { severity: "low", status: "open" }
+			: {}),
+		...(resource === "mantenimiento"
+			? { kind: "preventive", status: "scheduled", cost: 0 }
+			: {}),
 	});
 	return values;
 }
