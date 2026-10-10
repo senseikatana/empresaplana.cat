@@ -12,8 +12,12 @@ function devResend(): Resend {
 	return new Resend(ENV.resendApiKey);
 }
 
-function unwrap<T>(result: { data: T | null; error: { message: string } | null }, action: string): T {
-	if (result.error) throw new Error(`Resend ${action} failed: ${result.error.message}`);
+function unwrap<T>(
+	result: { data: T | null; error: { message: string } | null },
+	action: string,
+): T {
+	if (result.error)
+		throw new Error(`Resend ${action} failed: ${result.error.message}`);
 	if (!result.data) throw new Error(`Resend ${action} returned no data.`);
 	return result.data;
 }
@@ -25,10 +29,16 @@ export async function sendTransactionalEmail(input: {
 }): Promise<string> {
 	if (!ENV.emailFrom) throw new Error("AUTH_EMAIL_FROM must be configured.");
 	const data = unwrap(
-		await devResend().emails.send({ from: ENV.emailFrom, to: input.to, subject: input.subject, text: input.text }),
+		await devResend().emails.send({
+			from: ENV.emailFrom,
+			to: input.to,
+			subject: input.subject,
+			text: input.text,
+		}),
 		"send",
 	);
-	if (!data.id) throw new Error("Resend did not return an email delivery identifier.");
+	if (!data.id)
+		throw new Error("Resend did not return an email delivery identifier.");
 	return data.id;
 }
 

@@ -92,7 +92,11 @@ export function expiryState(day: unknown, today = new Date()) {
 		(toDay(day).getTime() - toDay(today.toISOString().slice(0, 10)).getTime()) /
 			86_400_000,
 	);
-	return days < 0 ? "expired" : days <= EXPIRY_WARNING_DAYS ? "expiring" : "valid";
+	return days < 0
+		? "expired"
+		: days <= EXPIRY_WARNING_DAYS
+			? "expiring"
+			: "valid";
 }
 export const management = {
 	rutas: definition(managementSchemas.rutas, {
@@ -421,14 +425,18 @@ export const management = {
 			).map(withBus),
 		count: (db, q) => db.incident.count({ where: search(["description"], q) }),
 		find: async (db, id) => {
-			const row = await db.incident.findUnique({ where: { id: numericId(id) } });
+			const row = await db.incident.findUnique({
+				where: { id: numericId(id) },
+			});
 			return row && plain(row);
 		},
 		write: (db, id, { occurredOn, ...rest }) => {
 			const data = { ...rest, occurredOn: toDay(occurredOn) };
 			return id === undefined
 				? db.incident.create({ data }).then(plain)
-				: db.incident.update({ where: { id: numericId(id) }, data }).then(plain);
+				: db.incident
+						.update({ where: { id: numericId(id) }, data })
+						.then(plain);
 		},
 		remove: (db, id) => db.incident.delete({ where: { id: numericId(id) } }),
 	}),

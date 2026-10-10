@@ -72,7 +72,7 @@ const labels = { google: googleLabel, github: githubLabel };
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
 						provider,
-						locale: callback.searchParams.get("locale") ?? "ca",
+						locale: callback.searchParams.get("locale") ?? "es",
 						redirect: callback.searchParams.get("redirect") ?? "",
 					}),
 				});

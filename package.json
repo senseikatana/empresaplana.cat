@@ -1,73 +1,69 @@
 {
-  "name": "empresaplana-astro",
-  "type": "module",
-  "version": "0.1.0",
-  "engines": {
-    "node": ">=22.12.0"
-  },
-  "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "start": "node dist/server/entry.mjs",
-    "deploy:insforge": "node src/scripts/deploy-insforge.mjs",
-    "email:test": "bun src/scripts/test-email.ts",
-    "email:manage": "bun src/scripts/manage-emails.ts",
-    "tunnel": "cloudflared tunnel --url http://localhost:4321",
-    "astro": "astro",
-    "sync:sheets": "bun src/scripts/sync-sheets.mjs",
-    "export:sheets": "bun src/scripts/export-sheets.mjs",
-    "bootstrap:sheets": "bun src/scripts/bootstrap-sheets.mjs",
-    "test": "astro check && bun test",
-    "format": "biome format --write .",
-    "format:check": "biome format .",
-    "lint": "biome lint .",
-    "check": "biome check .",
-    "postinstall": "prisma generate",
-    "db:generate": "prisma generate",
-    "db:push": "prisma db push",
-    "db:migrate": "prisma migrate dev",
-    "db:seed": "bunx tsx prisma/seed.ts",
-    "db:setup": "prisma db push && prisma generate",
-    "prepare": "husky"
-  },
-  "dependencies": {
-    "@astrojs/node": "^11.1.7",
-    "@astrojs/vue": "^7.0.3",
-    "@insforge/sdk": "^1.5.2",
-    "@prisma/adapter-pg": "^7.10.0",
-    "@prisma/client": "^7.10.0",
-    "@tailwindcss/vite": "^4.3.3",
-    "astro": "^7.3.8",
-    "dotenv": "^18.0.7",
-    "eslint": "^10.12.0",
-    "jose": "^6.2.12",
-    "katanakit-js": "^6.8.4",
-    "openai": "^7.32.0",
-    "pg": "^8.23.1",
-    "prettier": "^3.9.9",
-    "resend": "^6.32.1",
-    "tailwindcss": "^4.3.3",
-    "vue": "^3.5.43",
-    "zod": "^4.6.5"
-  },
-  "devDependencies": {
-    "@astrojs/check": "^0.9.10",
-    "@biomejs/biome": "^2.5.15",
-    "@types/bun": "^1.4.2",
-    "@types/node": "^26.6.5",
-    "@types/pg": "^8.23.1",
-    "husky": "^9.1.7",
-    "lint-staged": "^17.6.0",
-    "prisma": "^7.10.0",
-    "tsx": "^4.23.15",
-    "typescript": "^6.0.3"
-  },
-  "author": "Sergio Jurado",
-  "description": "Empresa Plana website, powered by Astro",
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,mjs,cjs}": [
-      "eslint --fix"
-    ]
-  }
+	"name": "empresaplana-astro",
+	"type": "module",
+	"version": "0.1.0",
+	"engines": {
+		"node": ">=22.12.0"
+	},
+	"scripts": {
+		"dev": "astro dev",
+		"build": "astro build",
+		"preview": "astro preview",
+		"start": "node dist/server/entry.mjs",
+		"deploy:insforge": "node src/scripts/deploy-insforge.mjs",
+		"email:test": "bun src/scripts/test-email.ts",
+		"email:manage": "bun src/scripts/manage-emails.ts",
+		"tunnel": "cloudflared tunnel --url http://localhost:4321",
+		"astro": "astro",
+		"test": "astro check && bun test",
+		"format": "biome format --write .",
+		"format:check": "biome format .",
+		"lint": "biome lint .",
+		"check": "biome check .",
+		"db:generate": "prisma generate",
+		"db:push": "prisma db push",
+		"db:migrate": "prisma migrate dev",
+		"db:seed": "bunx tsx prisma/seed.ts",
+		"db:setup": "prisma db push && prisma generate",
+		"prepare": "husky"
+	},
+	"dependencies": {
+		"@astrojs/node": "^11.1.7",
+		"@astrojs/vue": "^7.0.3",
+		"@insforge/sdk": "^1.5.2",
+		"@prisma/adapter-pg": "^7.10.0",
+		"@prisma/client": "^7.10.0",
+		"@tailwindcss/vite": "^4.3.3",
+		"astro": "^7.3.8",
+		"dotenv": "^18.0.7",
+		"eslint": "^10.12.0",
+		"jose": "^6.2.12",
+		"katanakit-js": "^6.8.4",
+		"openai": "^7.32.0",
+		"pg": "^8.23.1",
+		"prettier": "^3.9.9",
+		"resend": "^6.32.1",
+		"tailwindcss": "^4.3.3",
+		"vue": "^3.5.43",
+		"zod": "^4.6.5"
+	},
+	"devDependencies": {
+		"@astrojs/check": "^0.9.10",
+		"@biomejs/biome": "^2.5.15",
+		"@types/bun": "^1.4.2",
+		"@types/node": "^26.6.5",
+		"@types/pg": "^8.23.1",
+		"husky": "^9.1.7",
+		"lint-staged": "^17.6.0",
+		"prisma": "^7.10.0",
+		"tsx": "^4.23.15",
+		"typescript": "^6.0.3"
+	},
+	"author": "Sergio Jurado",
+	"description": "Empresa Plana website, powered by Astro",
+	"lint-staged": {
+		"*.{js,jsx,ts,tsx,mjs,cjs}": [
+			"eslint --fix"
+		]
+	}
 }

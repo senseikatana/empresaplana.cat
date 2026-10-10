@@ -12,7 +12,10 @@ const budgetSchema = z.object({
 		.email("Email inválido")
 		.max(200)
 		.transform((v) => v.toLowerCase()),
-	phone: z.string().trim().regex(/^\+?[0-9\s-]{6,20}$/, "Teléfono inválido"),
+	phone: z
+		.string()
+		.trim()
+		.regex(/^\+?[0-9\s-]{6,20}$/, "Teléfono inválido"),
 	company: z.string().trim().max(200).optional(),
 	reasonId: z.string().min(1, "Motivo requerido").max(60),
 	description: z.string().max(2000).optional(),
@@ -90,5 +93,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 		},
 	});
 
-	return Response.json({ id: budget.id, status: budget.status }, { status: 201 });
+	return Response.json(
+		{ id: budget.id, status: budget.status },
+		{ status: 201 },
+	);
 };

@@ -122,10 +122,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 			},
 		});
 		if (!participant) {
-			return Response.json(
-				{ error: "not_participant" },
-				{ status: 403 },
-			);
+			return Response.json({ error: "not_participant" }, { status: 403 });
 		}
 		conversation = await prisma().conversation.findUnique({
 			where: { id: conversationId },
@@ -136,9 +133,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 			data: {
 				type: "support",
 				participants: {
-					create: [
-						{ userId: user.id, role: user.role },
-					],
+					create: [{ userId: user.id, role: user.role }],
 				},
 			},
 			include: { participants: true },

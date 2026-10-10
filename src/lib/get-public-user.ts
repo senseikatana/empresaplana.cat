@@ -1,7 +1,9 @@
 import type { PublicUser } from "@/interfaces/users";
 import { prisma } from "@/lib/db";
 
-export async function getPublicUser(userId: number): Promise<PublicUser | null> {
+export async function getPublicUser(
+	userId: number,
+): Promise<PublicUser | null> {
 	const row = await prisma().user.findUnique({
 		where: { id: userId },
 		select: {
