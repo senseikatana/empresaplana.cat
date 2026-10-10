@@ -21,7 +21,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 		return Response.json(formatValidationError(parsed.error), { status: 400 });
 	}
 
-	const { username, passkey, redirect } = parsed.data;
+	const { username, passkey, redirect, locale } = parsed.data;
 	const user = await prisma().user.findFirst({
 		where: { username },
 	});
@@ -40,6 +40,6 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 	setSessionCookie(cookies, token);
 	return Response.json({
 		user: publicUser(user),
-		next: postLoginDestination(user.role, redirect),
+		next: postLoginDestination(user.role, redirect, locale),
 	});
 };

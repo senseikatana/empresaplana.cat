@@ -2,12 +2,19 @@
 /* ? Global Styles */
 import type { SiteInfoProps } from "@/interfaces";
 import "@/styles/global.css";
+import PublicHeader from "@/components/PublicHeader.astro";
+import { getLocale } from "@/config/i18n";
+import { getSession } from "@/lib/auth";
+import { getCanonicalUrl } from "@/config/site-info";
 
-interface Props extends SiteInfoProps {}
+interface Props extends SiteInfoProps {
+  publicHeader?: boolean;
+}
 
 const {
   title,
-  lang = "es",
+  lang = getLocale(Astro.params.lang),
+  publicHeader = true,
   bodyClass = "bg-surface text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col",
   description = "",
   author = "",
@@ -17,8 +24,10 @@ const {
   ogDescription = description,
   ogImage,
   ogType = "website",
-  canonicalUrl,
+  canonicalUrl = getCanonicalUrl(Astro.url.pathname),
 }: Props = Astro.props;
+const locale = getLocale(lang);
+const session = publicHeader ? await getSession(Astro.cookies) : null;
 ---
 
 <!doctype html>
@@ -61,6 +70,7 @@ const {
     />
   </head>
   <body class={bodyClass}>
+    {publicHeader && <PublicHeader locale={locale} role={session?.role} />}
     <slot />
   </body>
 </html>

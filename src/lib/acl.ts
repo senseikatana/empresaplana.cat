@@ -16,6 +16,13 @@
  * `CapabilityOverrides` (allow/deny puntuales sobre lo que da su rol).
  */
 
+import {
+	DEFAULT_LOCALE,
+	localizedPath,
+	unlocalizedPath,
+} from "@/config/i18n/routing";
+import type { Locale } from "@/interfaces/common";
+
 export const ROLES = ["client", "worker", "manager", "admin"] as const;
 export type Role = (typeof ROLES)[number];
 
@@ -94,16 +101,16 @@ const ADMIN_ONLY_PATHS = [
 	"/dashboard/gestion/integraciones",
 ];
 
-const ROLE_SPECIFIC_PATHS = [
-	"/dashboard/cliente",
-	"/dashboard/trabajador",
-];
+const ROLE_SPECIFIC_PATHS = ["/dashboard/cliente", "/dashboard/trabajador"];
 
 export function canAccessDashboardPath(
 	role: unknown,
 	pathname: string,
 ): boolean {
+	pathname = unlocalizedPath(pathname);
 	if (!isCompanyRole(role)) return false;
+	if (pathname !== "/dashboard" && !pathname.startsWith("/dashboard/"))
+		return false;
 	if (
 		ROLE_SPECIFIC_PATHS.some(
 			(path) => pathname === path || pathname.startsWith(`${path}/`),
@@ -129,9 +136,10 @@ export function dashboardHomeForRole(role: Role): string {
 export function postLoginDestination(
 	role: Role,
 	requestedPath: string | null | undefined,
+	locale: Locale = DEFAULT_LOCALE,
 ): string {
 	if (!isCompanyRole(role) || !requestedPath) {
-		return dashboardHomeForRole(role);
+		return localizedPath(dashboardHomeForRole(role), locale);
 	}
 
 	try {
@@ -140,11 +148,14 @@ export function postLoginDestination(
 			target.origin === "https://empresaplana.invalid" &&
 			canAccessDashboardPath(role, target.pathname)
 		) {
-			return `${target.pathname}${target.search}${target.hash}`;
+			return localizedPath(
+				`${target.pathname}${target.search}${target.hash}`,
+				locale,
+			);
 		}
 	} catch {
-		return dashboardHomeForRole(role);
+		return localizedPath(dashboardHomeForRole(role), locale);
 	}
 
-	return dashboardHomeForRole(role);
+	return localizedPath(dashboardHomeForRole(role), locale);
 }

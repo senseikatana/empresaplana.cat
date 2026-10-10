@@ -9,6 +9,12 @@ import type { Locations, LocationsMobile } from "@/interfaces/locations";
 import type { MobileApp } from "@/interfaces/mobile-app";
 import type { Routes } from "@/interfaces/routes";
 export interface I18nDictionary {
+	management: {
+		entities: Record<string, string>;
+		fields: Record<string, string>;
+		errors: Record<string, string>;
+		common: Record<string, string>;
+	};
 	ai: {
 		title: string;
 		description: string;

@@ -1,0 +1,4 @@
+---
+import { localizedPath, getLocale } from "@/config/i18n/routing";
+return Astro.redirect(localizedPath("/donde-estamos-mobile", getLocale(Astro.params.lang)));
+---

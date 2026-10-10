@@ -1,0 +1,14 @@
+---
+import { localizedPath, getLocale } from "@/config/i18n/routing";
+import { getSession } from "@/lib/auth";
+import { dashboardHomeForRole } from "@/lib/acl";
+
+export const prerender = false;
+
+const session = await getSession(Astro.cookies);
+if (!session) {
+	return Astro.redirect(localizedPath("/dashboard/login", getLocale(Astro.params.lang)));
+}
+
+return Astro.redirect(localizedPath(dashboardHomeForRole(session.role), getLocale(Astro.params.lang)));
+---

@@ -1,4 +1,5 @@
 ---
+import { localizedPath, getLocale } from "@/config/i18n/routing";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 
 interface ServiceContent {
@@ -32,7 +33,7 @@ const {
   >
     <a
       class="mb-stack-md inline-flex text-label-md text-deep-navy"
-      href="/servicios-discrecionales">← Volver a servicios</a
+      href={localizedPath("/servicios-discrecionales", getLocale(Astro.params.lang))}>← Volver a servicios</a
     >
     <section
       class="overflow-hidden rounded-xl border border-outline-variant bg-surface-container-lowest shadow-ambient"
@@ -80,7 +81,7 @@ const {
         </div>
         <a
           class="mt-stack-lg inline-flex rounded bg-energetic-orange px-stack-md py-stack-sm font-semibold text-white"
-          href="/solicitar-presupuesto">Solicitar presupuesto →</a
+          href={localizedPath("/solicitar-presupuesto", getLocale(Astro.params.lang))}>Solicitar presupuesto →</a
         >
       </div>
     </section>

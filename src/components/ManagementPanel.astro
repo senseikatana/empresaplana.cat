@@ -1,0 +1,178 @@
+---
+import type { Locale } from "@/interfaces/common";
+import { getDictionary } from "@/config/i18n";
+import { localizedPath } from "@/config/i18n/routing";
+import { managementFields, initialManagementValues, type ResourceName } from "@/lib/management-schemas";
+import type { ManagementRow, relationOptions } from "@/lib/management";
+
+interface Props {
+	resource: ResourceName;
+	locale: Locale;
+	writable: boolean;
+	rows: ManagementRow[];
+	total: number;
+	page: number;
+	limit: number;
+	query: string;
+	record: ManagementRow | null;
+	mode: "list" | "create" | "edit" | "view";
+	options: Awaited<ReturnType<typeof relationOptions>> | null;
+	error?: string;
+}
+const { resource, locale, writable, rows, total, page, limit, query, record, mode, options, error } = Astro.props;
+const copy = getDictionary(locale).management;
+const common = copy.common;
+const title = copy.entities[resource];
+const fields = managementFields(resource);
+const base = localizedPath(`/dashboard/gestion/${resource}`, locale);
+const api = `/api/management/${resource}`;
+const values = record ?? initialManagementValues(resource);
+const columnKeys: Record<ResourceName, string[]> = {
+	rutas: ["code", "name", "origin", "destination", "status"],
+	autobuses: ["number", "plate", "capacity", "routeId", "status"],
+	paradas: ["name", "address", "lat", "lng"],
+	horarios: ["routeId", "departure", "arrival", "days", "status"],
+	conductores: ["name", "phone", "license", "busNumber", "status"],
+	notificaciones: ["title", "type", "routeId", "read"],
+	reportes: ["lineId", "stop", "action", "minutesLate"],
+	oficinas: ["name", "city", "address", "phone"],
+	presupuestos: ["clientName", "email", "departureCity", "arrivalCity", "status"],
+	lineas: ["name", "pdfUrl"],
+	"horarios-linea": ["lineId", "originTown", "destinationTown", "departureTime", "arrivalTime", "duration"],
+	conexiones: ["fromLineId", "atStop", "toLineId", "waitMin"],
+};
+const cell = (value: unknown): string => value === null || value === undefined ? "—" : typeof value === "boolean" ? (value ? common.yes : common.no) : typeof value === "object" ? JSON.stringify(value) : String(value);
+const href = (action: "edit" | "view", id: string | number) => `${base}?${new URLSearchParams({ [action]: String(id), q: query, page: String(page) })}`;
+const pageHref = (page: number) => `${base}?${new URLSearchParams({ q: query, page: String(page), limit: String(limit) })}`;
+const inputClass = "mt-2 min-h-11 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm text-on-surface focus:border-coastal-teal focus:outline-none focus:ring-2 focus:ring-coastal-teal/20 disabled:opacity-70";
+const readOnly = mode === "view";
+---
+<section class="mx-auto max-w-7xl" data-management-panel data-api={api} data-return={pageHref(page)}>
+	<div class="flex flex-wrap items-center justify-between gap-4">
+		<h1 class="text-3xl font-bold text-deep-navy">{title}</h1>
+		{mode === "list" && writable && <a href={`${base}?new=1`} class="rounded-full bg-deep-navy px-5 py-3 text-sm font-semibold text-white">{common.add}</a>}
+		{mode !== "list" && <a href={pageHref(page)} class="text-sm font-semibold text-deep-navy">{common.back}</a>}
+	</div>
+	<p class="mt-3 text-sm text-on-surface-variant">{common.databaseNote}</p>
+	{["lineas", "horarios-linea", "conexiones"].includes(resource) && <p class="mt-3 rounded-lg bg-surface-container-low p-4 text-sm text-on-surface-variant">{common.syncNote}</p>}
+	{!writable && <p class="mt-3 text-sm text-on-surface-variant">{common.readOnly}</p>}
+	<p id="management-status" role="status" aria-live="polite" class:list={["mt-4 rounded-lg bg-error-container p-4 text-sm text-on-error-container", { hidden: !error }]}>{error ? copy.errors[error] ?? copy.errors.database_unavailable : ""}</p>
+	{!error && mode !== "list" && (
+		<form id="management-form" data-record-id={record?.id} class="mt-6 rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-ambient">
+			<h2 class="text-xl font-semibold text-deep-navy">{readOnly ? common.view : record ? common.edit : common.add}</h2>
+			{record && <p class="mt-2 text-sm text-on-surface-variant">ID: {record.id}</p>}
+			{resource === "horarios-linea" && <p class="mt-3 text-sm text-on-surface-variant">{common.derivedNote}</p>}
+			<div class="mt-4 grid gap-5 md:grid-cols-2">
+				{fields.map((field) => {
+					const value = values[field.name];
+					const list = field.relation && options ? options[field.relation] : [];
+					return <label class:list={["block text-sm font-medium text-on-surface", { "md:col-span-2": ["json", "textarea"].includes(field.type) }]}>
+						<span>{copy.fields[field.name]}{field.nullable ? ` (${common.optional})` : ""}</span>
+						{field.type === "checkbox"
+							? <input name={field.name} type="checkbox" checked={value === true} disabled={readOnly} class="ml-3 size-5 accent-deep-navy" />
+							: field.type === "json" || field.type === "textarea"
+								? <textarea name={field.name} data-type={field.type} data-nullable={String(field.nullable)} rows={field.type === "json" ? 8 : 3} disabled={readOnly} class:list={[inputClass, { "font-mono": field.type === "json" }]}>{field.type === "json" ? JSON.stringify(value, null, 2) : String(value ?? "")}</textarea>
+								: field.type === "select"
+									? <select name={field.name} disabled={readOnly} class={inputClass}>{field.options?.map((option) => <option value={option} selected={value === option}>{copy.fields[option]}</option>)}</select>
+									: <input name={field.name} type={field.type} value={value === null || value === undefined ? "" : String(value)} data-type={field.type} data-nullable={String(field.nullable)} list={field.relation ? `options-${field.name}` : undefined} step={field.type === "number" ? ["lat", "lng"].includes(field.name) ? "any" : "1" : undefined} disabled={readOnly} class={inputClass} />}
+						{field.type === "json" && <span class="mt-1 block text-xs text-on-surface-variant">{["routeIds", "stopIds"].includes(field.name) ? common.idsHelp : field.name === "stopsJson" ? common.stopsHelp : common.jsonHelp}</span>}
+						{field.relation && <><datalist id={`options-${field.name}`}>{list.map((entry) => <option value={entry.id}>{entry.name}</option>)}</datalist><span class="mt-1 block text-xs text-on-surface-variant">{common.relationHelp}</span></>}
+						<span data-field-error={field.name} class="mt-1 block text-xs text-error" aria-live="polite"></span>
+					</label>;
+				})}
+			</div>
+			{record && <dl class="mt-5 text-xs text-on-surface-variant">{["createdAt", "updatedAt", "originTown", "destinationTown", "departureTime", "arrivalTime", "duration"].filter((key) => key in record && !fields.some((field) => field.name === key)).map((key) => <div class="mt-2"><dt class="inline font-semibold">{copy.fields[key]}: </dt><dd class="inline">{cell(record[key])}</dd></div>)}</dl>}
+			<div class="mt-6 flex flex-wrap gap-3">
+				{!readOnly && writable && <button type="submit" class="rounded-full bg-deep-navy px-6 py-3 text-sm font-semibold text-white disabled:opacity-60">{common.save}</button>}
+				{readOnly && writable && record && <a href={href("edit", record.id)} class="rounded-full bg-deep-navy px-6 py-3 text-sm font-semibold text-white">{common.edit}</a>}
+				<a href={pageHref(page)} class="rounded-full border border-outline-variant px-6 py-3 text-sm font-semibold text-deep-navy">{common.cancel}</a>
+			</div>
+		</form>
+	)}
+	{mode === "list" && <>
+		<form method="GET" action={base} class="mt-6 flex flex-wrap gap-3">
+			<label class="flex-1"><span class="sr-only">{common.search}</span><input type="search" name="q" value={query} maxlength="200" placeholder={common.search} class={inputClass} /></label>
+			<button class="mt-2 rounded-full bg-deep-navy px-5 py-2 text-sm font-semibold text-white">{common.search}</button>
+		</form>
+		<p class="mt-4 text-sm text-on-surface-variant">{common.total}: {total}</p>
+		<div class="mt-4 overflow-x-auto rounded-xl border border-outline-variant bg-surface-container-lowest shadow-ambient">
+			<table class="w-full text-left text-sm">
+				<thead class="bg-surface-container-low text-on-surface-variant"><tr><th scope="col" class="p-4">ID</th>{columnKeys[resource].map((key) => <th scope="col" class="p-4">{copy.fields[key]}</th>)}<th scope="col" class="p-4">{common.actions}</th></tr></thead>
+				<tbody class="divide-y divide-outline-variant">{rows.map((row) => <tr><td class="p-4 font-mono text-xs">{row.id}</td>{columnKeys[resource].map((key) => <td class="max-w-xs break-words p-4">{cell(row[key])}</td>)}<td class="p-4"><div class="flex gap-3"><a class="font-semibold text-deep-navy" href={href("view", row.id)}>{common.view}</a>{writable && <><a class="font-semibold text-deep-navy" href={href("edit", row.id)}>{common.edit}</a><button type="button" data-delete-id={row.id} class="font-semibold text-error disabled:opacity-60">{common.delete}</button></>}</div></td></tr>)}
+					{!error && rows.length === 0 && <tr><td colspan={columnKeys[resource].length + 2} class="p-8 text-center text-on-surface-variant">{common.empty}</td></tr>}
+				</tbody>
+			</table>
+		</div>
+		<nav aria-label={common.pagination} class="mt-5 flex items-center justify-between gap-4">
+			{page > 1 ? <a href={pageHref(page - 1)} class="font-semibold text-deep-navy">{common.previous}</a> : <span />}
+			<span class="text-sm text-on-surface-variant">{page} / {Math.max(1, Math.ceil(total / limit))}</span>
+			{page * limit < total ? <a href={pageHref(page + 1)} class="font-semibold text-deep-navy">{common.next}</a> : <span />}
+		</nav>
+	</>}
+</section>
+<script define:vars={{ messages: copy.errors, labels: copy.fields, common }}>
+	const panel = document.querySelector("[data-management-panel]");
+	const status = document.getElementById("management-status");
+	const form = document.getElementById("management-form");
+	function showError(code, field, issues) {
+		if (!status) return;
+		status.textContent = messages[code] ?? messages.database_unavailable;
+		status.classList.remove("hidden");
+		if (field) status.textContent += ` (${labels[field] ?? field})`;
+		for (const issue of issues ?? []) {
+			const key = issue.path.split(".")[0];
+			const target = document.querySelector(`[data-field-error="${CSS.escape(key)}"]`);
+			if (target) target.textContent = `${messages.validation_failed} (${issue.path})`;
+		}
+		status.scrollIntoView({ block: "nearest" });
+	}
+	form?.addEventListener("submit", async (event) => {
+		event.preventDefault();
+		for (const target of document.querySelectorAll("[data-field-error]")) target.textContent = "";
+		const submit = form.querySelector('button[type="submit"]');
+		if (submit) submit.disabled = true;
+		try {
+			const data = {};
+			for (const field of form.querySelectorAll("[name]")) {
+				const value = field.value;
+				if (field.type === "checkbox") data[field.name] = field.checked;
+				else if (value === "" && field.dataset.nullable === "true") data[field.name] = null;
+				else if (field.dataset.type === "json") {
+					try { data[field.name] = JSON.parse(value); } catch { showError("invalid_json", field.name); return; }
+				}
+				else if (field.dataset.type === "number") {
+					if (value === "" || !Number.isFinite(Number(value))) { showError("validation_failed", field.name); return; }
+					data[field.name] = Number(value);
+				}
+				else data[field.name] = value;
+			}
+			const id = form.dataset.recordId;
+			const response = await fetch(panel.dataset.api + (id ? `/${encodeURIComponent(id)}` : ""), {
+				method: id ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data),
+			});
+			const result = await response.json();
+			if (!response.ok) { showError(result.error, result.field, result.issues); return; }
+			window.location.assign(panel.dataset.return);
+		} catch {
+			showError("network_error");
+		} finally {
+			if (submit) submit.disabled = false;
+		}
+	});
+	for (const button of document.querySelectorAll("[data-delete-id]")) {
+		button.addEventListener("click", async () => {
+			if (!window.confirm(common.confirmDelete)) return;
+			button.disabled = true;
+			try {
+				const response = await fetch(`${panel.dataset.api}/${encodeURIComponent(button.dataset.deleteId)}`, { method: "DELETE" });
+				const result = await response.json();
+				if (!response.ok) { showError(result.error, result.field); return; }
+				window.location.assign(panel.dataset.return);
+			} catch {
+				showError("network_error");
+			} finally {
+				button.disabled = false;
+			}
+		});
+	}
+</script>

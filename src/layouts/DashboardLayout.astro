@@ -14,6 +14,7 @@
 import "@/styles/global.css";
 import { hasCapability, isRole, type Role } from "@/lib/acl";
 import { LOCALES, getDictionary, getLocale } from "@/config/i18n";
+import { localizedPath, unlocalizedPath } from "@/config/i18n/routing";
 import type { PublicUser } from "@/interfaces/users";
 
 interface Props {
@@ -43,6 +44,11 @@ const companyNav = [
 	{ label: sectionNav.drivers, icon: "badge", href: "/dashboard/gestion/conductores" },
 	{ label: sectionNav.notifications, icon: "notifications", href: "/dashboard/gestion/notificaciones" },
 	{ label: sectionNav.reports, icon: "bar_chart", href: "/dashboard/gestion/reportes" },
+	{ label: dict.management.entities.oficinas, icon: "apartment", href: "/dashboard/gestion/oficinas" },
+	{ label: dict.management.entities.presupuestos, icon: "request_quote", href: "/dashboard/gestion/presupuestos" },
+	{ label: dict.management.entities.lineas, icon: "alt_route", href: "/dashboard/gestion/lineas" },
+	{ label: dict.management.entities["horarios-linea"], icon: "event", href: "/dashboard/gestion/horarios-linea" },
+	{ label: dict.management.entities.conexiones, icon: "connecting_airports", href: "/dashboard/gestion/conexiones" },
 	...(role === "admin"
 		? [{ label: sectionNav.integrations, icon: "power", href: "/dashboard/gestion/integraciones" }]
 		: []),
@@ -59,7 +65,7 @@ const footerNav = [
 ];
 
 // Current path for active state
-const currentPath = Astro.url.pathname;
+const currentPath = unlocalizedPath(Astro.url.pathname);
 
 function isActive(href: string): boolean {
 	return currentPath === href || currentPath.startsWith(href + "/");
@@ -128,7 +134,7 @@ function isActive(href: string): boolean {
           {
             navItems.map((item) => (
               <a
-                href={item.href}
+                href={localizedPath(item.href, currentLocale)}
                 class={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors mb-0.5 ${
                   isActive(item.href)
                     ? "nav-item-active"
@@ -149,7 +155,7 @@ function isActive(href: string): boolean {
           {
             footerNav.map((item) => (
               <a
-                href={item.href}
+                href={localizedPath(item.href, currentLocale)}
                 class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors mb-0.5"
               >
                 <span class="material-symbols-outlined text-[20px]">
@@ -222,7 +228,7 @@ function isActive(href: string): boolean {
               {
                 LOCALES.map((loc) => (
                   <a
-                    href={`?lang=${loc}`}
+                    href={localizedPath(`${Astro.url.pathname}${Astro.url.search}`, loc)}
                     class={`block px-3 py-1.5 text-sm hover:bg-surface-container-high transition-colors ${
                       loc === currentLocale
                         ? "font-semibold text-deep-navy"
@@ -256,7 +262,7 @@ function isActive(href: string): boolean {
     </div>
 
     <!-- Client-side scripts -->
-    <script is:inline>
+    <script define:vars={{ logoutPath: localizedPath("/dashboard/login", currentLocale) }}>
       // Sidebar toggle
       function toggleSidebar() {
         const sidebar = document.getElementById("app-sidebar");
@@ -331,7 +337,7 @@ function isActive(href: string): boolean {
           } catch {
             // ignore
           }
-          window.location.href = "/dashboard/login";
+          window.location.href = logoutPath;
         });
     </script>
   </body>

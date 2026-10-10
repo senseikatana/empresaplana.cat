@@ -45,6 +45,7 @@ export const loginSchema = z.object({
 	username: z.string().trim().min(1, "Username obligatorio"),
 	passkey: z.string().min(1, "Passkey obligatorio"),
 	redirect: z.string().max(2048).optional(),
+	locale: z.enum(["ca", "es", "en", "fr"]).optional(),
 });
 
 export function formatValidationError(error: z.ZodError) {

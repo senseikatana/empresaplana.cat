@@ -1,4 +1,5 @@
 ---
+import { localizedPath } from "@/config/i18n/routing";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import PublicHeader from "@/components/PublicHeader.astro";
 import { getDictionary } from "@/config/i18n";
@@ -14,6 +15,7 @@ const dict = getDictionary(locale);
 ---
 
 <BaseLayout
+	publicHeader={false}
 	title={`${title} | ${dict.common.brand}`}
 	lang={locale}
 	description={dict.meta.description}
@@ -26,7 +28,7 @@ const dict = getDictionary(locale);
 				<div class="mx-auto w-full max-w-md">
 					<a
 						class="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-deep-navy hover:text-secondary"
-						href={`/?lang=${locale}`}
+						href={localizedPath("/", locale)}
 					>
 						<span aria-hidden="true" class="material-symbols-outlined text-lg">arrow_back</span>
 						{dict.common.brand}

@@ -1,0 +1,14 @@
+**
+!Dockerfile
+!.dockerignore
+!package.json
+!bun.lock
+!astro.config.mjs
+!tsconfig.json
+!prisma.config.ts
+!prisma/
+!prisma/schema.prisma
+!src/
+!src/**
+!public/
+!public/**

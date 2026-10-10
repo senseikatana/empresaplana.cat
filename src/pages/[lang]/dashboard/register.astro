@@ -1,0 +1,166 @@
+---
+import { localizedPath } from "@/config/i18n/routing";
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import { getLocale, getDictionary } from "@/config/i18n";
+import { getSession } from "@/lib/auth";
+import { oauthProviders } from "@/config/config.env";
+import SocialAuthButtons from "@/components/auth/SocialAuthButtons.astro";
+
+export const prerender = false;
+
+const session = await getSession(Astro.cookies);
+if (session) return Astro.redirect(localizedPath(session.role === "client" || session.role === "worker" ? "/perfil" : "/dashboard", getLocale(Astro.params.lang)));
+
+const locale = getLocale(Astro.params.lang);
+const dict = getDictionary(locale);
+---
+
+<AuthLayout title={dict.app.register.title} locale={locale}>
+	<h1 class="text-3xl font-bold tracking-tight text-deep-navy">
+		{dict.app.register.title}
+	</h1>
+	<p class="mt-3 text-sm leading-6 text-on-surface-variant">
+		{dict.app.register.subtitle}
+	</p>
+
+	<form id="register-form" class="mt-8 flex flex-col gap-5">
+		<div>
+			<label for="name" class="mb-2 block text-sm font-semibold text-on-surface">
+				{dict.app.register.name}
+			</label>
+			<input
+				id="name"
+				name="name"
+				type="text"
+				autocomplete="name"
+				maxlength="60"
+				required
+				class="min-h-12 w-full rounded-lg border border-outline-variant bg-surface px-4 text-base text-on-surface transition focus:border-coastal-teal focus:outline-none focus:ring-2 focus:ring-coastal-teal/20"
+			/>
+		</div>
+		<div>
+			<label for="username" class="mb-2 block text-sm font-semibold text-on-surface">
+				{dict.app.auth.username}
+			</label>
+			<input
+				id="username"
+				name="username"
+				type="text"
+				autocomplete="username"
+				autocapitalize="none"
+				minlength="3"
+				maxlength="32"
+				required
+				class="min-h-12 w-full rounded-lg border border-outline-variant bg-surface px-4 text-base text-on-surface transition focus:border-coastal-teal focus:outline-none focus:ring-2 focus:ring-coastal-teal/20"
+			/>
+		</div>
+		<div>
+			<label for="email" class="mb-2 block text-sm font-semibold text-on-surface">
+				{dict.app.register.email}
+			</label>
+			<input
+				id="email"
+				name="email"
+				type="email"
+				autocomplete="email"
+				required
+				class="min-h-12 w-full rounded-lg border border-outline-variant bg-surface px-4 text-base text-on-surface transition focus:border-coastal-teal focus:outline-none focus:ring-2 focus:ring-coastal-teal/20"
+			/>
+		</div>
+		<div>
+			<label for="passkey" class="mb-2 block text-sm font-semibold text-on-surface">
+				{dict.app.auth.passkey}
+			</label>
+			<input
+				id="passkey"
+				name="passkey"
+				type="password"
+				autocomplete="new-password"
+				minlength="12"
+				maxlength="128"
+				required
+				class="min-h-12 w-full rounded-lg border border-outline-variant bg-surface px-4 text-base text-on-surface transition focus:border-coastal-teal focus:outline-none focus:ring-2 focus:ring-coastal-teal/20"
+			/>
+			<p class="mt-2 text-xs leading-5 text-on-surface-variant">{dict.app.register.passwordHint}</p>
+		</div>
+		<p
+			id="register-error"
+			class="hidden rounded-lg bg-error-container px-4 py-3 text-sm text-on-error-container"
+			role="alert"
+			aria-live="polite"
+		></p>
+		<button
+			type="submit"
+			class="inline-flex min-h-12 items-center justify-center rounded-lg bg-energetic-orange px-6 font-semibold text-on-background transition-colors hover:bg-tertiary-fixed-dim focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-deep-navy disabled:cursor-wait disabled:opacity-60"
+		>
+			{dict.app.register.submit}
+		</button>
+	</form>
+
+	<SocialAuthButtons
+		providers={oauthProviders}
+		callbackURL={`/api/auth/exchange?locale=${locale}`}
+		googleLabel={dict.app.auth.google}
+		githubLabel={dict.app.auth.github}
+		dividerLabel={dict.app.auth.orContinueWith}
+		errorMessage={dict.app.auth.oauthError}
+	/>
+
+	<p class="mt-6 text-center text-sm text-on-surface-variant">
+		{dict.app.register.haveAccount}
+		<a
+			class="font-semibold text-deep-navy underline decoration-coastal-teal underline-offset-4 hover:text-secondary"
+			href={localizedPath("/dashboard/login", locale)}
+		>
+			{dict.app.auth.login}
+		</a>
+	</p>
+
+	<script define:vars={{ locale, profilePath: localizedPath("/perfil", locale), takenMessage: dict.app.register.taken, invalidMessage: dict.app.auth.invalid, connectionMessage: dict.app.auth.connectionError }}>
+		const form = document.getElementById("register-form");
+		const error = document.getElementById("register-error");
+		const submit = form?.querySelector('button[type="submit"]');
+
+		form?.addEventListener("submit", async (event) => {
+			event.preventDefault();
+			if (!(form instanceof HTMLFormElement) || !(submit instanceof HTMLButtonElement)) return;
+			error?.classList.add("hidden");
+			submit.disabled = true;
+			submit.setAttribute("aria-busy", "true");
+
+			try {
+				const fields = new FormData(form);
+				const response = await fetch("/api/auth/register", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						name: fields.get("name"),
+						username: fields.get("username"),
+						email: fields.get("email"),
+						password: fields.get("passkey"),
+						locale,
+					}),
+				});
+				const result = await response.json();
+				if (!response.ok) {
+					if (error) {
+						error.textContent = result.error === "conflict"
+							? takenMessage
+								: invalidMessage;
+						error.classList.remove("hidden");
+					}
+					return;
+				}
+				window.location.assign(result.next ?? profilePath);
+			} catch {
+				if (error) {
+					error.textContent = connectionMessage;
+					error.classList.remove("hidden");
+				}
+			} finally {
+				submit.disabled = false;
+				submit.removeAttribute("aria-busy");
+			}
+		});
+	</script>
+</AuthLayout>

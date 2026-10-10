@@ -1,0 +1,85 @@
+---
+import { localizedPath } from "@/config/i18n/routing";
+import DashboardLayout from "@/layouts/DashboardLayout.astro";
+import { getSession } from "@/lib/auth";
+import { getPublicUser } from "@/lib/get-public-user";
+import { getLocale, getDictionary } from "@/config/i18n";
+import ManagementPanel from "@/components/ManagementPanel.astro";
+import { hasCapability } from "@/lib/acl";
+import { isResource, managementCapability } from "@/lib/management-schemas";
+import { findManagement, listManagement, managementError, pageSchema, relationOptions, type ManagementRow } from "@/lib/management";
+
+export const prerender = false;
+
+const session = await getSession(Astro.cookies);
+if (!session) {
+	return Astro.redirect(localizedPath("/dashboard/login", getLocale(Astro.params.lang)));
+}
+
+const locale = getLocale(Astro.params.lang);
+const dict = getDictionary(locale);
+
+const user = await getPublicUser(session.id);
+
+const seccion = Astro.params.seccion ?? "";
+const resource = isResource(seccion) ? seccion : null;
+if (!resource && !["mapa", "integraciones"].includes(seccion)) {
+	return new Response("Not found", { status: 404 });
+}
+const writable = resource ? hasCapability(session.role, managementCapability(resource)) : false;
+let rows: ManagementRow[] = [];
+let total = 0;
+let pagination = { page: 1, limit: 25, q: "" };
+let record: ManagementRow | null = null;
+let options: Awaited<ReturnType<typeof relationOptions>> | null = null;
+let error: string | undefined;
+const editId = Astro.url.searchParams.get("edit");
+const viewId = Astro.url.searchParams.get("view");
+const mode = writable && Astro.url.searchParams.get("new") === "1" ? "create"
+	: editId && writable ? "edit" : viewId || editId ? "view" : "list";
+if (resource) {
+	try {
+		pagination = pageSchema.parse(Object.fromEntries(Astro.url.searchParams));
+		if (mode === "list") {
+			const result = await listManagement(resource, pagination);
+			rows = result.rows;
+			total = result.total;
+		} else {
+			if (editId || viewId) record = await findManagement(resource, editId ?? viewId ?? "");
+			options = await relationOptions();
+		}
+	} catch (cause) {
+		const failure = managementError(cause);
+		error = typeof failure.body.error === "string" ? failure.body.error : "database_unavailable";
+		Astro.response.status = failure.status;
+	}
+}
+
+// Section labels mapping — same keys as the Nuxt reference
+const sectionKeys: Record<string, string> = {
+	mapa: "app.gestion.nav.map",
+	rutas: "app.gestion.nav.routes",
+	autobuses: "app.gestion.nav.buses",
+	paradas: "app.gestion.nav.stops",
+	horarios: "app.gestion.nav.schedules",
+	conductores: "app.gestion.nav.drivers",
+	notificaciones: "app.gestion.nav.notifications",
+	reportes: "app.gestion.nav.reports",
+	integraciones: "app.gestion.nav.integrations",
+};
+
+const key = sectionKeys[seccion];
+const title = resource ? dict.management.entities[resource] : key ? String(dict.app.gestion.nav[key.replace("app.gestion.nav.", "")] ?? seccion) : seccion;
+---
+
+<DashboardLayout title={title} locale={locale} user={user}>
+	{resource ? <ManagementPanel resource={resource} locale={locale} writable={writable} rows={rows} total={total} page={pagination.page} limit={pagination.limit} query={pagination.q} record={record} mode={mode} options={options} error={error} /> : <div>
+		<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-deep-navy">
+			{title}
+		</h1>
+
+		<div class="mt-6 rounded-lg bg-surface-container-low border border-surface-variant px-4 py-3 text-on-surface-variant text-sm">
+			{dict.app.worker.noLineData}
+		</div>
+	</div>}
+</DashboardLayout>

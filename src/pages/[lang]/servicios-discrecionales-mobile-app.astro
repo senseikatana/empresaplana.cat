@@ -1,0 +1,4 @@
+---
+import { localizedPath, getLocale } from "@/config/i18n/routing";
+return Astro.redirect(localizedPath("/servicios-discrecionales", getLocale(Astro.params.lang)));
+---

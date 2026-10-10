@@ -1,0 +1,192 @@
+---
+import { localizedPath } from "@/config/i18n/routing";
+import DashboardLayout from "@/layouts/DashboardLayout.astro";
+import { getLocale, getDictionary } from "@/config/i18n";
+import { getSession } from "@/lib/auth";
+import { getPublicUser } from "@/lib/get-public-user";
+import { prisma } from "@/lib/db";
+import type { UsuarioRole } from "@/interfaces/auth";
+
+export const prerender = false;
+
+const session = await getSession(Astro.cookies);
+if (!session) return Astro.redirect(localizedPath("/dashboard/login", getLocale(Astro.params.lang)));
+if (session.role !== "admin") return Astro.redirect(localizedPath("/dashboard/gestion", getLocale(Astro.params.lang)));
+
+const locale = getLocale(Astro.params.lang);
+const dict = getDictionary(locale);
+const user = await getPublicUser(session.id);
+const team = dict.app.team;
+const roles: UsuarioRole[] = ["client", "worker", "manager", "admin"];
+const users = await prisma().user.findMany({
+	orderBy: { createdAt: "desc" },
+});
+---
+
+<DashboardLayout title={team.title} locale={locale} user={user}>
+	<div class="mx-auto max-w-6xl">
+		<div class="flex flex-wrap items-end justify-between gap-4">
+			<div>
+				<p class="text-sm font-semibold uppercase tracking-[0.12em] text-coastal-teal">
+					{dict.app.gestion.nav.panel}
+				</p>
+				<h1 class="mt-2 text-3xl font-bold tracking-tight text-deep-navy">
+					{team.title}
+				</h1>
+				<p class="mt-3 max-w-2xl text-sm leading-6 text-on-surface-variant">
+					{team.subtitle}
+				</p>
+			</div>
+			<label class="w-full max-w-sm">
+				<span class="sr-only">{team.search}</span>
+				<input
+					id="team-search"
+					type="search"
+					placeholder={team.search}
+					class="min-h-11 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 text-sm text-on-surface placeholder:text-on-surface-variant focus:border-coastal-teal focus:outline-none focus:ring-2 focus:ring-coastal-teal/20"
+				/>
+			</label>
+		</div>
+
+		<p
+			id="team-status"
+			class="mt-5 hidden rounded-lg px-4 py-3 text-sm"
+			role="status"
+			aria-live="polite"
+		></p>
+
+		<div class="mt-6 overflow-x-auto rounded-xl border border-outline-variant/70 bg-surface-container-lowest shadow-ambient">
+			<table class="w-full min-w-[680px] border-collapse text-left text-sm">
+				<thead class="bg-surface-container-low text-xs uppercase tracking-wide text-on-surface-variant">
+					<tr>
+						<th scope="col" class="px-5 py-4">{team.name}</th>
+						<th scope="col" class="px-5 py-4">{team.email}</th>
+						<th scope="col" class="px-5 py-4">{team.role}</th>
+						<th scope="col" class="px-5 py-4">{team.action}</th>
+					</tr>
+				</thead>
+				<tbody id="team-rows" class="divide-y divide-outline-variant/60">
+					{users.map((entry) => (
+						<tr
+							data-user-row
+							data-search={`${entry.fullName} ${entry.name} ${entry.username} ${entry.email}`}
+							class="align-middle"
+						>
+							<td class="px-5 py-4">
+								<p class="font-semibold text-on-surface">{entry.fullName || entry.name}</p>
+								<p class="mt-1 text-xs text-on-surface-variant">@{entry.username}</p>
+							</td>
+							<td class="px-5 py-4 text-on-surface-variant">{entry.email}</td>
+							<td class="px-5 py-4">
+								<form id={`role-form-${entry.id}`} class="role-form flex items-center gap-2" data-user-id={entry.id}>
+									<label class="sr-only" for={`role-${entry.id}`}>{team.role}</label>
+									<select
+										id={`role-${entry.id}`}
+										name="role"
+										data-initial={entry.role}
+										class="min-h-10 rounded-lg border border-outline-variant bg-surface px-3 text-sm text-on-surface focus:border-coastal-teal focus:outline-none focus:ring-2 focus:ring-coastal-teal/20"
+									>
+										{roles.map((role) => (
+											<option value={role} selected={entry.role === role}>
+												{team.roles[role]}
+											</option>
+										))}
+									</select>
+								</form>
+							</td>
+							<td class="px-5 py-4">
+								<button
+									type="submit"
+									form={`role-form-${entry.id}`}
+									class="role-save inline-flex min-h-10 items-center justify-center rounded-full bg-deep-navy px-4 text-xs font-semibold text-white transition-colors hover:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-deep-navy disabled:cursor-wait disabled:opacity-60"
+								>
+									{team.action}
+								</button>
+							</td>
+						</tr>
+					))}
+					{users.length === 0 && (
+						<tr>
+							<td colspan="4" class="px-5 py-8 text-center text-on-surface-variant">
+								{team.empty}
+							</td>
+						</tr>
+					)}
+					<tr id="team-no-results" class="hidden">
+						<td colspan="4" class="px-5 py-8 text-center text-on-surface-variant">
+							{team.empty}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<script define:vars={{ savedMessage: team.saved, saveError: team.saveError, lastAdminMessage: team.lastAdmin }}>
+		const status = document.getElementById("team-status");
+		const search = document.getElementById("team-search");
+		const rows = Array.from(document.querySelectorAll("[data-user-row]"));
+		const noResults = document.getElementById("team-no-results");
+
+		function showStatus(message, isError = false) {
+			if (!status) return;
+			status.textContent = message;
+			status.className = `mt-5 rounded-lg px-4 py-3 text-sm ${isError ? "bg-error-container text-on-error-container" : "bg-primary-fixed text-deep-navy"}`;
+		}
+
+		search?.addEventListener("input", () => {
+			if (!(search instanceof HTMLInputElement)) return;
+			const term = search.value.trim().toLocaleLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+			let visible = 0;
+			for (const row of rows) {
+				const text = (row.getAttribute("data-search") ?? "").toLocaleLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+				const matches = text.includes(term);
+				row.classList.toggle("hidden", !matches);
+				if (matches) visible++;
+			}
+			noResults?.classList.toggle("hidden", visible > 0);
+		});
+
+		for (const form of document.querySelectorAll(".role-form")) {
+			form.addEventListener("submit", async (event) => {
+				event.preventDefault();
+				if (!(form instanceof HTMLFormElement)) return;
+				const button = document.querySelector(`button[form="${CSS.escape(form.id)}"]`);
+				const id = form.dataset.userId;
+				const role = new FormData(form).get("role");
+				const roleField = form.elements.namedItem("role");
+				const previousRole = roleField instanceof HTMLSelectElement
+					? roleField.dataset.initial
+					: undefined;
+				if (!id || typeof role !== "string") return;
+				if (button instanceof HTMLButtonElement) button.disabled = true;
+				try {
+					const response = await fetch(`/api/users/${encodeURIComponent(id)}`, {
+						method: "PATCH",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ role }),
+					});
+					const result = await response.json();
+					if (!response.ok) {
+						if (roleField instanceof HTMLSelectElement && previousRole) {
+							roleField.value = previousRole;
+						}
+						showStatus(result.error === "last_admin_required" ? lastAdminMessage : saveError, true);
+						return;
+					}
+					if (roleField instanceof HTMLSelectElement) {
+						roleField.dataset.initial = roleField.value;
+					}
+					showStatus(savedMessage);
+				} catch {
+					if (roleField instanceof HTMLSelectElement && previousRole) {
+						roleField.value = previousRole;
+					}
+					showStatus(saveError, true);
+				} finally {
+					if (button instanceof HTMLButtonElement) button.disabled = false;
+				}
+			});
+		}
+	</script>
+</DashboardLayout>

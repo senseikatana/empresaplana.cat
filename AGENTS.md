@@ -29,6 +29,12 @@ Run everything from this directory:
 - `bun run build` — builds `dist/` (server entry + client assets)
 - `bun run preview` — serves the production build
 - `bun run start` — runs the standalone Node server from `dist/server/entry.mjs`
+- `bun run deploy:insforge` — rebuilds and updates `empresaplana-web` in InsForge Compute.
+  Requires the linked CLI project and `flyctl` (also detected in `~/.fly/bin`).
+  Loads `.env.production`, `.env.local`, then `.env`, exporting only app runtime variables
+  through a private temporary file that is removed afterward. It does not commit, push or seed.
+  `INSFORGE_DEPLOY_URL` overrides the current fly.dev origin after custom-domain setup.
+  `bun run deploy:insforge --dry-run` checks configuration without deploying or printing secrets.
 
 ## Rendering mode
 
@@ -39,7 +45,24 @@ Run everything from this directory:
   a workerd-compatible Prisma Client; runtime WebAssembly compilation is blocked there.
 - InsForge provides PostgreSQL and is the intended Compute destination.
   Better Auth manages application authentication; InsForge Auth is not used.
-  No Compute service has been deployed yet.
+- Deploy with `npx -y @insforge/cli compute deploy . --name empresaplana-web --port 8080
+  --region fra --env-file <private-production-env-file>`. Source deployment requires
+  `flyctl` on PATH; InsForge supplies its credentials. Do not deploy using your own Fly account.
+  `Dockerfile` builds with Bun and runs standalone Node as a non-root user.
+  `.dockerignore` allows only build inputs, excluding local credentials and agent configuration.
+  Supply `DATABASE_URL`, `AUTH_SECRET`, `BETTER_AUTH_URL` and optional provider/AI secrets
+  at runtime. Set `WEBAUTHN_RP_ID` to the production hostname.
+  Local tracking JSON and Astro filesystem sessions are ephemeral across container replacement;
+  do not treat them as durable storage. Better Auth sessions remain in PostgreSQL.
+  The service runs in Frankfurt with 512 MB RAM and scales to zero when idle.
+  All UI routes use a locale prefix: `/es`, `/es/rutas-horarios`,
+  `/es/dashboard/login`, `/es/perfil`. Supported prefixes are `ca`, `es`, `en`, `fr`.
+  APIs remain unprefixed at `/api/*`. Unprefixed legacy UI URLs redirect with HTTP 308,
+  preserving the requested query language (Catalan by default) and other query parameters.
+  Use `localizedPath()` from `src/config/i18n/routing.ts` for navigation and redirects.
+  Read `Astro.params.lang`, not a query parameter, for the page language.
+  InsForge CLI domain attachment targets frontend deployments, not Compute services;
+  do not attach a Compute hostname through the frontend/Vercel domain workflow.
 - `security: { checkOrigin: false }` — the API endpoints are consumed by
   non-browser clients (no `Origin` header). CSRF is mitigated by the session
   cookie's `sameSite: "lax"` (browsers don't send it on cross-site POSTs).
@@ -62,10 +85,12 @@ Canonical tokens live in `src/assets/DESIGN.md` (mirror of the Stitch
 
 ## Structure
 
-- `src/layouts/BaseLayout.astro` — owns `<head>` (fonts, Tailwind CDN, the
-  canonical `tailwind.config`, Material Symbols, shared utility styles) and the
-  `<body>` wrapper. Pages only contribute body content via `<slot />`.
-- `src/pages/*.astro` — one page per Stitch screen:
+- `src/layouts/BaseLayout.astro` — owns `<head>`, global build-time styles,
+  the `<body>` wrapper and the shared `PublicHeader` (utility bar, navigation,
+  languages and account actions). Public pages must not render their own site header.
+  AuthLayout opts out with `publicHeader={false}` and supplies its own auth header;
+  DashboardLayout remains independent. Language links preserve the current route.
+- `src/pages/[lang]/*.astro` — one page per Stitch screen, prefixed by locale:
   `/rutas-horarios`, `/mobile`, `/donde-estamos`, `/home-variant-1`,
   `/donde-estamos-mobile`, `/home-variant-2`, `/servicios-discrecionales`,
   `/rastreig` (bus tracking demo), plus `/` (hub linking all screens).

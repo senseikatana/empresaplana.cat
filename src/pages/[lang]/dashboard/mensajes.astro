@@ -1,0 +1,215 @@
+---
+import { localizedPath } from "@/config/i18n/routing";
+import DashboardLayout from "@/layouts/DashboardLayout.astro";
+import { getSession } from "@/lib/auth";
+import { getPublicUser } from "@/lib/get-public-user";
+import { prisma } from "@/lib/db";
+import { getLocale, getDictionary } from "@/config/i18n";
+
+export const prerender = false;
+
+const session = await getSession(Astro.cookies);
+if (!session) {
+	return Astro.redirect(localizedPath("/dashboard/login", getLocale(Astro.params.lang)));
+}
+
+const locale = getLocale(Astro.params.lang);
+const dict = getDictionary(locale);
+
+const user = await getPublicUser(session.id);
+
+// Fetch conversations for the sidebar
+const convRows = await prisma().conversation.findMany({
+	where: {
+		participants: { some: { userId: session.id } },
+	},
+	include: { participants: true },
+	orderBy: { updatedAt: "desc" },
+});
+
+// Fetch last message for each conversation
+const convIds = convRows.map((c) => c.id);
+const lastMessages = convIds.length
+	? await prisma().message.findMany({
+			where: { conversationId: { in: convIds } },
+			orderBy: { createdAt: "desc" },
+		})
+	: [];
+// Deduplicate: keep only the first (latest) per conversationId
+const lastMsgMap = new Map<number, typeof lastMessages[0]>();
+for (const m of lastMessages) {
+	if (!lastMsgMap.has(m.conversationId)) lastMsgMap.set(m.conversationId, m);
+}
+
+const conversations = convRows.map((c) => ({
+	...c,
+	lastMessage: lastMsgMap.get(c.id) ?? null,
+}));
+
+const myId = session.id;
+---
+
+<DashboardLayout title={dict.app.panel.messages as string} locale={locale} user={user!}>
+	<div class="flex flex-col gap-6">
+		<!-- Header -->
+		<div>
+			<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-deep-navy">
+				{dict.app.panel.messages as string}
+			</h1>
+			<p class="font-body-md text-body-md text-on-surface-variant mt-1">
+				{dict.app.panel.messagesSubtitle as string}
+				<a href="https://wa.me/34666123456" target="_blank" rel="noopener noreferrer" class="text-coastal-teal hover:text-deep-navy">
+					{dict.app.panel.whatsapp as string}
+				</a>
+			</p>
+		</div>
+
+		<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter items-start">
+			<!-- Conversations sidebar -->
+			<div class="bg-surface-container-lowest rounded-xl border border-surface-variant shadow-ambient overflow-hidden">
+				<div class="px-4 py-3 border-b border-surface-variant">
+					<span class="font-label-md text-label-md text-on-surface-variant">{dict.app.panel.conversations as string}</span>
+				</div>
+				<ul class="divide-y divide-surface-variant" id="conversation-list">
+					{conversations.length === 0 && (
+						<li>
+							<p class="px-4 py-3 text-on-surface-variant text-sm">—</p>
+						</li>
+					)}
+					{conversations.map((c) => (
+						<li>
+							<button
+								type="button"
+								class="conv-btn w-full text-left px-4 py-3 transition-colors hover:bg-surface-container-low"
+								data-id={c.id}
+							>
+								<span class="font-label-md text-label-md text-deep-navy">Conversa #{c.id}</span>
+								<p class="font-body-md text-body-md text-on-surface-variant line-clamp-1">
+									{c.lastMessage?.body ?? "—"}
+								</p>
+							</button>
+						</li>
+					))}
+				</ul>
+			</div>
+
+			<!-- Message thread -->
+			<div class="lg:col-span-2 bg-surface-container-lowest rounded-xl border border-surface-variant shadow-ambient overflow-hidden flex flex-col">
+				<div id="chat-empty" class="p-8 text-center text-on-surface-variant">
+					{dict.app.panel.selectConversation as string}
+				</div>
+
+				<div id="chat-view" class="hidden flex flex-col h-[60vh]">
+					<!-- Messages -->
+					<div id="messages" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
+					</div>
+
+					<!-- Message form -->
+					<form id="chat-form" class="border-t border-surface-variant p-4 flex gap-3">
+						<input
+							id="chat-draft"
+							type="text"
+							placeholder={dict.app.panel.messages as string}
+							class="flex-1 rounded-lg border border-surface-variant bg-surface px-3 py-2 font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-coastal-teal"
+						/>
+						<button
+							type="submit"
+							class="rounded-lg bg-deep-navy text-on-primary font-button text-button px-4 py-2 hover:bg-primary transition-colors"
+						>
+							{dict.app.panel.send as string}
+						</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script define:vars={{ MY_ID: myId }}>
+		let activeId = null;
+		let socket = null;
+
+		// WebSocket
+		function socketUrl() {
+			const proto = window.location.protocol === "https:" ? "wss" : "ws";
+			return `${proto}://${window.location.host}/chat`;
+		}
+
+		function connectSocket() {
+			socket = new WebSocket(socketUrl());
+			socket.addEventListener("message", (event) => {
+				try {
+					const data = JSON.parse(event.data);
+					if (data?.type !== "message" || !data.message) return;
+					const m = data.message;
+					if (m.conversationId !== activeId) return;
+					appendMessage(m);
+				} catch { /* not JSON */ }
+			});
+			socket.addEventListener("open", () => {
+				if (activeId) {
+					socket.send(JSON.stringify({ type: "subscribe", conversationId: activeId }));
+				}
+			});
+		}
+
+		function appendMessage(m) {
+			const container = document.getElementById("messages");
+			if (!container) return;
+			const isOwn = m.senderId === MY_ID;
+			const div = document.createElement("div");
+			div.className = `max-w-[75%] rounded-xl px-4 py-2 ${isOwn ? "self-end bg-deep-navy text-on-primary" : "self-start bg-surface-container text-on-surface"}`;
+			const time = new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+			div.innerHTML = `<p class="font-body-md text-body-md">${m.body}</p><span class="text-xs opacity-70">${time}</span>`;
+			container.appendChild(div);
+			container.scrollTop = container.scrollHeight;
+		}
+
+		function selectConversation(id) {
+			activeId = id;
+			document.getElementById("chat-empty").classList.add("hidden");
+			document.getElementById("chat-view").classList.remove("hidden");
+			document.getElementById("chat-view").classList.add("flex");
+
+			// Highlight active
+			document.querySelectorAll(".conv-btn").forEach((btn) => {
+				btn.classList.toggle("bg-surface-container-low", btn.dataset.id == id);
+			});
+
+			// Load messages
+			fetch(`/api/chat/${id}`)
+				.then((r) => r.json())
+				.then((data) => {
+					const container = document.getElementById("messages");
+					container.innerHTML = "";
+					(data.messages ?? []).forEach((m) => appendMessage(m));
+				});
+
+			if (socket?.readyState === WebSocket.OPEN) {
+				socket.send(JSON.stringify({ type: "subscribe", conversationId: id }));
+			}
+		}
+
+		// Conversation clicks
+		document.querySelectorAll(".conv-btn").forEach((btn) => {
+			btn.addEventListener("click", () => selectConversation(Number(btn.dataset.id)));
+		});
+
+		// Chat form
+		document.getElementById("chat-form")?.addEventListener("submit", async (e) => {
+			e.preventDefault();
+			const draft = document.getElementById("chat-draft");
+			const body = draft.value.trim();
+			if (!body || !activeId) return;
+			draft.value = "";
+
+			await fetch("/api/chat", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ conversationId: activeId, body }),
+			});
+		});
+
+		// Init
+		connectSocket();
+	</script>
+</DashboardLayout>

@@ -10,6 +10,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "start": "node dist/server/entry.mjs",
+    "deploy:insforge": "node src/scripts/deploy-insforge.mjs",
+    "email:test": "bun src/scripts/test-email.ts",
     "tunnel": "cloudflared tunnel --url http://localhost:4321",
     "astro": "astro",
     "sync:sheets": "bun src/scripts/sync-sheets.mjs",

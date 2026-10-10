@@ -1,4 +1,5 @@
 ---
+import { localizedPath } from "@/config/i18n/routing";
 import { getDictionary } from "@/config/i18n";
 import type { Locale } from "@/interfaces/common";
 import type { UsuarioRole } from "@/interfaces/auth";
@@ -14,8 +15,11 @@ const { locale, role = null, showAuthActions = true } = Astro.props;
 const dict = getDictionary(locale);
 const { common } = dict;
 const languageLabel = dict.app.gestion.common.language;
-const localeHref = (path: string) => `${path}?lang=${locale}`;
-const contactHref = `/?lang=${locale}#contacto`;
+const languageHref = (language: Locale) => {
+	return localizedPath(`${Astro.url.pathname}${Astro.url.search}`, language);
+};
+const localeHref = (path: string) => localizedPath(path, locale);
+const contactHref = localizedPath("/#contacto", locale);
 const accountHref = role
 	? isCompanyRole(role)
 		? "/dashboard"
@@ -43,7 +47,7 @@ const accountLabel = role
 				{(["ca", "es", "en", "fr"] as const).map((language) => (
 					<a
 						class={`transition-colors hover:text-secondary-fixed ${language === locale ? "font-bold text-white" : "text-on-primary/75"}`}
-						href={`/?lang=${language}`}
+						href={languageHref(language)}
 						aria-current={language === locale ? "page" : undefined}
 					>
 						{common.lang[language]}
@@ -98,7 +102,7 @@ const accountLabel = role
 			{showAuthActions && role && accountHref && accountLabel && (
 				<a
 					class="inline-flex min-h-11 items-center justify-center gap-1 whitespace-nowrap rounded-full bg-deep-navy px-2 text-[11px] font-semibold text-white transition-colors hover:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-deep-navy sm:gap-2 sm:px-4 sm:text-sm"
-					href={accountHref}
+					href={localeHref(accountHref)}
 				>
 					<span aria-hidden="true" class="material-symbols-outlined text-lg">account_circle</span>
 					{accountLabel}
@@ -127,7 +131,7 @@ const accountLabel = role
 				{(["ca", "es", "en", "fr"] as const).map((language) => (
 					<a
 						class={`hover:text-deep-navy ${language === locale ? "font-bold text-deep-navy" : ""}`}
-						href={`/?lang=${language}`}
+						href={languageHref(language)}
 						aria-current={language === locale ? "page" : undefined}
 					>
 						{common.lang[language]}

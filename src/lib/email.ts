@@ -11,7 +11,7 @@ export async function sendTransactionalEmail(input: {
 	}
 
 	const resend = new Resend(ENV.resendApiKey);
-	const { error } = await resend.emails.send({
+	const { data, error } = await resend.emails.send({
 		from: ENV.emailFrom,
 		to: input.to,
 		subject: input.subject,
@@ -19,5 +19,8 @@ export async function sendTransactionalEmail(input: {
 	});
 	if (error) {
 		throw new Error(`Resend email delivery failed: ${error.message}`);
+	}
+	if (!data?.id) {
+		throw new Error("Resend did not return an email delivery identifier.");
 	}
 }

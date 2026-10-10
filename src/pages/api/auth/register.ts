@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
+import { getLocale, localizedPath } from "@/config/i18n/routing";
 import { setSessionCookie, signSessionToken } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { hashPasskey } from "@/lib/passkey";
@@ -9,6 +10,7 @@ import { formatValidationError } from "@/lib/validation/users";
 export const prerender = false;
 
 const registerSchema = z.object({
+	locale: z.enum(["ca", "es", "en", "fr"]).optional(),
 	username: z
 		.string()
 		.trim()
@@ -87,7 +89,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 	setSessionCookie(cookies, token);
 
 	return Response.json(
-		{ user: publicUser(created), next: "/perfil" },
+		{
+			user: publicUser(created),
+			next: localizedPath("/perfil", getLocale(data.locale)),
+		},
 		{ status: 201 },
 	);
 };

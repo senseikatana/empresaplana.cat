@@ -11,25 +11,16 @@ export type {
 	LocalizedPageProps,
 } from "@/interfaces";
 
-export const DEFAULT_LOCALE: Locale = "ca";
-
-export const LOCALES: readonly Locale[] = ["ca", "es", "en", "fr"] as const;
+export {
+	DEFAULT_LOCALE,
+	LOCALES,
+	isLocale,
+	getLocale,
+	localizedPath,
+	unlocalizedPath,
+} from "./routing";
 
 const dictionaries: Record<Locale, I18nDictionary> = { ca, en, es, fr };
-
-export function isLocale(value: string | undefined | null): value is Locale {
-	if (!value) return false;
-	return LOCALES.includes(value.toLowerCase() as Locale);
-}
-
-export function getLocale(
-	value: string | undefined | null,
-	fallback: Locale = DEFAULT_LOCALE,
-): Locale {
-	if (!value) return fallback;
-	const normalized = value.toLowerCase() as Locale;
-	return isLocale(normalized) ? normalized : fallback;
-}
 
 export function getDictionary(locale: Locale): I18nDictionary {
 	return dictionaries[locale];

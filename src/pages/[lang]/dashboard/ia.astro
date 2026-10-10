@@ -1,0 +1,65 @@
+---
+import { localizedPath } from "@/config/i18n/routing";
+import DashboardLayout from "@/layouts/DashboardLayout.astro";
+import { getDictionary, getLocale } from "@/config/i18n";
+import { ENV } from "@/config/config.env";
+import { getSession } from "@/lib/auth";
+import { isCompanyRole } from "@/lib/acl";
+import { getPublicUser } from "@/lib/get-public-user";
+import { AIError, aiPromptSchema, generateAIText } from "@/lib/ai";
+
+export const prerender = false;
+
+const session = await getSession(Astro.cookies);
+if (!session) return Astro.redirect(localizedPath("/dashboard/login", getLocale(Astro.params.lang)));
+if (!isCompanyRole(session.role)) return new Response(null, { status: 403 });
+const locale = getLocale(Astro.params.lang);
+const t = getDictionary(locale).ai;
+const user = await getPublicUser(session.id);
+let prompt = "";
+let result: { text: string; model: string } | null = null;
+let error: string | null = null;
+
+if (Astro.request.method === "POST") {
+	if (Astro.request.headers.get("origin") !== Astro.url.origin) {
+		return new Response(null, { status: 403 });
+	}
+	const form = await Astro.request.formData();
+	const parsed = aiPromptSchema.safeParse(form.get("prompt"));
+	prompt = typeof form.get("prompt") === "string" ? String(form.get("prompt")).slice(0, 4000) : "";
+	if (!parsed.success) {
+		error = t.invalid;
+		Astro.response.status = 400;
+	} else {
+		try {
+			result = await generateAIText(parsed.data, session.id);
+		} catch (cause) {
+			if (!(cause instanceof AIError)) throw cause;
+			error = cause.code === "rate_limit" ? t.rateLimit : cause.code === "not_configured" ? t.notConfigured : t.upstream;
+			Astro.response.status = cause.code === "rate_limit" ? 429 : cause.code === "not_configured" ? 503 : 502;
+			if (cause.code === "rate_limit") Astro.response.headers.set("Retry-After", "30");
+		}
+	}
+}
+Astro.response.headers.set("Cache-Control", "no-store");
+---
+
+<DashboardLayout title={t.title} locale={locale} user={user}>
+	<div class="mx-auto w-full max-w-3xl">
+		<h1 class="text-headline-lg font-bold text-deep-navy">{t.title}</h1>
+		<p class="mt-2 text-on-surface-variant">{t.description}</p>
+		<p id="ai-notice" class="mt-6 rounded-lg bg-surface-container-low p-4 text-sm text-on-surface-variant">{t.notice}</p>
+		{!ENV.openRouterApiKey && <p role="alert" class="mt-4 text-error">{t.notConfigured}</p>}
+		<form method="post" action={Astro.url.pathname} class="mt-6 space-y-4">
+			<label for="ai-prompt" class="block font-semibold">{t.prompt}</label>
+			<textarea id="ai-prompt" name="prompt" required maxlength="4000" rows="7" autocomplete="off" aria-describedby="ai-notice" class="w-full rounded-lg border border-outline-variant bg-surface-container-lowest p-4 text-on-surface focus-visible:outline-2 focus-visible:outline-coastal-teal">{prompt}</textarea>
+			<button type="submit" disabled={!ENV.openRouterApiKey} class="rounded-lg bg-deep-navy px-6 py-3 font-semibold text-white hover:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-coastal-teal disabled:cursor-not-allowed disabled:opacity-50">{t.submit}</button>
+		</form>
+		{error && <p role="alert" class="mt-6 rounded-lg bg-error-container p-4 text-on-error-container">{error}</p>}
+		{result && <section class="mt-8 rounded-xl border border-outline-variant bg-surface-container-lowest p-6">
+			<h2 class="text-headline-md font-semibold text-deep-navy">{t.result}</h2>
+			<p class="mt-2 text-sm text-on-surface-variant">{result.model}</p>
+			<p class="mt-4 whitespace-pre-wrap break-words">{result.text}</p>
+		</section>}
+	</div>
+</DashboardLayout>
