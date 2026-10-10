@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.2] - 2026-10-10
+
+Highlights: fix: update CI workflows and ignore files, plus 1 more change.
+
+- [x] 🐛 fix: update CI workflows and ignore files
+  - `.github/workflows/verify.yml`
+  - `.gitignore`
+  - `AGENTS.md`
+  - `docs/RELEASING.md`
+  - `package.json`
+- [x] 🐛 fix: update PORTING.md and package.json
+  - `docs/PORTING.md`
+  - `package.json`
+- [x] 🚀 feat: add verify workflow and update AGENTS.md and docs/RELEASING.md
+- [x] 🐛 fix: update CI workflows to use latest actions and tools
+- [x] 🚀 feat: configure ci with verify workflow
+- [x] 🐛 fix: update release scripts and documentation to reflect strict versioning (#13)
+
 ## [0.4.1] - 2026-10-10
 
 Highlights: feat: add verify workflow and update AGENTS.md and docs/RELEASING.md.
