@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [1.0.0] - 2026-10-10
 
 What's news:
 
@@ -76,20 +76,7 @@ What's news:
   - `src/pages/api/auth/register.ts`
   - `src/pages/api/users/index.ts`
   - `src/pages/index.astro`
-
-## [1.0.0] - 2026-07-26
-
-### Added
-- Initial release of the project.
-- Complete folder structure and baseline configuration.
-- Comprehensive `.gitignore`, `LICENSE`, and documentation files.
-- Responsive design layout and UI components.
-
-### Changed
-- Standardized project configurations and clean commit workflow.
-
-### Fixed
-- Resolved nested repository issues and gitlink submodule conflicts.
+- [ ] bun add v1.4.2 (744846f84) feat: update documentation for agents
 
 ## [0.1.1] - 2026-10-10
 
