@@ -10,6 +10,8 @@
 !tests/**
 !test/
 !test/**
+test/test-results/
+test/playwright-report/
 !prisma.config.ts
 !prisma/
 !prisma/schema.prisma

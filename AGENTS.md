@@ -39,7 +39,8 @@ Run everything from this directory:
   uses `--ignore-lock` without stopping the user's dev server on port 4321.
   Auth configuration uses a local fixture; login rejection is mocked in the browser.
   These tests do not verify real Google/GitHub login or authenticated database CRUD.
-  Failure screenshots/traces go to `test-results/`; HTML reports to `playwright-report/`.
+  Failure screenshots/traces go to `test/test-results/`; HTML reports to
+  `test/playwright-report/`. Generated reports are excluded from type checking.
 - `bun run test:integration` — run live InsForge CRUD tests separately, with
   `CRUD_TEST_BASE_URL` and verified admin/worker test credentials configured.
 - `bun run test` — run Biome, Astro checks, unit tests and E2E in sequence.
