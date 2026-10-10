@@ -1,4 +1,16 @@
 {
+	"ai": {
+		"title": "Assistent d'IA",
+		"description": "Genera text amb el Model Gateway d'InsForge i OpenRouter.",
+		"notice": "No incloguis dades personals ni secrets: el text s'envia a OpenRouter. Les respostes poden contenir errors. Maxim 4000 caracters; una peticio cada 30 segons per usuari i proces.",
+		"prompt": "Instruccions per a la IA",
+		"submit": "Generar text",
+		"result": "Resposta",
+		"invalid": "Escriu entre 1 i 4000 caracters.",
+		"notConfigured": "Falta OPENROUTER_API_KEY al servidor. Configura la clau amb la CLI d'InsForge.",
+		"rateLimit": "Espera 30 segons abans d'enviar una altra peticio.",
+		"upstream": "No s'ha pogut generar el text. Comprova la connexio i el saldo d'OpenRouter abans de tornar-ho a provar."
+	},
 	"meta": {
 		"title": "Empresa Plana | Transport públic de viatgers",
 		"description": "Empresa Plana ofereix serveis de transport públic de viatgers a la Costa Daurada. Consulta horaris, línies i rutes d'autobús."

@@ -1,4 +1,16 @@
 {
+	"ai": {
+		"title": "AI assistant",
+		"description": "Generate text with the InsForge Model Gateway and OpenRouter.",
+		"notice": "Do not include personal data or secrets: text is sent to OpenRouter. Answers may contain mistakes. Maximum 4000 characters; one request every 30 seconds per user and process.",
+		"prompt": "AI instructions",
+		"submit": "Generate text",
+		"result": "Answer",
+		"invalid": "Enter between 1 and 4000 characters.",
+		"notConfigured": "OPENROUTER_API_KEY is missing on the server. Configure it with the InsForge CLI.",
+		"rateLimit": "Wait 30 seconds before sending another request.",
+		"upstream": "Text generation failed. Check your connection and OpenRouter balance before retrying."
+	},
 	"meta": {
 		"title": "Empresa Plana | Transport públic de viatgers",
 		"description": "Empresa Plana ofereix serveis de transport públic de viatgers a la Costa Daurada. Consulta horaris, línies i rutes d'autobús."

@@ -9,6 +9,18 @@ import type { Locations, LocationsMobile } from "@/interfaces/locations";
 import type { MobileApp } from "@/interfaces/mobile-app";
 import type { Routes } from "@/interfaces/routes";
 export interface I18nDictionary {
+	ai: {
+		title: string;
+		description: string;
+		notice: string;
+		prompt: string;
+		submit: string;
+		result: string;
+		invalid: string;
+		notConfigured: string;
+		rateLimit: string;
+		upstream: string;
+	};
 	meta: {
 		title: string;
 		description: string;

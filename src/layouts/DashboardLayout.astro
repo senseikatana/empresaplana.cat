@@ -33,6 +33,7 @@ const displayName = user?.name || user?.fullName || user?.username || "";
 const roleLabel = role ? dict.app.role[role] : "";
 const sectionNav = dict.app.gestion.nav;
 const companyNav = [
+	{ label: dict.ai.title, icon: "auto_awesome", href: "/dashboard/ia" },
 	{ label: sectionNav.panel, icon: "dashboard", href: "/dashboard/gestion" },
 	{ label: sectionNav.map, icon: "map", href: "/dashboard/gestion/mapa" },
 	{ label: sectionNav.routes, icon: "route", href: "/dashboard/gestion/rutas" },

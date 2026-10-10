@@ -1,4 +1,16 @@
 {
+	"ai": {
+		"title": "Asistente de IA",
+		"description": "Genera texto con el Model Gateway de InsForge y OpenRouter.",
+		"notice": "No incluyas datos personales ni secretos: el texto se envia a OpenRouter. Las respuestas pueden contener errores. Maximo 4000 caracteres; una solicitud cada 30 segundos por usuario y proceso.",
+		"prompt": "Instrucciones para la IA",
+		"submit": "Generar texto",
+		"result": "Respuesta",
+		"invalid": "Escribe entre 1 y 4000 caracteres.",
+		"notConfigured": "Falta OPENROUTER_API_KEY en el servidor. Configura la clave con la CLI de InsForge.",
+		"rateLimit": "Espera 30 segundos antes de enviar otra solicitud.",
+		"upstream": "No se pudo generar el texto. Comprueba la conexion y el saldo de OpenRouter antes de reintentar."
+	},
 	"meta": {
 		"title": "Empresa Plana - Autocares y movilidad para la Costa Dorada",
 		"description": "Empresa Plana: horarios de autobús, rutas, traslados al aeropuerto y servicios discrecionales en la Costa Dorada, Camp de Tarragona y Barcelona."

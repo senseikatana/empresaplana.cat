@@ -1,7 +1,10 @@
 import { existsSync } from "node:fs";
 import { config } from "dotenv";
 
-config({ path: existsSync(".env") ? ".env" : ".env.production" });
+config({
+	path: [".env.local", existsSync(".env") ? ".env" : ".env.production"],
+	quiet: true,
+});
 
 export const ENV = {
 	authSecret: process.env.BETTER_AUTH_SECRET ?? process.env.AUTH_SECRET,
@@ -14,6 +17,8 @@ export const ENV = {
 	emailFrom: process.env.AUTH_EMAIL_FROM,
 	companyOrganizationId: process.env.COMPANY_ORGANIZATION_ID,
 	webAuthnRpId: process.env.WEBAUTHN_RP_ID,
+	openRouterApiKey: process.env.OPENROUTER_API_KEY,
+	openRouterChatModel: process.env.OPENROUTER_CHAT_MODEL ?? "openai/gpt-5.5",
 };
 
 export const oauthProviders = [
