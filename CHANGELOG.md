@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+What's news:
+
+- [ ] feat: add PRODUCT.md and auth
+  - `PRODUCT.md`
+  - `package.json`
+  - `src/interfaces/auth.ts`
+  - `src/lib/acl.ts`
+  - `src/lib/auth.ts`
+  - `src/middleware/index.ts`
+- [ ] feat: refresh standalone Astro website
+  - `bun.lock`
+  - `package.json`
+  - `public/images/empresa-plana-fleet.jpg`
+  - `src/interfaces/home.ts`
+  - `src/interfaces/i18n.ts`
+  - `src/lib/logger.ts`
+  - `src/pages/api/auth/register.ts`
+  - `src/pages/api/users/index.ts`
+  - `src/pages/index.astro`
+
 ## [1.0.0] - 2026-07-26
 
 ### Added

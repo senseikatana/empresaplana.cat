@@ -2,6 +2,8 @@ import "dotenv/config";
 import type { AstroCookies } from "astro";
 import { jwtVerify, SignJWT } from "jose";
 import type { SessionUser, UsuarioRole } from "@/interfaces/auth";
+import { isRole } from "@/lib/acl";
+import { prisma } from "@/lib/db";
 
 const SESSION_COOKIE = "ep_session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7;
@@ -32,19 +34,28 @@ export async function getSession(
 ): Promise<SessionUser | null> {
 	const token = cookies.get(SESSION_COOKIE)?.value;
 	if (!token) return null;
+	let payload: Awaited<ReturnType<typeof verifySessionToken>>;
 	try {
-		const { payload } = await jwtVerify(token, secret(), { issuer: ISSUER });
-		const id = Number(payload.sub);
-		if (!Number.isInteger(id) || typeof payload.username !== "string")
-			return null;
-		return {
-			id,
-			username: payload.username,
-			role: payload.role as UsuarioRole,
-		};
+		payload = await verifySessionToken(token);
 	} catch {
 		return null;
 	}
+
+	const id = Number(payload.sub);
+	if (!Number.isInteger(id) || id <= 0) return null;
+
+	const user = await prisma().user.findUnique({
+		where: { id },
+		select: { username: true, role: true },
+	});
+	if (!user || !isRole(user.role)) return null;
+
+	return { id, username: user.username, role: user.role };
+}
+
+async function verifySessionToken(token: string) {
+	const { payload } = await jwtVerify(token, secret(), { issuer: ISSUER });
+	return payload;
 }
 
 export function setSessionCookie(cookies: AstroCookies, token: string): void {
@@ -69,7 +80,11 @@ export async function authorize(cookies: AstroCookies, role?: UsuarioRole) {
 			response: Response.json({ error: "unauthorized" }, { status: 401 }),
 		};
 	}
-	if (role && session.role !== role && session.role !== "admin") {
+	if (
+		role &&
+		session.role !== role &&
+		!(role !== "manager" && session.role === "admin")
+	) {
 		return {
 			user: null,
 			response: Response.json({ error: "forbidden" }, { status: 403 }),

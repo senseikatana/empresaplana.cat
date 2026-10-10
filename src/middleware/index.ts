@@ -1,5 +1,9 @@
 import type { MiddlewareHandler } from "astro";
 import { getSession } from "@/lib/auth";
+import {
+	canAccessDashboardPath,
+	dashboardHomeForRole,
+} from "@/lib/acl";
 
 /**
  * Astro middleware — dashboard auth guard.
@@ -23,9 +27,9 @@ function isPublicAuthPath(pathname: string): boolean {
 
 export const onRequest: MiddlewareHandler = async (context, next) => {
 	const { pathname } = context.url;
+	const isProfilePath = pathname === "/perfil";
 
-	// Only guard dashboard routes
-	if (!DASHBOARD_PATTERN.test(pathname)) {
+	if (!DASHBOARD_PATTERN.test(pathname) && !isProfilePath) {
 		return next();
 	}
 
@@ -34,16 +38,23 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
 		return next();
 	}
 
-	// Check session
 	const session = await getSession(context.cookies);
 
 	if (!session) {
-		const redirect = encodeURIComponent(pathname + context.url.search);
+		const redirect = encodeURIComponent(
+			pathname + context.url.search + context.url.hash,
+		);
 		return context.redirect(`/dashboard/login?redirect=${redirect}`);
 	}
 
-	// Attach session to locals so pages can access it without re-verifying
 	context.locals.session = session;
+
+	if (
+		DASHBOARD_PATTERN.test(pathname) &&
+		!canAccessDashboardPath(session.role, pathname)
+	) {
+		return context.redirect(dashboardHomeForRole(session.role));
+	}
 
 	return next();
 };
