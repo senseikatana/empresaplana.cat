@@ -11,7 +11,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 What's news:
 
-- [ ] feat: add PRODUCT.md and auth
+- [ ] feat: auth and i18n implemented
+  - `AGENTS.md`
+  - `PRODUCT.md`
+  - `README.md`
+  - `package.json`
+  - `src/components/PublicHeader.astro`
+  - `src/config/i18n/ca.json`
+  - `src/config/i18n/en.json`
+  - `src/config/i18n/es.json`
+  - `src/config/i18n/fr.json`
+  - `src/interfaces/common.ts`
+  - `src/layouts/AuthLayout.astro`
+  - `src/layouts/DashboardLayout.astro`
+  - `src/lib/db.ts`
+  - `src/lib/validation/users.ts`
+  - `src/pages/api/account.ts`
+  - `src/pages/api/auth/login.ts`
+  - `src/pages/api/auth/register.ts`
+  - `src/pages/api/users/[id].ts`
+  - `src/pages/api/users/index.ts`
+  - `src/pages/dashboard/gestion/usuarios.astro`
+  - `src/pages/dashboard/index.astro`
+  - `src/pages/dashboard/login.astro`
+  - `src/pages/dashboard/register.astro`
+  - `src/pages/index.astro`
+  - `src/pages/perfil.astro`
+  - `tests/acl.test.ts`
+- [ ] ]7;file://localhost/home/senseikatana/Proyectos/empresaplana-astrobun add v1.4.3 (c6da4a4d3) feat: add PRODUCT.md and auth
   - `PRODUCT.md`
   - `package.json`
   - `src/interfaces/auth.ts`

@@ -10,7 +10,11 @@
 			"locations": "Localisations",
 			"downloads": "Téléchargements",
 			"contact": "Contact",
-			"bookNow": "RÉSERVER"
+			"bookNow": "RÉSERVER",
+			"login": "Connexion",
+			"register": "Créer un compte",
+			"profile": "Mon profil",
+			"companyDashboard": "Espace entreprise"
 		},
 		"lang": {
 			"ca": "CA",
@@ -126,11 +130,16 @@
 			"asClient": "Se connecter en tant que Client",
 			"asWorker": "Se connecter en tant que Travailleur",
 			"asBoss": "Se connecter en tant que Chef",
+			"loginTitle": "Ravi de vous revoir",
+			"imageTitle": "Votre mobilité, au même endroit",
+			"imageDescription": "Consultez les informations de service et gérez votre compte avec Empresa Plana.",
+			"connectionError": "Connexion impossible. Veuillez réessayer.",
 			"invalid": "Nom d'utilisateur ou mot de passe incorrect."
 		},
 		"role": {
 			"client": "Client",
 			"worker": "Travailleur",
+			"manager": "Gérant",
 			"admin": "Administrateur"
 		},
 		"status": {
@@ -239,6 +248,7 @@
 				"drivers": "Chauffeurs",
 				"notifications": "Notifications",
 				"reports": "Rapports",
+				"users": "Utilisateurs",
 				"integrations": "Intégrations"
 			},
 			"common": {
@@ -457,11 +467,33 @@
 			"username": "Nom d'utilisateur",
 			"email": "Adresse e-mail",
 			"password": "Mot de passe",
+			"passwordHint": "Utilisez au moins 12 caractères.",
 			"submit": "Créer le compte",
 			"haveAccount": "Vous avez déjà un compte ?",
 			"login": "Se connecter",
 			"taken": "Ce nom d'utilisateur ou cette adresse e-mail est déjà enregistré.",
 			"invalid": "Vérifiez les données saisies."
+		},
+		"team": {
+			"title": "Accès de l'équipe",
+			"subtitle": "Gérez les comptes et attribuez les permissions de gérance. Seuls les administrateurs peuvent modifier les rôles.",
+			"search": "Rechercher par nom, identifiant ou e-mail",
+			"name": "Personne",
+			"email": "Adresse e-mail",
+			"role": "Rôle",
+			"action": "Enregistrer le rôle",
+			"loading": "Chargement des comptes…",
+			"empty": "Aucun compte à afficher.",
+			"loadError": "Impossible de charger les comptes. Réessayez.",
+			"saveError": "Impossible d'enregistrer ce rôle.",
+			"saved": "Rôle mis à jour.",
+			"lastAdmin": "Au moins un administrateur actif doit être conservé.",
+			"roles": {
+				"client": "Client",
+				"worker": "Travailleur",
+				"manager": "Gérant",
+				"admin": "Administrateur"
+			}
 		},
 		"panel": {
 			"home": "Accueil",
@@ -476,6 +508,12 @@
 			"backToSite": "Retour au site",
 			"accountTitle": "Compte",
 			"accountSubtitle": "Gérez vos données personnelles et la sécurité de votre compte.",
+			"profileIntro": "Cet espace est privé. Vous seul pouvez consulter et modifier vos données personnelles.",
+			"accountRole": "Type de compte",
+			"memberSince": "Compte créé",
+			"currentPassword": "Mot de passe actuel",
+			"passwordHint": "Confirmez votre mot de passe actuel pour modifier votre e-mail ou votre mot de passe.",
+			"saveError": "Impossible d'enregistrer les modifications. Vérifiez les données et réessayez.",
 			"name": "Nom",
 			"email": "Adresse e-mail",
 			"password": "Mot de passe",

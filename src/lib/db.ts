@@ -21,6 +21,3 @@ export function prisma(): PrismaClient {
 	}
 	return _client;
 }
-
-/** @deprecated Use prisma() instead */
-export const db = prisma();

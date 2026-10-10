@@ -22,10 +22,8 @@ const registerSchema = z.object({
 		.transform((v) => v.toLowerCase()),
 	password: z
 		.string()
-		.regex(
-			/^[A-Za-z0-9]{8}$/,
-			"El passkey debe tener 8 caracteres alfanuméricos",
-		),
+		.min(12, "La contraseña debe tener al menos 12 caracteres")
+		.max(128, "La contraseña no puede superar 128 caracteres"),
 	name: z
 		.string()
 		.trim()
@@ -84,9 +82,12 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 	const token = await signSessionToken({
 		id: created.id,
 		username: created.username,
-		role: created.role as "client",
+		role: "client",
 	});
 	setSessionCookie(cookies, token);
 
-	return Response.json({ user: publicUser(created) }, { status: 201 });
+	return Response.json(
+		{ user: publicUser(created), next: "/perfil" },
+		{ status: 201 },
+	);
 };

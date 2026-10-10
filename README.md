@@ -44,6 +44,15 @@ The development site runs at `http://localhost:4321`.
 | `bun run db:seed` | Seed development data |
 | `bun run sync:sheets` | Sync route schedules from Google Sheets |
 
+## Accounts and access
+
+The public navigation links to login and registration. Self-registration
+creates a client account, which can view and update its own profile at
+`/perfil`; administrators and managers are routed to the private company
+dashboard. Only administrators can assign roles or access user and integration
+management. These restrictions are enforced by server middleware and APIs,
+not just by the navigation UI.
+
 ## Project layout
 
 - `src/pages/` — public pages and dashboard routes

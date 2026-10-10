@@ -24,7 +24,7 @@ const updateAccountSchema = z.object({
 	phone: z
 		.string()
 		.trim()
-		.regex(/^\+?[0-9\s-]{6,20}$/, "Teléfono inválido")
+		.regex(/^$|^\+?[0-9\s-]{6,20}$/, "Teléfono inválido")
 		.optional(),
 	email: z
 		.email("Email inválido")
@@ -33,10 +33,8 @@ const updateAccountSchema = z.object({
 		.optional(),
 	newPassword: z
 		.string()
-		.regex(
-			/^[A-Za-z0-9]{8}$/,
-			"El passkey debe tener 8 caracteres alfanuméricos",
-		)
+		.min(12, "La contraseña debe tener al menos 12 caracteres")
+		.max(128, "La contraseña no puede superar 128 caracteres")
 		.optional(),
 	currentPasskey: z.string().min(1, "Passkey actual requerido").optional(),
 });
@@ -90,10 +88,7 @@ export const PATCH: APIRoute = async ({ request, cookies }) => {
 			select: { passkey: true },
 		});
 		if (!existing || !verifyPasskey(data.currentPasskey, existing.passkey)) {
-			return Response.json(
-				{ error: "invalid_passkey" },
-				{ status: 401 },
-			);
+			return Response.json({ error: "invalid_passkey" }, { status: 401 });
 		}
 	}
 

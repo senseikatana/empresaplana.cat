@@ -10,7 +10,11 @@
 			"locations": "Localizaciones",
 			"downloads": "Descargas",
 			"contact": "Contacto",
-			"bookNow": "RESERVAR AHORA"
+			"bookNow": "RESERVAR AHORA",
+			"login": "Acceder",
+			"register": "Crear cuenta",
+			"profile": "Mi perfil",
+			"companyDashboard": "Panel de empresa"
 		},
 		"lang": {
 			"ca": "CA",
@@ -126,11 +130,16 @@
 			"asClient": "Entrar como Cliente",
 			"asWorker": "Entrar como Trabajador",
 			"asBoss": "Entrar como Jefe",
+			"loginTitle": "Te damos la bienvenida",
+			"imageTitle": "Tu movilidad, en tu espacio",
+			"imageDescription": "Consulta información del servicio y gestiona tu cuenta con Empresa Plana.",
+			"connectionError": "No se pudo conectar. Inténtalo de nuevo.",
 			"invalid": "Usuario o contraseña no válidos."
 		},
 		"role": {
 			"client": "Cliente",
 			"worker": "Trabajador",
+			"manager": "Gerente",
 			"admin": "Administrador"
 		},
 		"status": {
@@ -239,6 +248,7 @@
 				"drivers": "Conductores",
 				"notifications": "Notificaciones",
 				"reports": "Reportes",
+				"users": "Usuarios",
 				"integrations": "Integraciones"
 			},
 			"common": {
@@ -457,11 +467,33 @@
 			"username": "Usuario",
 			"email": "Correo electrónico",
 			"password": "Contraseña",
+			"passwordHint": "Usa al menos 12 caracteres.",
 			"submit": "Crear cuenta",
 			"haveAccount": "¿Ya tienes cuenta?",
 			"login": "Inicia sesión",
 			"taken": "Ese usuario o correo ya está registrado.",
 			"invalid": "Revisa los datos introducidos."
+		},
+		"team": {
+			"title": "Acceso del equipo",
+			"subtitle": "Gestiona las cuentas y asigna permisos de gerencia. Solo los administradores pueden cambiar roles.",
+			"search": "Buscar por nombre, usuario o correo",
+			"name": "Persona",
+			"email": "Correo electrónico",
+			"role": "Rol",
+			"action": "Guardar rol",
+			"loading": "Cargando cuentas…",
+			"empty": "No hay cuentas para mostrar.",
+			"loadError": "No se pudieron cargar las cuentas. Inténtalo de nuevo.",
+			"saveError": "No se pudo guardar este rol.",
+			"saved": "Rol actualizado.",
+			"lastAdmin": "Debe mantenerse al menos un administrador activo.",
+			"roles": {
+				"client": "Cliente",
+				"worker": "Trabajador",
+				"manager": "Gerente",
+				"admin": "Administrador"
+			}
 		},
 		"panel": {
 			"home": "Inicio",
@@ -476,6 +508,12 @@
 			"backToSite": "Volver a la web",
 			"accountTitle": "Cuenta",
 			"accountSubtitle": "Gestiona tus datos personales y la seguridad de tu cuenta.",
+			"profileIntro": "Este espacio es privado. Solo tú puedes consultar y editar tus datos personales.",
+			"accountRole": "Tipo de cuenta",
+			"memberSince": "Cuenta creada",
+			"currentPassword": "Contraseña actual",
+			"passwordHint": "Para cambiar el correo o la contraseña, confirma tu contraseña actual.",
+			"saveError": "No se pudieron guardar los cambios. Revisa los datos e inténtalo de nuevo.",
 			"name": "Nombre",
 			"email": "Correo electrónico",
 			"password": "Contraseña",

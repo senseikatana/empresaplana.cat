@@ -20,6 +20,7 @@ Customers browse routes and services on the public website. Signed-in customers 
 - The application uses Astro, PostgreSQL through Prisma, scrypt password hashing, and signed HttpOnly session cookies.
 - Public self-registration creates client accounts. **Inferred default:** only an administrator may promote an account to manager; public registration cannot grant privileged roles.
 - Only administrators and company managers may access the company dashboard. Other signed-in roles may access their own profile but not company dashboard pages.
+- **Implementation assumption:** user-role management and integrations are administrator-only; managers receive the operational company dashboard without those controls.
 - Existing customer, worker, and administrator records must remain usable. Authentication roles are stored as strings in the existing database.
 
 ## Brand Commitments

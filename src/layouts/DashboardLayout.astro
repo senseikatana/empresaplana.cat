@@ -13,7 +13,7 @@
  */
 import "@/styles/global.css";
 import { hasCapability, isRole, type Role } from "@/lib/acl";
-import { LOCALES, getLocale } from "@/config/i18n";
+import { LOCALES, getDictionary, getLocale } from "@/config/i18n";
 import type { PublicUser } from "@/interfaces/users";
 
 interface Props {
@@ -24,107 +24,37 @@ interface Props {
 
 const { title, locale: rawLocale, user } = Astro.props;
 const currentLocale = getLocale(rawLocale);
+const dict = getDictionary(currentLocale);
 
 // Resolve role for nav filtering
 const role: Role | undefined = user && isRole(user.role) ? user.role : undefined;
 
 const displayName = user?.name || user?.fullName || user?.username || "";
-const roleLabel =
-	role === "admin"
-		? "Administrador"
-		: role === "worker"
-			? "Treballador"
-			: "Client";
-
-// --- Navigation items per role ---
-const clientNav = [
-	{ label: "Inici", icon: "home", href: "/dashboard/cliente" },
-	{ label: "Compte", icon: "person", href: "/dashboard/cliente/cuenta" },
-	{
-		label: "Linies preferides",
-		icon: "star",
-		href: "/dashboard/cliente/favoritas",
-	},
-	{
-		label: "Pressupostos",
-		icon: "description",
-		href: "/dashboard/cliente/cotizaciones",
-	},
-	{ label: "Missatges", icon: "chat", href: "/dashboard/mensajes" },
+const roleLabel = role ? dict.app.role[role] : "";
+const sectionNav = dict.app.gestion.nav;
+const companyNav = [
+	{ label: sectionNav.panel, icon: "dashboard", href: "/dashboard/gestion" },
+	{ label: sectionNav.map, icon: "map", href: "/dashboard/gestion/mapa" },
+	{ label: sectionNav.routes, icon: "route", href: "/dashboard/gestion/rutas" },
+	{ label: sectionNav.buses, icon: "directions_bus", href: "/dashboard/gestion/autobuses" },
+	{ label: sectionNav.stops, icon: "place", href: "/dashboard/gestion/paradas" },
+	{ label: sectionNav.schedules, icon: "schedule", href: "/dashboard/gestion/horarios" },
+	{ label: sectionNav.drivers, icon: "badge", href: "/dashboard/gestion/conductores" },
+	{ label: sectionNav.notifications, icon: "notifications", href: "/dashboard/gestion/notificaciones" },
+	{ label: sectionNav.reports, icon: "bar_chart", href: "/dashboard/gestion/reportes" },
+	...(role === "admin"
+		? [{ label: sectionNav.integrations, icon: "power", href: "/dashboard/gestion/integraciones" }]
+		: []),
+	...(role === "admin"
+		? [{ label: sectionNav.users, icon: "group", href: "/dashboard/gestion/usuarios" }]
+		: []),
+	{ label: dict.app.panel.messages, icon: "chat", href: "/dashboard/mensajes" },
 ];
+const navItems = role && hasCapability(role, "dashboard:access") ? companyNav : [];
 
-const workerNav = [
-	{
-		label: "Inici",
-		icon: "directions_bus",
-		href: "/dashboard/trabajador",
-	},
-	{ label: "Linies", icon: "route", href: "/dashboard/trabajador/lineas" },
-	{
-		label: "Incidencies",
-		icon: "report_problem",
-		href: "/dashboard/trabajador/incidencias",
-	},
-	{
-		label: "Informes",
-		icon: "assignment",
-		href: "/dashboard/trabajador/reportes",
-	},
-	{ label: "Missatges", icon: "chat", href: "/dashboard/mensajes" },
-];
-
-const adminNav = [
-	{ label: "Panell", icon: "dashboard", href: "/dashboard/gestion" },
-	{ label: "Mapa en viu", icon: "map", href: "/dashboard/gestion/mapa" },
-	{ label: "Rutes", icon: "route", href: "/dashboard/gestion/rutas" },
-	{
-		label: "Autobusos",
-		icon: "directions_bus",
-		href: "/dashboard/gestion/autobuses",
-	},
-	{
-		label: "Parades",
-		icon: "place",
-		href: "/dashboard/gestion/paradas",
-	},
-	{
-		label: "Horaris",
-		icon: "schedule",
-		href: "/dashboard/gestion/horarios",
-	},
-	{
-		label: "Conductors",
-		icon: "badge",
-		href: "/dashboard/gestion/conductores",
-	},
-	{
-		label: "Notificacions",
-		icon: "notifications",
-		href: "/dashboard/gestion/notificaciones",
-	},
-	{
-		label: "Reportes",
-		icon: "bar_chart",
-		href: "/dashboard/gestion/reportes",
-	},
-	{
-		label: "Integracions",
-		icon: "power",
-		href: "/dashboard/gestion/integraciones",
-	},
-	{ label: "Missatges", icon: "chat", href: "/dashboard/mensajes" },
-];
-
-let navItems: { label: string; icon: string; href: string }[] = [];
-if (role) {
-	if (hasCapability(role, "users:manage")) navItems = adminNav;
-	else if (hasCapability(role, "fleet:view")) navItems = workerNav;
-	else navItems = clientNav;
-}
-
-// Footer nav
 const footerNav = [
-	{ label: "Torna a la web", icon: "open_in_new", href: "/" },
+	{ label: dict.app.panel.account, icon: "person", href: "/perfil" },
+	{ label: dict.app.panel.backToSite, icon: "open_in_new", href: "/" },
 ];
 
 // Current path for active state
@@ -243,7 +173,7 @@ function isActive(href: string): boolean {
             <button
               id="logout-btn"
               class="p-1.5 rounded-md hover:bg-surface-container-high text-on-surface-variant transition-colors"
-              title="Tancar sessio"
+              title={dict.app.nav.logout}
             >
               <span class="material-symbols-outlined text-[18px]">
                 logout

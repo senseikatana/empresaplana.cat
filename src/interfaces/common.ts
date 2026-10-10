@@ -5,6 +5,10 @@ export interface CommonNav {
 	downloads: string;
 	contact: string;
 	bookNow: string;
+	login: string;
+	register: string;
+	profile: string;
+	companyDashboard: string;
 }
 export interface CommonLang {
 	ca: string;
