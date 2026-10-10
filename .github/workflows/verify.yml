@@ -1,0 +1,68 @@
+name: verify
+
+# Corre en cada push y en cada PR. El job se llama "gate" a proposito: ese
+# nombre es el que hay que marcar como required check en la proteccion de
+# `main`, y es lo que bloquea el merge cuando algo falla.
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    # `prisma.config.ts` hace `env("DATABASE_URL")`, asi que la variable debe
+    # existir para que `prisma generate` arranque. No se conecta a ninguna base:
+    # el generador solo lee el schema. El valor es un placeholder.
+    env:
+      DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/placeholder
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # Imprescindible antes de `astro check`. `generated/` esta gitignored, asi
+      # que un checkout limpio no trae el Prisma client; sin este paso el type
+      # check falla con ~44 errores en cascada (implicit any, propiedades que no
+      # existen) que NO existen en local. No necesita base de datos.
+      - name: Generate Prisma client
+        run: bun run db:generate
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+
+      # La puerta completa, y el UNICO sitio donde corre entera. Los hooks
+      # locales de pre-push no la ejecutan a proposito: aqui corre una sola vez,
+      # y este job es el required check que bloquea el merge.
+      #
+      # NO compila: `astro build` no debe correr en CI.
+      - name: Gate
+        run: bun run verify
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: test/playwright-report/
+          retention-days: 7
+          if-no-files-found: ignore

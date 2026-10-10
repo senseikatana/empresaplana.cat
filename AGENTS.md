@@ -315,15 +315,19 @@ outside the gate, because the gate validates the code, not `dist/`.
 
 It runs in three places, so a red result stops the change at the earliest point:
 
-- `.husky/pre-commit` — `verify:fast` (Biome + types) plus lint-staged, about
-  15s. `astro check` dominates that time; it is kept because a type error caught
-  here never reaches a branch.
-- `.husky/pre-push` — the full `verify`. Nothing leaves the machine if it fails.
-- `.github/workflows/verify.yml` — job **gate**, the required status check that
-  blocks merging into `main`.
+- `.husky/pre-commit` — `lint-staged` only. Formats staged files; about 1s.
+- `.husky/pre-push` — `bun run check` (Biome) only. About 1s.
+- `.github/workflows/verify.yml` — the full `verify`, in the job named **gate**,
+  the required status check that blocks merging into `main`.
 
-`deploy:insforge` runs `verify` first, so production cannot be reached from a red
-tree.
+**The full gate runs in CI and nowhere else.** Running it in the local hooks as
+well duplicated every check and stalled each push for ~35s before CI did exactly
+the same work. `deploy:insforge` still runs `verify` first, so production cannot
+be reached from a red tree.
+
+CI runs `bun run db:generate` before `astro check`. `generated/` is gitignored,
+so a clean checkout has no Prisma client; without that step `astro check`
+reports ~44 cascading errors that do not exist locally.
 
 ### Commit hooks
 

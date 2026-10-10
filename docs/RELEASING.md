@@ -18,12 +18,19 @@ Where the gate runs, in order of how early it catches a problem:
 
 | Where | Command | Cost |
 | --- | --- | --- |
-| `.husky/pre-commit` | `verify:fast` + lint-staged | ~15s |
-| `.husky/pre-push` | `verify` | ~35s |
-| `.github/workflows/verify.yml` | `verify` | ~2 min |
+| `.husky/pre-commit` | `lint-staged` | ~1s |
+| `.husky/pre-push` | `check` | ~1s |
+| `.github/workflows/verify.yml` | `verify` | ~40s |
 
-`verify:fast` is Biome plus `astro check`. The type check is the slow part, and it
-earns its place: a type error caught at commit time never reaches a branch.
+The full gate runs in CI and nowhere else. Running it in the local hooks as well
+duplicated every check and stalled each push for ~35s before CI did exactly the
+same work. Local hooks stay fast enough that nobody reaches for `--no-verify`;
+CI is where correctness is enforced.
+
+CI runs `bun run db:generate` before `astro check`. Because `generated/` is
+gitignored, a clean checkout has no Prisma client, and without that step
+`astro check` reports around 44 cascading errors — implicit `any` and missing
+properties — that do not exist locally.
 
 The CI job is named **gate**. Mark it as a required status check in the branch
 protection for `main` and that is what blocks a red merge. A gate blocks
