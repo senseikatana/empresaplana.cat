@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.4] - 2026-10-10
+
+Highlights: fix: enforce consistent versioning across package.json, git tags, and chang.
+
+- [x] 🐛 fix: enforce consistent versioning across package.json, git tags, and chang
+  - `.husky/pre-push`
+  - `docs/RELEASING.md`
+  - `src/scripts/release-versions.mjs`
+- [x] 🐛 fix: update AGENTS.md documentation for releases
+- [x] 🐛 fix: update husky and package.json for correct version
+- [x] 🐛 fix(package): update package version to 0.4.0
+- [x] 🐛 fix: update CI workflows and ignore files
+- [x] 🐛 fix: update PORTING.md and package.json
+
 ## [0.4.3] - 2026-10-10
 
 Highlights: fix: update husky and package.json for correct version, plus 1 more change.
