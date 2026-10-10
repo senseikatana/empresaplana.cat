@@ -78,6 +78,183 @@ What's news:
   - `src/pages/index.astro`
 - [ ] bun add v1.4.2 (744846f84) feat: update documentation for agents
 
+## [0.2.0] - 2026-10-10
+
+Highlights: feat: adds CRUD and Auth features to Management API and UI and fix: cell rendering and management schemas, plus 5 more changes.
+
+- [x] 🐛 fix: cell rendering and management schemas
+  - `src/components/ManagementPanel.astro`
+  - `src/lib/management-schemas.ts`
+  - `tests/management.integration.test.ts`
+- [x] 🚀 feat: adds CRUD and Auth features to Management API and UI
+  - `AGENTS.md`
+  - `astro.config.mjs`
+  - `src/components/ManagementPanel.astro`
+  - `src/lib/management-api.ts`
+  - `src/lib/management-schemas.ts`
+  - `src/lib/management.ts`
+  - `tests/management.integration.test.ts`
+  - `tests/management.test.ts`
+- [x] 🚀 feat: update configuration files for InsForge
+  - `.dockerignore`
+  - `.env.example`
+  - `.gitignore`
+  - `AGENTS.md`
+  - `Dockerfile`
+  - `package.json`
+  - `src/components/ManagementPanel.astro`
+  - `src/components/PublicHeader.astro`
+  - `src/components/QuoteForm.astro`
+  - `src/components/ServiceDetail.astro`
+  - `src/components/auth/SocialAuthButtons.astro`
+  - `src/config/i18n/ca.json`
+  - `src/config/i18n/en.json`
+  - `src/config/i18n/es.json`
+  - `src/config/i18n/fr.json`
+  - `src/config/i18n/index.ts`
+  - `src/config/i18n/routing.ts`
+  - `src/interfaces/i18n.ts`
+  - `src/layouts/AuthLayout.astro`
+  - `src/layouts/BaseLayout.astro`
+  - `src/layouts/DashboardLayout.astro`
+  - `src/lib/acl.ts`
+  - `src/lib/email.ts`
+  - `src/lib/management-api.ts`
+  - `src/lib/management-schemas.ts`
+  - `src/lib/management.ts`
+  - `src/lib/validation/users.ts`
+  - `src/middleware/index.ts`
+  - `src/pages/[lang]/aviso-legal-variante.astro`
+  - `src/pages/[lang]/aviso-legal.astro`
+  - `src/pages/[lang]/dashboard/cliente/cotizaciones.astro`
+  - `src/pages/[lang]/dashboard/cliente/cuenta.astro`
+  - `src/pages/[lang]/dashboard/cliente/favoritas.astro`
+  - `src/pages/[lang]/dashboard/cliente/index.astro`
+  - `src/pages/[lang]/dashboard/gestion/[seccion].astro`
+  - `src/pages/[lang]/dashboard/gestion/index.astro`
+  - `src/pages/[lang]/dashboard/gestion/usuarios.astro`
+  - `src/pages/[lang]/dashboard/ia.astro`
+  - `src/pages/[lang]/dashboard/index.astro`
+  - `src/pages/[lang]/dashboard/login.astro`
+  - `src/pages/[lang]/dashboard/mensajes.astro`
+  - `src/pages/[lang]/dashboard/register.astro`
+  - `src/pages/[lang]/dashboard/trabajador/incidencias.astro`
+  - `src/pages/[lang]/dashboard/trabajador/index.astro`
+  - `src/pages/[lang]/dashboard/trabajador/lineas.astro`
+  - `src/pages/[lang]/dashboard/trabajador/reportes.astro`
+  - `src/pages/[lang]/donde-estamos-mobile-app.astro`
+  - `src/pages/[lang]/donde-estamos-mobile.astro`
+  - `src/pages/[lang]/donde-estamos-oficina-seleccionada.astro`
+  - `src/pages/[lang]/donde-estamos.astro`
+  - `src/pages/[lang]/home-variant-1.astro`
+  - `src/pages/[lang]/home-variant-2.astro`
+  - `src/pages/[lang]/index.astro`
+  - `src/pages/[lang]/marketing-kit.astro`
+  - `src/pages/[lang]/mobile.astro`
+  - `src/pages/[lang]/perfil.astro`
+  - `src/pages/[lang]/politica-cookies.astro`
+  - `src/pages/[lang]/politica-privacidad.astro`
+  - `src/pages/[lang]/rastreig.astro`
+  - `src/pages/[lang]/rutas-horarios-mobile-app.astro`
+  - `src/pages/[lang]/rutas-horarios-sin-resultados.astro`
+  - `src/pages/[lang]/rutas-horarios.astro`
+  - `src/pages/[lang]/screens.astro`
+  - `src/pages/[lang]/servicios-discrecionales-mobile-app.astro`
+  - `src/pages/[lang]/servicios-discrecionales.astro`
+  - `src/pages/[lang]/servicios/[slug].astro`
+  - `src/pages/[lang]/solicitar-presupuesto.astro`
+  - `src/pages/[lang]/solicitud-confirmada.astro`
+  - `src/pages/api/auth/exchange.ts`
+  - `src/pages/api/auth/login.ts`
+  - `src/pages/api/auth/register.ts`
+  - `src/pages/api/management/[resource]/[id].ts`
+  - `src/pages/api/management/[resource]/index.ts`
+  - `src/pages/aviso-legal-variante.astro`
+  - `src/pages/aviso-legal.astro`
+  - `src/pages/dashboard/cliente/cotizaciones.astro`
+  - `src/pages/dashboard/cliente/cuenta.astro`
+  - `src/pages/dashboard/cliente/favoritas.astro`
+  - `src/pages/dashboard/cliente/index.astro`
+  - `src/pages/dashboard/gestion/[seccion].astro`
+  - `src/pages/dashboard/gestion/index.astro`
+  - `src/pages/dashboard/gestion/usuarios.astro`
+  - `src/pages/dashboard/ia.astro`
+  - `src/pages/dashboard/index.astro`
+  - `src/pages/dashboard/login.astro`
+  - `src/pages/dashboard/mensajes.astro`
+  - `src/pages/dashboard/register.astro`
+  - `src/pages/dashboard/trabajador/incidencias.astro`
+  - `src/pages/dashboard/trabajador/index.astro`
+  - `src/pages/dashboard/trabajador/lineas.astro`
+  - `src/pages/dashboard/trabajador/reportes.astro`
+  - `src/pages/donde-estamos-mobile-app.astro`
+  - `src/pages/donde-estamos-mobile.astro`
+  - `src/pages/donde-estamos-oficina-seleccionada.astro`
+  - `src/pages/donde-estamos.astro`
+  - `src/pages/home-variant-1.astro`
+  - `src/pages/home-variant-2.astro`
+  - `src/pages/index.astro`
+  - `src/pages/marketing-kit.astro`
+  - `src/pages/mobile.astro`
+  - `src/pages/perfil.astro`
+  - `src/pages/politica-cookies.astro`
+  - `src/pages/politica-privacidad.astro`
+  - `src/pages/rastreig.astro`
+  - `src/pages/rutas-horarios-mobile-app.astro`
+  - `src/pages/rutas-horarios-sin-resultados.astro`
+  - `src/pages/rutas-horarios.astro`
+  - `src/pages/screens.astro`
+  - `src/pages/servicios-discrecionales-mobile-app.astro`
+  - `src/pages/servicios-discrecionales.astro`
+  - `src/pages/servicios/[slug].astro`
+  - `src/pages/solicitar-presupuesto.astro`
+  - `src/pages/solicitud-confirmada.astro`
+  - `src/scripts/deploy-insforge.mjs`
+  - `src/scripts/test-email.ts`
+  - `tests/acl.test.ts`
+  - `tests/locale-routing.test.ts`
+- [x] 🐛 fix(ai): type Bun fetch mocks and correct localized copy
+  - `bun.lock`
+  - `package.json`
+  - `src/config/i18n/ca.json`
+  - `src/config/i18n/es.json`
+  - `src/config/i18n/fr.json`
+  - `tests/ai.test.ts`
+- [x] 🐛 fix(ai): type Bun fetch mocks and correct localized copy
+  - `bun.lock`
+  - `package.json`
+  - `src/config/i18n/ca.json`
+  - `src/config/i18n/es.json`
+  - `src/config/i18n/fr.json`
+  - `tests/ai.test.ts`
+- [x] 🐛 fix: update environment variables and openai integration (#4)
+  - `.env.example`
+  - `AGENTS.md`
+  - `biome.json`
+  - `bun.lock`
+  - `package.json`
+  - `prisma/seed.ts`
+  - `router.ts`
+  - `src/config/config.env.ts`
+  - `src/config/i18n/ca.json`
+  - `src/config/i18n/en.json`
+  - `src/config/i18n/es.json`
+  - `src/config/i18n/fr.json`
+  - `src/interfaces/i18n.ts`
+  - `src/layouts/DashboardLayout.astro`
+  - `src/lib/ai.ts`
+  - `src/pages/dashboard/ia.astro`
+  - `tests/ai.test.ts`
+- [x] 🐛 fix(runtime): use Node for InsForge and Prisma
+  - `AGENTS.md`
+  - `astro.config.mjs`
+  - `bun.lock`
+  - `package.json`
+  - `prisma/schema.prisma`
+  - `src/lib/db.ts`
+  - `src/pages/rutas-horarios.astro`
+  - `wrangler.cloudflare.jsonc`
+
 ## [0.1.4] - 2026-10-10
 
 Highlights: fix: deploy:cloudflare: deploy the Worker using wrangler.cloudflare.jsonc.
