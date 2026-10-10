@@ -6,7 +6,7 @@ exported as HTML into `stitch-export/`, then transformed into Astro pages.
 
 ## Stack
 
-- Astro 7 + `@astrojs/cloudflare` adapter + `@astrojs/react` (islands), deployed to Cloudflare Workers
+- Astro 7 + `@astrojs/node` adapter + `@astrojs/react` (islands), targeting InsForge Compute
 - Package manager: **bun** (`bun.lock` present)
 - Node >= 22.12
 - Database: **InsForge** (Postgres, proyecto `empresaplana.cat`) via
@@ -28,17 +28,18 @@ Run everything from this directory:
 - `bun run dev` — dev server on port 4321
 - `bun run build` — builds `dist/` (server entry + client assets)
 - `bun run preview` — serves the production build
-- `bun run deploy:cloudflare` — builds and deploys the Worker using
-  `wrangler.cloudflare.jsonc`
+- `bun run start` — runs the standalone Node server from `dist/server/entry.mjs`
 
 ## Rendering mode
 
-- `astro.config.mjs` sets `output: "server"` with the Cloudflare adapter.
+- `astro.config.mjs` sets `output: "server"` with the Node adapter (`mode: "standalone"`).
   Astro 7 removed `output: "hybrid"`; `server` renders every route on request.
-- `wrangler.cloudflare.jsonc` targets the stable custom domain
-  `empresaplana.samuraicoder.dev`; configure runtime secrets in Cloudflare,
-  never in this file. The deployment also uses Cloudflare KV for Astro
-  sessions and Images for image processing.
+- The application runs in Node, including local development, so Prisma's
+  Node query compiler is supported. Do not switch to Workers without generating
+  a workerd-compatible Prisma Client; runtime WebAssembly compilation is blocked there.
+- InsForge provides PostgreSQL and is the intended Compute destination.
+  Better Auth manages application authentication; InsForge Auth is not used.
+  No Compute service has been deployed yet.
 - `security: { checkOrigin: false }` — the API endpoints are consumed by
   non-browser clients (no `Origin` header). CSRF is mitigated by the session
   cookie's `sameSite: "lax"` (browsers don't send it on cross-site POSTs).
