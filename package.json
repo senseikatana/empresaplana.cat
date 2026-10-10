@@ -1,7 +1,7 @@
 {
   "name": "empresaplana-astro",
   "type": "module",
-  "version": "0.2.3",
+  "version": "0.1.0",
   "engines": {
     "node": ">=22.12.0"
   },
