@@ -78,6 +78,24 @@ What's news:
   - `src/pages/index.astro`
 - [ ] bun add v1.4.2 (744846f84) feat: update documentation for agents
 
+## [0.2.2] - 2026-10-10
+
+Highlights: feat: update i18n config for fleet operations and miscellaneous translation.
+
+- [x] 🚀 feat: update i18n config for fleet operations and miscellaneous translation
+  - `AGENTS.md`
+  - `package.json`
+  - `src/config/i18n/ca.json`
+  - `src/config/i18n/en.json`
+  - `src/config/i18n/es.json`
+  - `src/config/i18n/fr.json`
+  - `tests/management.test.ts`
+- [x] 🚀 feat: management-panel: add documents, incidents, and maintenance sections
+- [x] 🚀 feat: adds fleet operations migration, including VehicleDocument, Incident, (#7)
+- [x] 🚀 feat: native InsForge auth, Vue islands, theme/language menu, service alerts
+- [x] 🐛 fix: cell rendering and management schemas
+- [x] 🚀 feat: adds CRUD and Auth features to Management API and UI
+
 ## [0.2.1] - 2026-10-10
 
 Highlights: feat: management-panel: add documents, incidents, and maintenance sections, plus 2 more changes.
