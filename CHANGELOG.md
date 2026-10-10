@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.5] - 2026-10-10
+
+Highlights: fix(release): restore package.json to 0.4.4 after downgrade commits, plus 2 more changes.
+
+- [x] 🐛 fix(release): restore package.json to 0.4.4 after downgrade commits
+  - `package.json`
+- [x] 🐛 fix: update package version to 0.4.2 in package.json
+  - `package.json`
+- [x] 🐛 fix: bump version to 0.4.3 in package.json
+  - `package.json`
+- [x] 🐛 fix: enforce consistent versioning across package.json, git tags, and chang
+- [x] 🐛 fix: update AGENTS.md documentation for releases
+- [x] 🐛 fix: update husky and package.json for correct version
+
 ## [0.4.4] - 2026-10-10
 
 Highlights: fix: enforce consistent versioning across package.json, git tags, and chang.
