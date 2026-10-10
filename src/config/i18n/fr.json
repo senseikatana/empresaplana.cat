@@ -134,7 +134,11 @@
 			"imageTitle": "Votre mobilité, au même endroit",
 			"imageDescription": "Consultez les informations de service et gérez votre compte avec Empresa Plana.",
 			"connectionError": "Connexion impossible. Veuillez réessayer.",
-			"invalid": "Nom d'utilisateur ou mot de passe incorrect."
+			"invalid": "Nom d'utilisateur ou mot de passe incorrect.",
+			"google": "Continuer avec Google",
+			"github": "Continuer avec GitHub",
+			"orContinueWith": "ou continuer avec",
+			"oauthError": "Connexion impossible avec ce fournisseur. Veuillez réessayer."
 		},
 		"role": {
 			"client": "Client",

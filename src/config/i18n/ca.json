@@ -134,7 +134,11 @@
 			"imageTitle": "La teva mobilitat, al teu espai",
 			"imageDescription": "Consulta informació de servei i gestiona el teu compte amb Empresa Plana.",
 			"connectionError": "No s'ha pogut connectar. Torna-ho a provar.",
-			"invalid": "Usuari o contrasenya no vàlids."
+			"invalid": "Usuari o contrasenya no vàlids.",
+			"google": "Continua amb Google",
+			"github": "Continua amb GitHub",
+			"orContinueWith": "o continua amb",
+			"oauthError": "No s'ha pogut iniciar la sessió amb aquest proveïdor. Torna-ho a provar."
 		},
 		"role": {
 			"client": "Client",

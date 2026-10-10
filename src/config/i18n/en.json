@@ -134,7 +134,11 @@
 			"imageTitle": "Your mobility, in one place",
 			"imageDescription": "Check service information and manage your account with Empresa Plana.",
 			"connectionError": "Could not connect. Please try again.",
-			"invalid": "Invalid username or password."
+			"invalid": "Invalid username or password.",
+			"google": "Continue with Google",
+			"github": "Continue with GitHub",
+			"orContinueWith": "or continue with",
+			"oauthError": "Could not sign in with that provider. Please try again."
 		},
 		"role": {
 			"client": "Customer",

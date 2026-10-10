@@ -134,7 +134,11 @@
 			"imageTitle": "Tu movilidad, en tu espacio",
 			"imageDescription": "Consulta información del servicio y gestiona tu cuenta con Empresa Plana.",
 			"connectionError": "No se pudo conectar. Inténtalo de nuevo.",
-			"invalid": "Usuario o contraseña no válidos."
+			"invalid": "Usuario o contraseña no válidos.",
+			"google": "Continuar con Google",
+			"github": "Continuar con GitHub",
+			"orContinueWith": "o continuar con",
+			"oauthError": "No se pudo iniciar sesión con ese proveedor. Inténtalo de nuevo."
 		},
 		"role": {
 			"client": "Cliente",

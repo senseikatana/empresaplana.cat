@@ -12,7 +12,8 @@ export function hashPasskey(passkey: string): string {
  *   - "salt:hash" (current scrypt format)
  *   - plain text (legacy fallback — compare as-is, constant-time)
  */
-export function verifyPasskey(passkey: string, stored: string): boolean {
+export function verifyPasskey(passkey: string, stored: string | null): boolean {
+	if (!stored) return false;
 	const [salt, hash] = stored.split(":");
 	if (!salt || !hash) {
 		// Legacy plain-text passkey: compare via timingSafeEqual

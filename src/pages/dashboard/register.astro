@@ -2,6 +2,8 @@
 import AuthLayout from "@/layouts/AuthLayout.astro";
 import { getLocale, getDictionary } from "@/config/i18n";
 import { getSession } from "@/lib/auth";
+import { oauthProviders } from "@/lib/oauth-env";
+import SocialAuthButtons from "@/components/auth/SocialAuthButtons.astro";
 
 export const prerender = false;
 
@@ -93,6 +95,15 @@ const dict = getDictionary(locale);
 			{dict.app.register.submit}
 		</button>
 	</form>
+
+	<SocialAuthButtons
+		providers={oauthProviders}
+		callbackURL="/api/auth/exchange"
+		googleLabel={dict.app.auth.google}
+		githubLabel={dict.app.auth.github}
+		dividerLabel={dict.app.auth.orContinueWith}
+		errorMessage={dict.app.auth.oauthError}
+	/>
 
 	<p class="mt-6 text-center text-sm text-on-surface-variant">
 		{dict.app.register.haveAccount}

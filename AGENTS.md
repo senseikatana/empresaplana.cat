@@ -12,8 +12,9 @@ exported as HTML into `stitch-export/`, then transformed into Astro pages.
 - Database: **InsForge** (Postgres, proyecto `empresaplana.cat`) via
   **Prisma 7** (`prisma-client` generator, output `generated/prisma/`) +
   `@prisma/adapter-pg` + `pg`. Validation with **zod v4**, auth tokens with
-  **jose** (HS256 JWT in an httpOnly cookie). Credentials in `.env`
-  (`DATABASE_URL`, `AUTH_SECRET`).
+  **jose** (HS256 JWT in an httpOnly cookie), plus **Better Auth** for Google
+  and GitHub OAuth. Credentials in `.env` (`DATABASE_URL`, `AUTH_SECRET`,
+  `BETTER_AUTH_URL`, and optional OAuth client secrets).
 - Styling: **Tailwind CSS v4 build-time** via `@tailwindcss/vite` (no CDN) +
   Geist + Material Symbols. Theme lives in `src/styles/global.css` (`@theme`
   block mirroring `src/assets/DESIGN.md`; brand colors exposed as CSS custom
@@ -155,7 +156,11 @@ Canonical tokens live in `src/assets/DESIGN.md` (mirror of the Stitch
 - New and changed passwords must be 12–128 characters. Existing seeded
   development users (passkey `12345678`: `admin`, `trabajador`, `cliente`)
   remain able to log in for backwards-compatible local testing.
-- Google Auth is planned as a future addition.
+- Google and GitHub OAuth use `src/lib/better-auth.ts` and separate
+  `AuthUser`/`AuthSession`/`AuthAccount`/`AuthVerification` tables. Verified
+  provider emails link to an existing application account; new social users
+  receive the `client` role. OAuth sessions exchange into the app's existing
+  `ep_session` cookie so existing ACLs continue to apply.
 
 ## Bus tracking (Glovo-style)
 

@@ -3,6 +3,8 @@ import AuthLayout from "@/layouts/AuthLayout.astro";
 import { getLocale, getDictionary } from "@/config/i18n";
 import { dashboardHomeForRole } from "@/lib/acl";
 import { getSession } from "@/lib/auth";
+import { oauthProviders } from "@/lib/oauth-env";
+import SocialAuthButtons from "@/components/auth/SocialAuthButtons.astro";
 
 export const prerender = false;
 
@@ -65,6 +67,15 @@ const redirect = Astro.url.searchParams.get("redirect") ?? "";
 		</button>
 	</form>
 
+	<SocialAuthButtons
+		providers={oauthProviders}
+		callbackURL={`/api/auth/exchange${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ""}`}
+		googleLabel={dict.app.auth.google}
+		githubLabel={dict.app.auth.github}
+		dividerLabel={dict.app.auth.orContinueWith}
+		errorMessage={dict.app.auth.oauthError}
+	/>
+
 	<p class="mt-6 text-center text-sm text-on-surface-variant">
 		{dict.app.register.haveAccount}
 		<a
@@ -75,10 +86,15 @@ const redirect = Astro.url.searchParams.get("redirect") ?? "";
 		</a>
 	</p>
 
-	<script define:vars={{ invalidMessage: dict.app.auth.invalid, connectionMessage: dict.app.auth.connectionError }}>
+	<script define:vars={{ invalidMessage: dict.app.auth.invalid, connectionMessage: dict.app.auth.connectionError, oauthErrorMessage: dict.app.auth.oauthError }}>
 		const form = document.getElementById("login-form");
 		const error = document.getElementById("login-error");
 		const submit = form?.querySelector('button[type="submit"]');
+
+		if (new URLSearchParams(window.location.search).get("oauth") === "failed" && error) {
+			error.textContent = oauthErrorMessage;
+			error.classList.remove("hidden");
+		}
 
 		form?.addEventListener("submit", async (event) => {
 			event.preventDefault();

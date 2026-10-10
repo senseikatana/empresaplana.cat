@@ -9,7 +9,8 @@ popular timetable downloads, airport transfers, and coach hire.
 - Astro with the Node standalone adapter and React islands
 - TypeScript, Tailwind CSS v4, and Bun
 - Prisma 7 with PostgreSQL via `@prisma/adapter-pg`
-- `jose` session tokens, scrypt password hashes, and Zod validation
+- Better Auth OAuth with Google/GitHub, `jose` app sessions, scrypt password
+  hashes, and Zod validation
 - Catalan, Spanish, English, and French interface dictionaries
 
 ## Requirements
@@ -23,12 +24,27 @@ popular timetable downloads, airport transfers, and coach hire.
 ```sh
 cp .env.example .env
 # Set DATABASE_URL and AUTH_SECRET in .env.
+# OAuth credentials are optional locally; configure Google/GitHub to enable
+# those sign-in buttons. Set BETTER_AUTH_URL to the canonical app origin.
 bun install
 bun run db:generate
 bun run dev
 ```
 
 The development site runs at `http://localhost:4321`.
+
+To enable Google and GitHub sign-in, set `GOOGLE_CLIENT_ID`,
+`GOOGLE_CLIENT_SECRET`, `GITHUB_CLIENT_ID`, and `GITHUB_CLIENT_SECRET`. Register
+these callback URLs with the providers:
+
+- `http://localhost:4321/api/auth/callback/google`
+- `http://localhost:4321/api/auth/callback/github`
+
+For production, replace `BETTER_AUTH_URL` with the canonical HTTPS origin and
+register the matching callback URLs. Then apply the added authentication
+tables and nullable password field to the configured PostgreSQL database with
+`bun run db:push`. Social sign-up creates client accounts; existing users are
+matched only when the provider confirms the email as verified.
 
 ## Commands
 

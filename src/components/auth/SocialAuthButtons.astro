@@ -1,0 +1,85 @@
+---
+interface Props {
+	providers: readonly ("google" | "github")[];
+	callbackURL: string;
+	googleLabel: string;
+	githubLabel: string;
+	dividerLabel: string;
+	errorMessage: string;
+}
+
+const {
+	providers,
+	callbackURL,
+	googleLabel,
+	githubLabel,
+	dividerLabel,
+	errorMessage,
+} = Astro.props;
+const labels = { google: googleLabel, github: githubLabel };
+---
+
+{
+	providers.length > 0 && (
+		<div class="mt-6">
+			<div class="relative mb-5 flex items-center">
+				<div class="h-px flex-1 bg-outline-variant"></div>
+				<span class="px-3 text-xs text-on-surface-variant">{dividerLabel}</span>
+				<div class="h-px flex-1 bg-outline-variant"></div>
+			</div>
+			<div class="grid gap-3">
+				{providers.map((provider) => (
+					<button
+						type="button"
+						data-oauth-provider={provider}
+						data-callback-url={callbackURL}
+						data-error-message={errorMessage}
+						class="inline-flex min-h-12 items-center justify-center rounded-lg border border-outline-variant bg-surface px-6 font-semibold text-on-surface transition-colors hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-deep-navy disabled:cursor-wait disabled:opacity-60"
+					>
+						{labels[provider]}
+					</button>
+				))}
+			</div>
+			<p
+				data-oauth-error
+				class="mt-4 hidden rounded-lg bg-error-container px-4 py-3 text-sm text-on-error-container"
+				role="alert"
+				aria-live="polite"
+			></p>
+		</div>
+	)
+}
+
+<script>
+	import { createAuthClient } from "better-auth/client";
+
+	const authClient = createAuthClient();
+
+	document.querySelectorAll<HTMLButtonElement>("[data-oauth-provider]").forEach((button) => {
+		button.addEventListener("click", async () => {
+			const provider = button.dataset.oauthProvider;
+			const error = button.parentElement?.parentElement?.querySelector<HTMLElement>("[data-oauth-error]");
+			if (provider !== "google" && provider !== "github") return;
+
+			button.disabled = true;
+			if (error) {
+				error.classList.add("hidden");
+				error.textContent = "";
+			}
+
+			try {
+				const result = await authClient.signIn.social({
+					provider,
+					callbackURL: button.dataset.callbackUrl,
+				});
+				if (result.error) throw result.error;
+			} catch {
+				if (error) {
+					error.textContent = button.dataset.errorMessage ?? "";
+					error.classList.remove("hidden");
+				}
+				button.disabled = false;
+			}
+		});
+	});
+</script>

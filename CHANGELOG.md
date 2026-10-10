@@ -11,7 +11,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 What's news:
 
-- [ ] feat: auth and i18n implemented
+- [ ] fix!: improve Better Auth for Google and GitHub OAuth
+  - `.env.example`
+  - `AGENTS.md`
+  - `README.md`
+  - `bun.lock`
+  - `package.json`
+  - `prisma/schema.prisma`
+  - `src/components/auth/SocialAuthButtons.astro`
+  - `src/config/i18n/ca.json`
+  - `src/config/i18n/en.json`
+  - `src/config/i18n/es.json`
+  - `src/config/i18n/fr.json`
+  - `src/lib/better-auth.ts`
+  - `src/lib/oauth-env.ts`
+  - `src/lib/oauth-users.ts`
+  - `src/lib/passkey.ts`
+  - `src/pages/api/auth/[...all].ts`
+  - `src/pages/api/auth/exchange.ts`
+  - `src/pages/api/auth/logout.ts`
+  - `src/pages/dashboard/login.astro`
+  - `src/pages/dashboard/register.astro`
+- [ ] ]7;file://localhost/home/senseikatana/Proyectos/empresaplana-astrobun add v1.4.3 (c6da4a4d3) feat: auth and i18n implemented
   - `AGENTS.md`
   - `PRODUCT.md`
   - `README.md`

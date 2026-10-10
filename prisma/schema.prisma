@@ -16,7 +16,7 @@ datasource db {
 model User {
 	id             Int             @id @default(autoincrement())
 	username       String          @unique @db.VarChar(60)
-	passkey        String          @db.VarChar(128)
+	passkey        String?         @db.VarChar(128)
 	name           String          @db.VarChar(60)
 	fullName       String          @db.VarChar(120)
 	email          String          @db.VarChar(200)
@@ -32,6 +32,68 @@ model User {
 	messages       Message[]
 
 	@@index([role])
+}
+
+model AuthUser {
+	id            String        @id
+	name          String
+	email         String        @unique
+	emailVerified Boolean       @default(false)
+	image         String?
+	createdAt     DateTime      @default(now())
+	updatedAt     DateTime      @updatedAt
+	appUserId     Int?          @unique
+	sessions      AuthSession[]
+	accounts      AuthAccount[]
+
+	@@map("auth_users")
+}
+
+model AuthSession {
+	id        String   @id
+	expiresAt DateTime
+	token     String   @unique
+	createdAt DateTime @default(now())
+	updatedAt DateTime @updatedAt
+	ipAddress String?
+	userAgent String?
+	userId    String
+	user      AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+	@@index([userId])
+	@@map("auth_sessions")
+}
+
+model AuthAccount {
+	id                    String    @id
+	accountId             String
+	providerId            String
+	userId                String
+	user                  AuthUser  @relation(fields: [userId], references: [id], onDelete: Cascade)
+	accessToken           String?
+	refreshToken          String?
+	idToken               String?
+	accessTokenExpiresAt  DateTime?
+	refreshTokenExpiresAt DateTime?
+	scope                 String?
+	password              String?
+	createdAt             DateTime  @default(now())
+	updatedAt             DateTime  @updatedAt
+
+	@@index([userId])
+	@@map("auth_accounts")
+}
+
+model AuthVerification {
+	id         String   @id
+	identifier String
+	value      String
+	expiresAt  DateTime
+	createdAt  DateTime @default(now())
+	updatedAt  DateTime @updatedAt
+
+	@@index([identifier])
+	@@map("auth_verifications")
 }
 
 model FavoriteRoute {
