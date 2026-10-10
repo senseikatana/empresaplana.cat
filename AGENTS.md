@@ -350,12 +350,29 @@ otherwise swallow both.
 
 ## Releases
 
-`bun run release:check` fails when `package.json` disagrees with the latest git
-tag, and warns when `CHANGELOG.md` does. The tag is the authority on what shipped;
-a changelog mismatch warns rather than fails because resolving it means adding a
-tag or editing release history by hand. `bun run release:check:strict` promotes
-the warning to a failure. `bun run release:version -- --to 0.4.0` syncs the
-manifest and adds a changelog heading when one is missing.
+**The version is bumped outside this repository.** Releases run through the
+global `onGit push --release` command, defined in `~/.zsh/functions/git.zsh`
+(loaded via the zsh fpath). Its `_git_release_sync_versions` writes the manifest
+during the release; `_git_release_core` creates the changelog section, the tag
+and the commit. That machinery is **not** in this repo — do not duplicate it,
+and do not assume `release:version` below is what ships a version.
+
+Copies of the same file live in `snippets-codes-vault/` and `youtube-videos-demos/`.
+Both are backups. Only `~/.zsh/functions/` is loaded.
+
+In-repo scripts for verification and manual repair:
+
+- `bun run release:check` fails when `package.json` disagrees with the latest git
+  tag, and warns when `CHANGELOG.md` does. The tag is the authority on what
+  shipped; a changelog mismatch warns rather than fails because resolving it
+  means adding a tag or editing release history by hand.
+- `bun run release:check:strict` promotes the warning to a failure.
+- `bun run release:version -- --to 0.4.2` syncs the manifest and adds a changelog
+  heading when one is missing. Use it to repair drift, not to cut a release.
+
+The release path stages the manifest from the git index rather than the working
+tree, so an uncommitted `package.json` bump is invisible to it.
+
 See `docs/RELEASING.md`.
 
 ## Portability
