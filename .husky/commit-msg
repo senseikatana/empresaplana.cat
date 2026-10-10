@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+# Valida el formato del asunto. Bloquea solo errores de forma reales.
+# Merge, revert, fixup y squash estan exentos: no se escriben a mano.
+node src/scripts/commit-guard.mjs validate "$1"

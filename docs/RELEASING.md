@@ -1,5 +1,40 @@
 # Releasing
 
+## The gate
+
+```sh
+bun run verify
+```
+
+Runs Biome, `astro check`, unit tests, Playwright E2E and `release:check`. It
+**does not build** — `astro build` is outside the gate on purpose, because the
+gate validates code, not `dist/`. `bun run build` still runs the gate first and
+then builds.
+
+`bun run verify:fast` is the subset for `pre-commit`: Biome plus `astro check`,
+about 15 seconds.
+
+Where the gate runs, in order of how early it catches a problem:
+
+| Where | Command | Cost |
+| --- | --- | --- |
+| `.husky/pre-commit` | `verify:fast` + lint-staged | ~15s |
+| `.husky/pre-push` | `verify` | ~35s |
+| `.github/workflows/verify.yml` | `verify` | ~2 min |
+
+`verify:fast` is Biome plus `astro check`. The type check is the slow part, and it
+earns its place: a type error caught at commit time never reaches a branch.
+
+The CI job is named **gate**. Mark it as a required status check in the branch
+protection for `main` and that is what blocks a red merge. A gate blocks
+*merging*, not opening the PR — if you need the PR itself blocked, add the check
+to a ruleset instead.
+
+`bun run deploy:insforge` runs `verify` first, so production cannot be reached
+from a red tree.
+
+## The version
+
 The version lives in three places. `src/scripts/release-versions.mjs` keeps them
 from drifting apart.
 

@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+# Solo al cambiar de rama, NO al restaurar archivos sueltos.
+# El tercer argumento vale 1 cuando es un cambio de rama; en `git checkout <file>`
+# viene vacio y este hook no debe disparar una reinstalacion.
+[ "$3" = "1" ] || exit 0
+
+if [ -n "$(git diff --name-only HEAD@{1} HEAD -- bun.lock package.json 2>/dev/null)" ]; then
+	echo "lockfile differs on this branch -> reinstalling dependencies"
+	bun install --frozen-lockfile
+fi

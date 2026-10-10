@@ -11,6 +11,13 @@ bun.lockb
 !.env.example
 !.prettierrc
 !.eslintrc.json
+# Sin esto, la regla `.*` de arriba se tragaria .github y los workflows de
+# CI nunca se podrian commitear. .github/copilot* sigue ignorado, porque esa
+# regla aparece mas abajo y en gitignore gana la ultima coincidencia.
+!.github/
+# Igual que .github: sin esta negacion, `.*` impediria versionar los hooks.
+# .husky/_ se vuelve a excluir al final del archivo (shims generados).
+!.husky/
 
 # Compilaciones y logs
 dist/
@@ -67,3 +74,7 @@ Thumbs.db
 .roo
 .trae
 .windsurf
+
+# Husky: los shims se generan con `bun install` (prepare), no se versionan.
+# Los hooks reales en .husky/*.sh sí se versionan.
+.husky/_

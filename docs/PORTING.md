@@ -21,11 +21,12 @@ share one application:
 
 ### Data model
 
-19 tables, in four groups:
+22 tables, in six groups:
 
 | Group | Models | Notes |
 | --- | --- | --- |
 | Identity | `User`, `Conversation`, `ConversationParticipant`, `Message` | `User` links to the native auth identity by `User.insforgeId` only, never by email |
+| Personal | `FavoriteRoute`, `RecentSearch` | per-user saved routes and search history |
 | Commercial | `Route`, `Stop`, `Schedule`, `Budget`, `Office`, `Activity` | `Budget` is a customer quote, with a 7-value status lifecycle |
 | Fleet | `Bus`, `Driver`, `Notification`, `Report` | `Report` is a service-delay log from a stop |
 | Public search (legacy) | `Line`, `SchedulesOnLine`, `LineConnection` | denormalized stop JSON, see below |
@@ -254,19 +255,22 @@ from the spreadsheet sync, and the local copy is demo data.
 
 Verified before writing this document:
 
-- The latest git tag is **`v0.3.0`**. `git describe` reports `v0.3.0-1-g<sha>`.
-- `package.json` declares `"version": "0.1.0"` — it contradicts the tag and
-  lags it by a full minor version. Automated releases would start from the wrong
-  number.
-- `CHANGELOG.md` opens with a `## [1.0.0]` section describing a release that
-  **has no corresponding tag or commits**. It is aspirational, not factual. It
-  also contains 8 embedded ANSI OSC-8 terminal escape sequences from a copy-paste,
-  one of them malformed.
+- The latest git tag is **`v0.3.1`**, and `package.json` declares **`0.3.1`**. They
+  agree, so the manifest is not lagging.
+- `CHANGELOG.md` opens with a `## [1.0.0]` section describing a release that **has
+  no corresponding tag or commits**. It is aspirational, not factual.
+- `CHANGELOG.md` also contains 8 embedded ANSI **OSC 7** terminal escape sequences
+  from a copy-paste (`ESC ] 7 ; file://... BEL`). All 8 are well-formed, but they
+  leak a stale absolute local path into the file.
 
-Treat the changelog's `[1.0.0]` block as fiction. The release/version tooling now
-in `src/scripts/` reads git tags rather than the changelog for exactly this
-reason, and `--check` fails when `package.json`, the latest tag and the changelog
-disagree.
+Treat the changelog's `[1.0.0]` section as fiction. The release tooling in
+`src/scripts/` reads git tags rather than the changelog for exactly this reason:
+the tag is the authority on what shipped, and a stray heading must not be able to
+dictate the expected version.
+
+`bun run release:check` fails when the manifest and the tag disagree, and warns
+when the changelog disagrees. The warning does not fail the check on purpose,
+because clearing it means either creating a tag or editing recorded history.
 
 ---
 

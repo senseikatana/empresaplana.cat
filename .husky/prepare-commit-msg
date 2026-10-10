@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+# Limpia el mensaje ANTES de validarlo. Un pegado desde terminal puede meter
+# secuencias OSC 7 (el payload file://) dentro del asunto; dos commits de este
+# repo ya quedaron corruptos asi. Auto-reparar, no rechazar.
+[ -n "$1" ] && node src/scripts/commit-guard.mjs sanitize "$1"

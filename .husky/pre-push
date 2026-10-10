@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+# Puerta completa antes de subir nada al remoto: si esto falla, nada sale del
+# equipo. Cubre formato, tipos, tests unitarios, tests E2E y coherencia de version.
+#
+# NO compila: `astro build` queda fuera a proposito. La puerta debe validar
+# el codigo, no gastar minutos ni disco en generar `dist/`.
+bun run verify

@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+# Puerta rapida: formatea lo staged y comprueba formato + tipos.
+# Deliberadamente NO incluye tests E2E ni build: este hook corre en cada
+# commit, y debe terminar en segundos para que nadie lo saltee con --no-verify.
+#
+# La puerta completa vive en .husky/pre-push y en CI.
+bunx lint-staged && bun run verify:fast

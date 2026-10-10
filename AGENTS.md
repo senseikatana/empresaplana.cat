@@ -307,6 +307,47 @@ the updated HTML/PNG from Stitch into a scratch directory outside the repo, then
    in `BaseLayout` with `export const prerender = false;`.
 2. Run `bun run build` and verify all routes.
 
+## Verification gates
+
+`bun run verify` is the single gate: Biome, `astro check`, unit tests, Playwright
+E2E, and `release:check`. It **never builds** — `astro build` is deliberately
+outside the gate, because the gate validates the code, not `dist/`.
+
+It runs in three places, so a red result stops the change at the earliest point:
+
+- `.husky/pre-commit` — `verify:fast` (Biome + types) plus lint-staged, about
+  15s. `astro check` dominates that time; it is kept because a type error caught
+  here never reaches a branch.
+- `.husky/pre-push` — the full `verify`. Nothing leaves the machine if it fails.
+- `.github/workflows/verify.yml` — job **gate**, the required status check that
+  blocks merging into `main`.
+
+`deploy:insforge` runs `verify` first, so production cannot be reached from a red
+tree.
+
+### Commit hooks
+
+| Hook | Runs | Blocks? |
+| --- | --- | --- |
+| `prepare-commit-msg` | `commit-guard.mjs sanitize` | no — strips terminal escapes and reports |
+| `commit-msg` | `commit-guard.mjs validate` | yes — Conventional Commits only |
+| `post-merge`, `post-checkout` | `bun install` if `bun.lock` or `package.json` changed | no |
+
+Two commit messages in this repo were corrupted by an OSC 7 `file://` payload
+pasted from a terminal, which is why `sanitize` runs before `validate` and
+repairs rather than rejects. Merge, revert, fixup and squash subjects are exempt
+from the format rule because they are not written by hand.
+
+There is deliberately **no `post-commit` hook**: a commit has already happened,
+so nothing there can block anything. If a check matters, it belongs in
+`pre-commit` or `pre-push`. `post-commit` is a notification channel and nothing
+more — adding gates to it only duplicates work and trains people to ignore it.
+
+All `.husky/*` hooks are tracked in git; `.husky/_` holds generated shims from
+`bun install` (`prepare`) and is gitignored. `.gitignore` needs explicit
+`!.husky/` and `!.github/` negations, because its catch-all `.*` rule would
+otherwise swallow both.
+
 ## Releases
 
 `bun run release:check` fails when `package.json` disagrees with the latest git

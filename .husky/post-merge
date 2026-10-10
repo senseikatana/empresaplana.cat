@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+# Tras un merge/pull: si el lockfile cambio, las dependencias locales quedaron
+# obsoletas. Sin esto se falla en runtime con errores que parecen bugs de codigo.
+if [ -n "$(git diff --name-only HEAD@{1} HEAD -- bun.lock package.json 2>/dev/null)" ]; then
+	echo "lockfile changed -> reinstalling dependencies"
+	bun install --frozen-lockfile
+fi

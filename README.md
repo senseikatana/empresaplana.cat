@@ -60,7 +60,7 @@ to inherit privileged roles. New verified identities always start as clients.
 | `bun run sync:sheets` | Sync route schedules from Google Sheets |
 | `bun run release:check` | Verify `package.json` matches the latest git tag |
 | `bun run release:check:strict` | Also fail on `CHANGELOG.md` drift |
-| `bun run release:version -- --to 1.0.0` | Set the version everywhere (add `--tag` to tag) |
+| `bun run release:version -- --to 0.4.0` | Set `package.json` and add a changelog heading (add `--tag` to tag) |
 
 ## Accounts and access
 
