@@ -7,25 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
-
-Maintenance release with 1 change.
-
-- [x] ♻️ refactor(auth): centralize Better Auth configuration
-  - `.env.example`
-  - `AGENTS.md`
-  - `bun.lock`
-  - `package.json`
-  - `src/config/auth.config.ts`
-  - `src/config/config.env.ts`
-  - `src/lib/better-auth.ts`
-  - `src/lib/oauth-env.ts`
-  - `src/pages/api/auth/[...all].ts`
-  - `src/pages/api/auth/exchange.ts`
-  - `src/pages/api/auth/logout.ts`
-  - `src/pages/dashboard/login.astro`
-  - `src/pages/dashboard/register.astro`
-
 ## [1.0.0] - 2026-10-10
 
 What's news:
@@ -96,6 +77,30 @@ What's news:
   - `src/pages/api/users/index.ts`
   - `src/pages/index.astro`
 - [ ] bun add v1.4.2 (744846f84) feat: update documentation for agents
+
+## [0.1.3] - 2026-10-10
+
+Maintenance release with 1 change.
+
+- [x] ♻️ refactor(auth): centralize Better Auth configuration
+  - `.env.example`
+  - `AGENTS.md`
+  - `bun.lock`
+  - `package.json`
+  - `src/config/auth.config.ts`
+  - `src/config/config.env.ts`
+  - `src/lib/better-auth.ts`
+  - `src/lib/oauth-env.ts`
+  - `src/pages/api/auth/[...all].ts`
+  - `src/pages/api/auth/exchange.ts`
+  - `src/pages/api/auth/logout.ts`
+  - `src/pages/dashboard/login.astro`
+  - `src/pages/dashboard/register.astro`
+- [x] 🐛 fix!: improve Better Auth for Google and GitHub OAuth
+- [x] 🔹 ]7;file://localhost/home/senseikatana/Proyectos/empresaplana-astrobun add v1.4.3 (c6da4a4d3) feat: auth and i18n implemented
+- [x] 🔹 ]7;file://localhost/home/senseikatana/Proyectos/empresaplana-astrobun add v1.4.3 (c6da4a4d3) feat: add PRODUCT.md and auth
+- [x] 🚀 feat: refresh standalone Astro website
+- [x] 🔹 bun add v1.4.2 (744846f84) feat: update documentation for agents
 
 ## [0.1.2] - 2026-10-10
 
