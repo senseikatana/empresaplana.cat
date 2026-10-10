@@ -60,6 +60,40 @@ function definition<S extends z.ZodObject>(
 		},
 	};
 }
+const toDay = (value: string) => new Date(`${value}T00:00:00.000Z`);
+function plain<T extends Record<string, unknown>>(row: T): T {
+	return Object.fromEntries(
+		Object.entries(row).map(([key, value]) => [
+			key,
+			value instanceof Date && key.endsWith("On")
+				? value.toISOString().slice(0, 10)
+				: Prisma.Decimal.isDecimal(value)
+					? Number(value)
+					: value,
+		]),
+	) as T;
+}
+const fleetIncludes = {
+	bus: { select: { number: true, plate: true } },
+} as const;
+function withBus<T extends { bus?: { number: string; plate: string } | null }>(
+	row: T,
+) {
+	const { bus, ...rest } = row;
+	return plain({
+		...rest,
+		busLabel: bus ? `${bus.number} · ${bus.plate}` : null,
+	});
+}
+export const EXPIRY_WARNING_DAYS = 30;
+export function expiryState(day: unknown, today = new Date()) {
+	if (typeof day !== "string") return null;
+	const days = Math.floor(
+		(toDay(day).getTime() - toDay(today.toISOString().slice(0, 10)).getTime()) /
+			86_400_000,
+	);
+	return days < 0 ? "expired" : days <= EXPIRY_WARNING_DAYS ? "expiring" : "valid";
+}
 export const management = {
 	rutas: definition(managementSchemas.rutas, {
 		list: (db, page, q) =>
@@ -344,6 +378,88 @@ export const management = {
 		remove: (db, id) =>
 			db.lineConnection.delete({ where: { id: numericId(id) } }),
 	}),
+	documentos: definition(managementSchemas.documentos, {
+		list: async (db, page, q) =>
+			(
+				await db.vehicleDocument.findMany({
+					...page,
+					where: search(["reference", "docType"], q),
+					orderBy: { expiresOn: "asc" },
+					include: fleetIncludes,
+				})
+			)
+				.map(withBus)
+				.map((row) => ({ ...row, expiryState: expiryState(row.expiresOn) })),
+		count: (db, q) =>
+			db.vehicleDocument.count({ where: search(["reference", "docType"], q) }),
+		find: async (db, id) => {
+			const row = await db.vehicleDocument.findUnique({
+				where: { id: numericId(id) },
+			});
+			return row && plain(row);
+		},
+		write: (db, id, { expiresOn, ...rest }) => {
+			const data = { ...rest, expiresOn: toDay(expiresOn) };
+			return id === undefined
+				? db.vehicleDocument.create({ data }).then(plain)
+				: db.vehicleDocument
+						.update({ where: { id: numericId(id) }, data })
+						.then(plain);
+		},
+		remove: (db, id) =>
+			db.vehicleDocument.delete({ where: { id: numericId(id) } }),
+	}),
+	incidencias: definition(managementSchemas.incidencias, {
+		list: async (db, page, q) =>
+			(
+				await db.incident.findMany({
+					...page,
+					where: search(["description"], q),
+					orderBy: [{ occurredOn: "desc" }, { id: "desc" }],
+					include: fleetIncludes,
+				})
+			).map(withBus),
+		count: (db, q) => db.incident.count({ where: search(["description"], q) }),
+		find: async (db, id) => {
+			const row = await db.incident.findUnique({ where: { id: numericId(id) } });
+			return row && plain(row);
+		},
+		write: (db, id, { occurredOn, ...rest }) => {
+			const data = { ...rest, occurredOn: toDay(occurredOn) };
+			return id === undefined
+				? db.incident.create({ data }).then(plain)
+				: db.incident.update({ where: { id: numericId(id) }, data }).then(plain);
+		},
+		remove: (db, id) => db.incident.delete({ where: { id: numericId(id) } }),
+	}),
+	mantenimiento: definition(managementSchemas.mantenimiento, {
+		list: async (db, page, q) =>
+			(
+				await db.maintenance.findMany({
+					...page,
+					where: search(["description"], q),
+					orderBy: [{ serviceOn: "desc" }, { id: "desc" }],
+					include: fleetIncludes,
+				})
+			).map(withBus),
+		count: (db, q) =>
+			db.maintenance.count({ where: search(["description"], q) }),
+		find: async (db, id) => {
+			const row = await db.maintenance.findUnique({
+				where: { id: numericId(id) },
+			});
+			return row && plain(row);
+		},
+		write: (db, id, { serviceOn, ...rest }) => {
+			const data = { ...rest, serviceOn: toDay(serviceOn) };
+			return id === undefined
+				? db.maintenance.create({ data }).then(plain)
+				: db.maintenance
+						.update({ where: { id: numericId(id) }, data })
+						.then(plain);
+		},
+		remove: (db, id) => db.maintenance.delete({ where: { id: numericId(id) } }),
+	}),
 } satisfies Record<ResourceName, Definition>;
 
 async function checkReferences(
@@ -392,6 +508,16 @@ async function checkReferences(
 					Boolean(
 						await db.bus.findUnique({
 							where: { number: value },
+							select: { id: true },
+						}),
+					);
+				break;
+			case "vehicles":
+				exists =
+					typeof value === "number" &&
+					Boolean(
+						await db.bus.findUnique({
+							where: { id: value },
 							select: { id: true },
 						}),
 					);
@@ -469,16 +595,24 @@ async function protectDelete(
 				])
 			).reduce((total, count) => total + count, 0);
 			break;
-		case "autobuses":
-			if (typeof row.number === "string")
-				dependencies = await db.driver.count({
-					where: { busNumber: row.number },
-				});
+		case "autobuses": {
+			const busId = numericId(id);
+			dependencies = (
+				await Promise.all([
+					typeof row.number === "string"
+						? db.driver.count({ where: { busNumber: row.number } })
+						: 0,
+					db.vehicleDocument.count({ where: { busId } }),
+					db.incident.count({ where: { busId } }),
+					db.maintenance.count({ where: { busId } }),
+				])
+			).reduce((total, count) => total + count, 0);
 			break;
+		}
 		case "conductores":
-			dependencies = await db.route.count({
-				where: { driverId: numericId(id) },
-			});
+			dependencies =
+				(await db.route.count({ where: { driverId: numericId(id) } })) +
+				(await db.incident.count({ where: { driverId: numericId(id) } }));
 			break;
 		case "paradas":
 			dependencies = await db.route.count({
@@ -638,7 +772,7 @@ export async function relationOptions() {
 		db.bus.findMany({
 			take: 200,
 			orderBy: { id: "asc" },
-			select: { number: true, plate: true },
+			select: { id: true, number: true, plate: true },
 		}),
 		db.user.findMany({
 			take: 200,
@@ -656,6 +790,10 @@ export async function relationOptions() {
 		stops,
 		drivers,
 		buses: buses.map((bus) => ({ id: bus.number, name: bus.plate })),
+		vehicles: buses.map((bus) => ({
+			id: bus.id,
+			name: `${bus.number} · ${bus.plate}`,
+		})),
 		users,
 		lines,
 	};

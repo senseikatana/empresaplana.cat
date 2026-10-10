@@ -40,12 +40,15 @@ const columnKeys: Record<ResourceName, string[]> = {
 	lineas: ["name", "pdfUrl"],
 	"horarios-linea": ["lineId", "originTown", "destinationTown", "departureTime", "arrivalTime", "duration"],
 	conexiones: ["fromLineId", "atStop", "toLineId", "waitMin"],
+	documentos: ["busLabel", "docType", "reference", "expiresOn", "expiryState"],
+	incidencias: ["occurredOn", "busLabel", "severity", "status", "description"],
+	mantenimiento: ["serviceOn", "busLabel", "kind", "status", "cost"],
 };
 const cell = (value: unknown, key?: string): string => {
 	if (value === null || value === undefined) return "—";
 	if (typeof value === "boolean") return value ? common.yes : common.no;
 	if (value instanceof Date) return value.toISOString();
-	if (["status", "type", "action"].includes(key ?? "") && typeof value === "string") return copy.fields[value] ?? value;
+	if (["status", "type", "action", "docType", "severity", "kind", "expiryState"].includes(key ?? "") && typeof value === "string") return copy.fields[value] ?? value;
 	return typeof value === "object" ? JSON.stringify(value) : String(value);
 };
 const href = (action: "edit" | "view", id: string | number) => `${base}?${new URLSearchParams({ [action]: String(id), q: query, page: String(page) })}`;
@@ -82,7 +85,7 @@ const saved = Astro.url.searchParams.get("saved");
 								? <textarea name={field.name} data-type={field.type} data-nullable={String(field.nullable)} rows={field.type === "json" ? 8 : 3} disabled={readOnly} class:list={[inputClass, { "font-mono": field.type === "json" }]}>{field.type === "json" ? JSON.stringify(value, null, 2) : String(value ?? "")}</textarea>
 								: field.type === "select"
 									? <select name={field.name} disabled={readOnly} class={inputClass}>{field.options?.map((option) => <option value={option} selected={value === option}>{copy.fields[option]}</option>)}</select>
-									: <input name={field.name} type={field.type} value={value === null || value === undefined ? "" : String(value)} data-type={field.type} data-nullable={String(field.nullable)} list={field.relation ? `options-${field.name}` : undefined} step={field.type === "number" ? ["lat", "lng"].includes(field.name) ? "any" : "1" : undefined} disabled={readOnly} class={inputClass} />}
+									: <input name={field.name} type={field.type} value={value === null || value === undefined ? "" : String(value)} data-type={field.type} data-nullable={String(field.nullable)} list={field.relation ? `options-${field.name}` : undefined} step={field.type === "number" ? ["lat", "lng"].includes(field.name) ? "any" : field.name === "cost" ? "0.01" : "1" : undefined} disabled={readOnly} class={inputClass} />}
 						{field.type === "json" && <span class="mt-1 block text-xs text-on-surface-variant">{["routeIds", "stopIds"].includes(field.name) ? common.idsHelp : field.name === "stopsJson" ? common.stopsHelp : common.jsonHelp}</span>}
 						{field.relation && <><datalist id={`options-${field.name}`}>{list.map((entry) => <option value={entry.id}>{entry.name}</option>)}</datalist><span class="mt-1 block text-xs text-on-surface-variant">{common.relationHelp}</span></>}
 						<span data-field-error={field.name} class="mt-1 block text-xs text-error" aria-live="polite"></span>

@@ -4,6 +4,7 @@ import DashboardLayout from "@/layouts/DashboardLayout.astro";
 import { getSession } from "@/lib/auth";
 import { getPublicUser } from "@/lib/get-public-user";
 import { prisma } from "@/lib/db";
+import { EXPIRY_WARNING_DAYS } from "@/lib/management";
 import { getLocale, getDictionary } from "@/config/i18n";
 
 export const prerender = false;
@@ -19,18 +20,49 @@ const dict = getDictionary(locale);
 const user = await getPublicUser(session.id);
 
 // Fetch fleet summary
-const [routesCount, busesCount, stopsCount, driversCount] = await Promise.all([
+const today = new Date(`${new Date().toISOString().slice(0, 10)}T00:00:00.000Z`);
+const warningLimit = new Date(today.getTime() + EXPIRY_WARNING_DAYS * 86_400_000);
+const [
+	routesCount,
+	busesCount,
+	stopsCount,
+	driversCount,
+	expiredDocs,
+	expiringDocs,
+	openIncidents,
+	pendingMaintenance,
+	alerts,
+] = await Promise.all([
 	prisma().route.count(),
 	prisma().bus.count(),
 	prisma().stop.count(),
 	prisma().driver.count(),
+	prisma().vehicleDocument.count({ where: { expiresOn: { lt: today } } }),
+	prisma().vehicleDocument.count({ where: { expiresOn: { gte: today, lte: warningLimit } } }),
+	prisma().incident.count({ where: { status: { not: "resolved" } } }),
+	prisma().maintenance.count({ where: { status: { not: "completed" } } }),
+	prisma().vehicleDocument.findMany({
+		where: { expiresOn: { lte: warningLimit } },
+		orderBy: { expiresOn: "asc" },
+		take: 8,
+		include: { bus: { select: { number: true, plate: true } } },
+	}),
 ]);
+const fields = dict.management.fields;
+const docsHref = localizedPath("/dashboard/gestion/documentos", locale);
+const daysLeft = (day: Date) => Math.round((day.getTime() - today.getTime()) / 86_400_000);
 
 const kpis = [
 	{ label: dict.app.gestion.nav.routes, value: routesCount, icon: "route" },
 	{ label: dict.app.gestion.nav.buses, value: busesCount, icon: "directions_bus" },
 	{ label: dict.app.gestion.nav.stops, value: stopsCount, icon: "location_on" },
 	{ label: dict.app.gestion.nav.drivers, value: driversCount, icon: "badge" },
+];
+const fleetKpis = [
+	{ label: fields.expiredDocuments, value: expiredDocs, icon: "gpp_bad", href: docsHref, alert: expiredDocs > 0 },
+	{ label: fields.expiringDocuments, value: expiringDocs, icon: "event_upcoming", href: docsHref, alert: expiringDocs > 0 },
+	{ label: fields.openIncidents, value: openIncidents, icon: "report_problem", href: localizedPath("/dashboard/gestion/incidencias", locale), alert: openIncidents > 0 },
+	{ label: fields.pendingMaintenance, value: pendingMaintenance, icon: "build", href: localizedPath("/dashboard/gestion/mantenimiento", locale), alert: false },
 ];
 ---
 
@@ -56,5 +88,38 @@ const kpis = [
 				</div>
 			))}
 		</div>
+
+		<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+			{fleetKpis.map((k) => (
+				<a href={k.href} class="bg-surface-container-lowest rounded-xl shadow-ambient border border-surface-variant p-6 hover:border-coastal-teal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coastal-teal">
+					<div class="flex items-center gap-3">
+						<span class:list={["material-symbols-outlined text-[28px]", k.alert ? "text-error" : "text-coastal-teal"]} aria-hidden="true">{k.icon}</span>
+						<div>
+							<p class="font-headline-lg font-bold text-deep-navy">{k.value}</p>
+							<p class="font-label-md text-label-md text-on-surface-variant">{k.label}</p>
+						</div>
+					</div>
+				</a>
+			))}
+		</div>
+
+		<section class="mt-8 bg-surface-container-lowest rounded-xl shadow-ambient border border-surface-variant p-6" aria-labelledby="expiry-alerts">
+			<h2 id="expiry-alerts" class="font-headline-md text-headline-md font-bold text-deep-navy">{fields.expiryAlerts}</h2>
+			{alerts.length === 0
+				? <p class="mt-3 text-on-surface-variant">{fields.noExpiryAlerts}</p>
+				: <ul class="mt-4 divide-y divide-outline-variant">
+					{alerts.map((doc) => {
+						const days = daysLeft(doc.expiresOn);
+						return (
+							<li class="flex flex-wrap items-center justify-between gap-2 py-3">
+								<a class="font-semibold text-deep-navy" href={`${docsHref}?view=${doc.id}`}>{doc.bus.number} · {fields[doc.docType] ?? doc.docType}</a>
+								<span class:list={["rounded-full px-3 py-1 text-xs font-semibold", days < 0 ? "bg-error-container text-on-error-container" : "bg-surface-container-high text-on-surface"]}>
+									{doc.expiresOn.toISOString().slice(0, 10)} · {(days < 0 ? fields.expiredDaysAgo : fields.expiresInDays).replace("{days}", String(Math.abs(days)))}
+								</span>
+							</li>
+						);
+					})}
+				</ul>}
+		</section>
 	</div>
 </DashboardLayout>
