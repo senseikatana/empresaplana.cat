@@ -78,6 +78,24 @@ What's news:
   - `src/pages/index.astro`
 - [ ] bun add v1.4.2 (744846f84) feat: update documentation for agents
 
+## [0.3.1] - 2026-10-10
+
+Highlights: feat: update design tokens and management CRUD documentation, plus 1 more change.
+
+- [x] 🚀 feat: update design tokens and management CRUD documentation
+  - `AGENTS.md`
+  - `README.md`
+  - `docs/PORTING.md`
+  - `docs/RELEASING.md`
+  - `package.json`
+  - `src/scripts/release-versions.mjs`
+- [x] 🚀 feat: update package.json version to 0.1.0 (#11)
+  - `package.json`
+- [x] 🚀 feat: update file paths in AGENTS.md and tsconfig.json to include test dire
+- [x] 🐛 fix: remove fly.toml configuration
+- [x] 🚀 feat(.dockerignore): add cwd, errors and locale
+- [x] 🐛 fix!: update package.json for astro and bun commands
+
 ## [0.3.0] - 2026-10-10
 
 Highlights: feat: update file paths in AGENTS.md and tsconfig.json to include test dire and fix: remove fly.toml configuration, plus 5 more changes.
