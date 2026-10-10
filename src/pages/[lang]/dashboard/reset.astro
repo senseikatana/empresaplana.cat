@@ -1,0 +1,41 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import { getLocale, getDictionary, localizedPath } from "@/config/i18n";
+const locale = getLocale(Astro.params.lang);
+const dict = getDictionary(locale);
+const copy = dict.nativeAuth;
+export const prerender = false;
+---
+<AuthLayout title={copy.resetTitle} locale={locale}>
+	<h1 class="text-3xl font-bold text-deep-navy">{copy.resetTitle}</h1>
+	<p class="mt-4 text-on-surface-variant">{copy.resetNote}</p>
+	<form id="reset-form" class="mt-6 grid gap-4">
+		<label>{dict.app.register.email}<input name="email" type="email" autocomplete="email" required class="mt-2 w-full rounded-lg border border-outline-variant bg-surface p-3" /></label>
+		<label>{copy.code}<input name="otp" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" class="mt-2 w-full rounded-lg border border-outline-variant bg-surface p-3" /></label>
+		<label>{copy.newPassword}<input name="newPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" class="mt-2 w-full rounded-lg border border-outline-variant bg-surface p-3" /></label>
+		<button type="button" id="send-reset" class="rounded-lg border border-outline-variant p-3">{copy.resend}</button>
+		<button type="submit" class="rounded-lg bg-deep-navy p-3 text-white">{copy.reset}</button>
+	</form>
+	<p id="reset-status" role="status" aria-live="polite" class="mt-4 text-on-surface"></p>
+	<a href={localizedPath("/dashboard/login", locale)} class="mt-4 block font-semibold text-deep-navy">{dict.app.auth.login}</a>
+	<script define:vars={{ locale, failure: copy.failure, sent: copy.sent }}>
+		const form = document.getElementById("reset-form");
+		const status = document.getElementById("reset-status");
+		async function reset(send) {
+			if (!form.elements.namedItem("email").reportValidity()) return;
+			if (!send && (!form.elements.namedItem("otp").value || !form.elements.namedItem("newPassword").value || !form.reportValidity())) { status.textContent = failure; return; }
+			for (const button of form.querySelectorAll("button")) button.disabled = true;
+			try {
+				const fields = new FormData(form);
+				const response = await fetch("/api/auth/reset", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: fields.get("email"), ...(send ? {} : { otp: fields.get("otp"), newPassword: fields.get("newPassword") }), locale }) });
+				const data = await response.json();
+				if (!response.ok) { status.textContent = data.message ?? failure; return; }
+				if (data.next) window.location.assign(data.next);
+				else status.textContent = sent;
+			} catch { status.textContent = failure; }
+			finally { for (const button of form.querySelectorAll("button")) button.disabled = false; }
+		}
+		form.addEventListener("submit", (event) => { event.preventDefault(); reset(false); });
+		document.getElementById("send-reset").addEventListener("click", () => reset(true));
+	</script>
+</AuthLayout>

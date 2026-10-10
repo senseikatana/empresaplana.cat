@@ -4,6 +4,7 @@ import { getDictionary } from "@/config/i18n";
 import type { Locale } from "@/interfaces/common";
 import type { UsuarioRole } from "@/interfaces/auth";
 import { isCompanyRole } from "@/lib/acl";
+import HeaderPreferences from "@/components/HeaderPreferences.astro";
 
 interface Props {
 	locale: Locale;
@@ -14,10 +15,6 @@ interface Props {
 const { locale, role = null, showAuthActions = true } = Astro.props;
 const dict = getDictionary(locale);
 const { common } = dict;
-const languageLabel = dict.app.gestion.common.language;
-const languageHref = (language: Locale) => {
-	return localizedPath(`${Astro.url.pathname}${Astro.url.search}`, language);
-};
 const localeHref = (path: string) => localizedPath(path, locale);
 const contactHref = localizedPath("/#contacto", locale);
 const accountHref = role
@@ -33,8 +30,8 @@ const accountLabel = role
 ---
 
 <header class="relative z-20 bg-surface-container-lowest">
-	<div class="hidden border-b border-outline-variant/40 bg-deep-navy text-on-primary md:block">
-		<div class="mx-auto flex max-w-container-max items-center justify-end gap-6 px-margin-desktop py-2 text-sm">
+	<div class="border-b border-outline-variant/40 bg-deep-navy text-white">
+		<div class="mx-auto flex h-11 max-w-container-max items-center justify-between gap-3 px-margin-mobile text-sm md:justify-end md:gap-6 md:px-margin-desktop">
 			<a
 				class="inline-flex items-center gap-2 transition-colors hover:text-secondary-fixed"
 				href="tel:+34977553680"
@@ -43,17 +40,7 @@ const accountLabel = role
 				+34 977 553 680
 			</a>
 			<span aria-hidden="true" class="h-4 w-px bg-on-primary/30"></span>
-			<nav class="flex items-center gap-3" aria-label={languageLabel}>
-				{(["ca", "es", "en", "fr"] as const).map((language) => (
-					<a
-						class={`transition-colors hover:text-secondary-fixed ${language === locale ? "font-bold text-white" : "text-on-primary/75"}`}
-						href={languageHref(language)}
-						aria-current={language === locale ? "page" : undefined}
-					>
-						{common.lang[language]}
-					</a>
-				))}
-			</nav>
+			<HeaderPreferences locale={locale} />
 		</div>
 	</div>
 	<div class="mx-auto flex max-w-container-max items-center justify-between gap-3 px-margin-mobile py-4 md:px-margin-desktop">
@@ -92,7 +79,7 @@ const accountLabel = role
 									<span class="sr-only sm:not-sr-only">{common.nav.login}</span>
 								</a>
 								<a
-									class="inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded-full bg-energetic-orange px-2 text-[11px] font-bold text-on-background transition-colors hover:bg-tertiary-fixed-dim focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-deep-navy sm:px-4 sm:text-sm"
+									class="inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded-full bg-energetic-orange px-2 text-xs font-bold text-on-background transition-colors hover:bg-tertiary-fixed-dim focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-deep-navy sm:px-4 sm:text-sm"
 									href={localeHref("/dashboard/register")}
 								>
 						{common.nav.register}
@@ -101,7 +88,7 @@ const accountLabel = role
 			)}
 			{showAuthActions && role && accountHref && accountLabel && (
 				<a
-					class="inline-flex min-h-11 items-center justify-center gap-1 whitespace-nowrap rounded-full bg-deep-navy px-2 text-[11px] font-semibold text-white transition-colors hover:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-deep-navy sm:gap-2 sm:px-4 sm:text-sm"
+					class="inline-flex min-h-11 items-center justify-center gap-1 whitespace-nowrap rounded-full bg-deep-navy px-2 text-xs font-semibold text-white transition-colors hover:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-deep-navy sm:gap-2 sm:px-4 sm:text-sm"
 					href={localeHref(accountHref)}
 				>
 					<span aria-hidden="true" class="material-symbols-outlined text-lg">account_circle</span>
@@ -127,17 +114,6 @@ const accountLabel = role
 			<a class="shrink-0 hover:text-deep-navy" href={contactHref}>
 				{common.nav.contact}
 			</a>
-			<div class="ml-auto flex shrink-0 items-center gap-3 text-xs">
-				{(["ca", "es", "en", "fr"] as const).map((language) => (
-					<a
-						class={`hover:text-deep-navy ${language === locale ? "font-bold text-deep-navy" : ""}`}
-						href={languageHref(language)}
-						aria-current={language === locale ? "page" : undefined}
-					>
-						{common.lang[language]}
-					</a>
-				))}
-			</div>
 		</div>
 	</nav>
 </header>

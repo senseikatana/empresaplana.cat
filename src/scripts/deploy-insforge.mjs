@@ -32,31 +32,22 @@ if (
 
 const keys = [
   "DATABASE_URL",
-  "AUTH_SECRET",
-  "BETTER_AUTH_SECRET",
-  "BETTER_AUTH_API_KEY",
-  "GOOGLE_CLIENT_ID",
-  "GOOGLE_CLIENT_SECRET",
-  "GITHUB_CLIENT_ID",
-  "GITHUB_CLIENT_SECRET",
-  "RESEND_API_KEY",
-  "AUTH_EMAIL_FROM",
-  "COMPANY_ORGANIZATION_ID",
+  "INSFORGE_URL",
+  "INSFORGE_ANON_KEY",
   "OPENROUTER_API_KEY",
   "OPENROUTER_CHAT_MODEL",
 ];
 const env = Object.fromEntries(
   keys.filter((key) => process.env[key]).map((key) => [key, process.env[key]]),
 );
-for (const key of ["DATABASE_URL", "AUTH_SECRET"]) {
+for (const key of ["DATABASE_URL", "INSFORGE_URL", "INSFORGE_ANON_KEY"]) {
   if (!env[key]) throw new Error(`${key} is required for deployment.`);
 }
 Object.assign(env, {
   NODE_ENV: "production",
   HOST: "0.0.0.0",
   PORT: "8080",
-  BETTER_AUTH_URL: origin.origin,
-  WEBAUTHN_RP_ID: origin.hostname,
+  APP_URL: process.env.APP_URL || origin.origin,
 });
 
 const flyBin = join(homedir(), ".fly", "bin");

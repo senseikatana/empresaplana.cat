@@ -9,6 +9,12 @@ import type { Locations, LocationsMobile } from "@/interfaces/locations";
 import type { MobileApp } from "@/interfaces/mobile-app";
 import type { Routes } from "@/interfaces/routes";
 export interface I18nDictionary {
+	nativeAuth: {
+		verifyTitle: string; verifyNote: string; verified: string;
+		code: string; verify: string; resend: string; sent: string;
+		resetTitle: string; resetNote: string; newPassword: string;
+		reset: string; failure: string; theme: string; light: string; dark: string; system: string;
+	};
 	management: {
 		entities: Record<string, string>;
 		fields: Record<string, string>;

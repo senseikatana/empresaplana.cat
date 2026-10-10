@@ -6,15 +6,14 @@ exported as HTML into `stitch-export/`, then transformed into Astro pages.
 
 ## Stack
 
-- Astro 7 + `@astrojs/node` adapter + `@astrojs/react` (islands), targeting InsForge Compute
+- Astro 7 + `@astrojs/node` adapter + `@astrojs/vue` (islands), targeting InsForge Compute
 - Package manager: **bun** (`bun.lock` present)
 - Node >= 22.12
 - Database: **InsForge** (Postgres, proyecto `empresaplana.cat`) via
   **Prisma 7** (`prisma-client` generator, output `generated/prisma/`) +
-  `@prisma/adapter-pg` + `pg`. Validation with **zod v4**, auth tokens with
-  **jose** (HS256 JWT in an httpOnly cookie), plus **Better Auth** for Google
-  and GitHub OAuth. Credentials in `.env` (`DATABASE_URL`, `AUTH_SECRET`,
-  `BETTER_AUTH_URL`, and optional OAuth client secrets).
+  `@prisma/adapter-pg` + `pg`. Validation with **zod v4**, native authentication
+  with **@insforge/sdk** SSR helpers. Credentials in `.env` (`DATABASE_URL`,
+  `INSFORGE_URL`, `INSFORGE_ANON_KEY`, optional canonical `APP_URL`).
 - Styling: **Tailwind CSS v4 build-time** via `@tailwindcss/vite` (no CDN) +
   Geist + Material Symbols. Theme lives in `src/styles/global.css` (`@theme`
   block mirroring `src/assets/DESIGN.md`; brand colors exposed as CSS custom
@@ -44,16 +43,16 @@ Run everything from this directory:
   Node query compiler is supported. Do not switch to Workers without generating
   a workerd-compatible Prisma Client; runtime WebAssembly compilation is blocked there.
 - InsForge provides PostgreSQL and is the intended Compute destination.
-  Better Auth manages application authentication; InsForge Auth is not used.
+  InsForge Auth manages identities, credentials and OAuth.
 - Deploy with `npx -y @insforge/cli compute deploy . --name empresaplana-web --port 8080
   --region fra --env-file <private-production-env-file>`. Source deployment requires
   `flyctl` on PATH; InsForge supplies its credentials. Do not deploy using your own Fly account.
   `Dockerfile` builds with Bun and runs standalone Node as a non-root user.
   `.dockerignore` allows only build inputs, excluding local credentials and agent configuration.
-  Supply `DATABASE_URL`, `AUTH_SECRET`, `BETTER_AUTH_URL` and optional provider/AI secrets
-  at runtime. Set `WEBAUTHN_RP_ID` to the production hostname.
+  Supply `DATABASE_URL`, `INSFORGE_URL`, `INSFORGE_ANON_KEY`, `APP_URL` and optional AI secrets
+  at runtime.
   Local tracking JSON and Astro filesystem sessions are ephemeral across container replacement;
-  do not treat them as durable storage. Better Auth sessions remain in PostgreSQL.
+  do not treat them as durable storage. Native auth sessions are managed by InsForge.
   The service runs in Frankfurt with 512 MB RAM and scales to zero when idle.
   All UI routes use a locale prefix: `/es`, `/es/rutas-horarios`,
   `/es/dashboard/login`, `/es/perfil`. Supported prefixes are `ca`, `es`, `en`, `fr`.
@@ -66,9 +65,16 @@ Run everything from this directory:
 - `security: { checkOrigin: false }` — the API endpoints are consumed by
   non-browser clients (no `Origin` header). CSRF is mitigated by the session
   cookie's `sameSite: "lax"` (browsers don't send it on cross-site POSTs).
+- `security.allowedDomains` explicitly trusts local development hosts and the
+  two production hosts for SSR request origins. Astro 7 otherwise rewrites
+  untrusted hosts to localhost, breaking same-origin API checks and OAuth URLs.
 - All pages declare `export const prerender = false;` (redundant but explicit
-  in server mode). The only client-side code is the `BusTrackingPanel` React
+  in server mode). The `BusTrackingPanel` Vue
   island (`client:load`).
+- Header preferences use KatanaKit's framework-independent theme service with
+  `ep-theme` storage, light/dark/system modes and prepaint initialization.
+  Use `HeaderPreferences` once per header; do not duplicate mobile language lists.
+  Dark surface/text tokens live in `src/styles/global.css`, not per-page styles.
 - Client-side prefetching is enabled (`prefetch: { prefetchAll: true }`).
 
 ## Design system
@@ -120,8 +126,8 @@ Canonical tokens live in `src/assets/DESIGN.md` (mirror of the Stitch
   offices, budgets, favorites, reports and chat using non-destructive upserts.
   Demo records use negative IDs or `demo-` prefixes and visible DEMO labels.
   These schedules are not official and must not be used for travel.
-  Auth sessions, verifications and organizations are created by Better Auth
-  during normal use, not fabricated by the seed.
+  Demo profiles have no passwords or native identities. Native auth accounts
+  are created through registration/OAuth, never fabricated by this seed.
 
 ## Google Sheets sync
 
@@ -191,29 +197,29 @@ Canonical tokens live in `src/assets/DESIGN.md` (mirror of the Stitch
 - `CRUD_TEST_BASE_URL=http://127.0.0.1:4322 bun test tests/management.integration.test.ts`
   exercises all twelve entities against a local running server and InsForge,
   creating only isolated test records and deleting them afterwards. Optional
-  `CRUD_TEST_USERNAME`/`CRUD_TEST_PASSKEY` select an existing admin; defaults
-  are the seeded development account. Never run against a production URL.
+  `CRUD_TEST_EMAIL`/`CRUD_TEST_PASSWORD` and `CRUD_TEST_WORKER_EMAIL`/
+  `CRUD_TEST_WORKER_PASSWORD` must identify verified native test accounts with
+  the corresponding application roles. No legacy login defaults remain.
+  Never run against a production URL.
 
 ## Auth & users
 
-- Better Auth verification, reset and invitation emails use `src/lib/email.ts`
-  and Resend's transactional API, not Resend Events or InsForge native Auth SMTP.
-  Set server-only `RESEND_API_KEY` and `AUTH_EMAIL_FROM`; deploy:insforge includes
-  both in the Compute runtime. `bun run email:test` sends to `RESEND_TEST_TO`;
-  `--dry-run` reports readiness without sending. The onboarding@resend.dev sender
-  only permits the Resend account owner's inbox; use a verified sender domain
-  for other recipients and production.
-
-- `src/lib/passkey.ts` — scrypt hashing (`salt:hash`, node:crypto, no deps).
-- `src/lib/auth.ts` — JWT session via `jose` (HS256, `AUTH_SECRET`, 7d) in
-  the `ep_session` httpOnly cookie; `authorize(cookies, role?)` guard returns
-  a ready-made 401/403 `Response`.
-- `src/lib/validation/users.ts` — zod v4 schemas (create/update/login);
+- Native verification/reset emails use InsForge-managed delivery (custom SMTP
+  disabled by user choice in `insforge.toml`). Resend is development-only:
+  `src/lib/email.ts` refuses to run when `NODE_ENV=production`, and the deploy
+  script does not ship `RESEND_API_KEY`/`AUTH_EMAIL_FROM`. Use
+  `bun run email:test` to send a test and `bun run email:manage list|get|
+  cancel|share` to inspect sent emails (Resend "manage emails" API).
+- `src/lib/insforge-auth.ts` adapts Astro cookies to InsForge SSR actions.
+  Both access and refresh cookies are httpOnly because app operations are
+  server-mediated. Middleware refreshes sessions; `src/lib/auth.ts` validates
+  identities remotely and resolves application roles by `User.insforgeId`.
+- `src/lib/validation/users.ts` — zod v4 schemas (create/update profiles);
   errors map to `{ error, issues }`. Unique conflicts are pre-checked →
   `{ error: "conflict", field }` 409.
 - API: `POST /api/auth/login|logout`, `GET /api/auth/me`, `GET|POST
   /api/users` (admin), `GET|PATCH|DELETE /api/users/[id]` (admin; can't
-  delete yourself). `passkey_hash` is never exposed.
+  delete yourself). Profile CRUD does not create native credentials.
 - Roles are `client`, `worker`, `manager`, and `admin`. Only managers and
   admins may access `/dashboard`; only admins may manage team roles or open
   integrations. Server middleware enforces these restrictions.
@@ -221,19 +227,21 @@ Canonical tokens live in `src/assets/DESIGN.md` (mirror of the Stitch
   their own profile at `/perfil`; admins promote team members through
   `/dashboard/gestion/usuarios`. This admin-only role assignment is a product
   assumption until explicitly changed.
-- New and changed passwords must be 12–128 characters. Existing seeded
-  development users (passkey `12345678`: `admin`, `trabajador`, `cliente`)
-  remain able to log in for backwards-compatible local testing.
-- Google and GitHub OAuth use `src/config/auth.config.ts` and environment
-  values from `src/config/config.env.ts`, with separate
-  `AuthUser`/`AuthSession`/`AuthAccount`/`AuthVerification` tables. Verified
-  provider emails link to an existing application account; new social users
-  receive the `client` role. OAuth sessions exchange into the app's existing
-  `ep_session` cookie so existing ACLs continue to apply.
+- New passwords must be 12–128 characters. No local password/JWT login exists.
+  `/perfil` edits application name/phone and links to native recovery;
+  linked identity emails cannot be edited as application-only fields.
+- Google/GitHub provider callbacks point to
+  `{INSFORGE_URL}/api/auth/oauth/{provider}/callback`. The app exchanges
+  `insforge_code` with a server-owned PKCE verifier at `/api/auth/exchange`.
+  Native auth config is in `insforge.toml`; external provider console changes
+  are separate. Never auto-link a privileged profile by verified email.
+- `migrations/20261010112209_insforge-auth-native.sql` removes obsolete auth
+  tables and adds the unique native identity mapping. Validate on an isolated
+  backend branch and coordinate promotion with deployment of the new code.
 
 ## Bus tracking (Glovo-style)
 
-- `src/components/BusTrackingPanel.tsx` — React island (`client:load`) with
+- `src/components/BusTrackingPanel.vue` — Vue island (`client:load`) with
   report buttons (passed / on time / late / early / not passed / cancelled),
   escalation progress and a review (stars) form. Receives `t` (the
   `busTracking` dictionary) and `stops` from the page.
@@ -249,8 +257,8 @@ Canonical tokens live in `src/assets/DESIGN.md` (mirror of the Stitch
 
 ## Gotchas
 
-- `/dashboard/ia` provides text generation for managers/admins using Better Auth
-  and the existing application session guard. InsForge supplies `OPENROUTER_API_KEY`;
+- `/dashboard/ia` provides text generation for managers/admins using native Auth
+  and the application session guard. InsForge supplies `OPENROUTER_API_KEY`;
   server-side OpenAI SDK calls use OpenRouter, never the deprecated InsForge AI SDK.
   Prompts are not stored and are sent to OpenRouter; do not include personal data.
   Requests cap input at 4000 characters and output at 800 tokens, with a 30-second

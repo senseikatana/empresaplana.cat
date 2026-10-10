@@ -16,14 +16,13 @@ datasource db {
 
 model User {
 	id             Int             @id @default(autoincrement())
+	insforgeId     String?         @unique @db.Uuid
 	username       String          @unique @db.VarChar(60)
-	passkey        String?         @db.VarChar(128)
 	name           String          @db.VarChar(60)
 	fullName       String          @db.VarChar(120)
 	email          String          @db.VarChar(200)
 	phone          String          @db.VarChar(30)
 	role           String          @default("client") @db.VarChar(20)
-	totpSecret     String?         @db.VarChar(100)
 	emailVerified  Boolean         @default(false)
 	createdAt     DateTime        @default(now())
 	updatedAt      DateTime        @default(now()) @updatedAt
@@ -33,151 +32,6 @@ model User {
 	messages       Message[]
 
 	@@index([role])
-}
-
-model AuthUser {
-	id            String        @id
-	name          String
-	email         String        @unique
-	emailVerified Boolean       @default(false)
-	twoFactorEnabled Boolean?   @default(false)
-	image         String?
-	createdAt     DateTime      @default(now())
-	updatedAt     DateTime      @updatedAt
-	username      String?       @unique
-	appUserId     Int?          @unique
-	sessions      AuthSession[]
-	accounts      AuthAccount[]
-	members       AuthMember[]
-	invitations   AuthInvitation[] @relation("AuthInvitationInviter")
-	twoFactor     AuthTwoFactor?
-	passkeys      AuthPasskey[]
-
-	@@map("auth_users")
-}
-
-model AuthSession {
-	id        String   @id
-	expiresAt DateTime
-	token     String   @unique
-	createdAt DateTime @default(now())
-	updatedAt DateTime @updatedAt
-	ipAddress String?
-	userAgent String?
-	userId    String
-	activeOrganizationId String?
-	user      AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-	@@index([userId])
-	@@map("auth_sessions")
-}
-
-model AuthAccount {
-	id                    String    @id
-	accountId             String
-	providerId            String
-	userId                String
-	user                  AuthUser  @relation(fields: [userId], references: [id], onDelete: Cascade)
-	accessToken           String?
-	refreshToken          String?
-	idToken               String?
-	accessTokenExpiresAt  DateTime?
-	refreshTokenExpiresAt DateTime?
-	scope                 String?
-	password              String?
-	createdAt             DateTime  @default(now())
-	updatedAt             DateTime  @updatedAt
-
-	@@index([userId])
-	@@map("auth_accounts")
-}
-
-model AuthVerification {
-	id         String   @id
-	identifier String
-	value      String
-	expiresAt  DateTime
-	createdAt  DateTime @default(now())
-	updatedAt  DateTime @updatedAt
-
-	@@index([identifier])
-	@@map("auth_verifications")
-}
-
-model AuthTwoFactor {
-	id                     String   @id
-	secret                 String
-	backupCodes            String
-	userId                 String   @unique
-	verified               Boolean  @default(true)
-	failedVerificationCount Int     @default(0)
-	lockedUntil            DateTime?
-	user                   AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-	@@map("auth_two_factors")
-}
-
-model AuthPasskey {
-	id           String   @id
-	name         String?
-	publicKey    String
-	userId       String
-	credentialID String   @unique
-	counter      Int
-	deviceType   String
-	backedUp     Boolean
-	transports   String?
-	createdAt    DateTime @default(now())
-	aaguid       String?
-	user         AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-	@@index([userId])
-	@@map("auth_passkeys")
-}
-
-model AuthOrganization {
-	id          String           @id
-	name        String
-	slug        String           @unique
-	logo        String?
-	createdAt   DateTime         @default(now())
-	updatedAt   DateTime         @updatedAt
-	metadata    String?
-	members     AuthMember[]
-	invitations AuthInvitation[]
-
-	@@map("auth_organizations")
-}
-
-model AuthMember {
-	id             String           @id
-	organizationId String
-	userId         String
-	role           String           @default("member")
-	createdAt      DateTime         @default(now())
-	organization   AuthOrganization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-	user           AuthUser         @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-	@@unique([organizationId, userId])
-	@@index([userId])
-	@@map("auth_members")
-}
-
-model AuthInvitation {
-	id             String           @id
-	organizationId String
-	email          String
-	role           String
-	status         String           @default("pending")
-	expiresAt      DateTime
-	createdAt      DateTime         @default(now())
-	inviterId      String
-	organization   AuthOrganization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-	inviter        AuthUser         @relation("AuthInvitationInviter", fields: [inviterId], references: [id], onDelete: Cascade)
-
-	@@index([organizationId])
-	@@index([email])
-	@@map("auth_invitations")
 }
 
 model FavoriteRoute {

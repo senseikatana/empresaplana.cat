@@ -3,6 +3,7 @@
 import type { SiteInfoProps } from "@/interfaces";
 import "@/styles/global.css";
 import PublicHeader from "@/components/PublicHeader.astro";
+import ThemeInit from "@/components/ThemeInit.astro";
 import { getLocale } from "@/config/i18n";
 import { getSession } from "@/lib/auth";
 import { getCanonicalUrl } from "@/config/site-info";
@@ -19,7 +20,6 @@ const {
   description = "",
   author = "",
   keywords,
-  themeColor,
   ogTitle = title,
   ogDescription = description,
   ogImage,
@@ -47,7 +47,7 @@ const session = publicHeader ? await getSession(Astro.cookies) : null;
         <meta name="keywords" content={keywords.join(", ")} />
       )
     }
-    {themeColor && <meta name="theme-color" content={themeColor} />}
+    <ThemeInit />
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
     <meta property="og:title" content={ogTitle} />
     {

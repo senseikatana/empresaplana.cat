@@ -8,6 +8,7 @@ export interface BusTrackingActions {
 	cancelled: string;
 }
 export interface BusTrackingFeedback {
+	failure: string;
 	thanks: string;
 	thanksDesc: string;
 	confirm: string;

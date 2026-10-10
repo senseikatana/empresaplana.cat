@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
 import { authorize } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { hashPasskey } from "@/lib/passkey";
 import { publicUser } from "@/lib/users";
 import {
 	formatValidationError,
@@ -53,6 +52,9 @@ export const PATCH: APIRoute = async ({ params, request, cookies }) => {
 
 	const existing = await prisma().user.findUnique({ where: { id } });
 	if (!existing) return Response.json({ error: "not_found" }, { status: 404 });
+	if (existing.insforgeId && data.email !== undefined && data.email !== existing.email) {
+		return Response.json({ error: "native_email_managed", message: "Email is managed by InsForge Auth." }, { status: 409 });
+	}
 	if (existing.role === "admin" && data.role && data.role !== "admin") {
 		const adminCount = await prisma().user.count({
 			where: { role: "admin" },
@@ -92,8 +94,6 @@ export const PATCH: APIRoute = async ({ params, request, cookies }) => {
 	if (data.email !== undefined) updateData.email = data.email;
 	if (data.username !== undefined) updateData.username = data.username;
 	if (data.role !== undefined) updateData.role = data.role;
-	if (data.passkey !== undefined)
-		updateData.passkey = hashPasskey(data.passkey);
 
 	const updated = await prisma().user.update({
 		where: { id },

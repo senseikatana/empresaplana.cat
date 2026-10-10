@@ -53,8 +53,6 @@ const labels = { google: googleLabel, github: githubLabel };
 }
 
 <script>
-	import { authClient } from "@/lib/auth-client";
-
 	document.querySelectorAll<HTMLButtonElement>("[data-oauth-provider]").forEach((button) => {
 		button.addEventListener("click", async () => {
 			const provider = button.dataset.oauthProvider;
@@ -68,12 +66,19 @@ const labels = { google: googleLabel, github: githubLabel };
 			}
 
 			try {
-				const result = await authClient.signIn.social({
-					provider,
-					callbackURL: button.dataset.callbackUrl,
-					errorCallbackURL: button.dataset.errorUrl,
+				const callback = new URL(button.dataset.callbackUrl ?? "", window.location.origin);
+				const response = await fetch("/api/auth/oauth", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						provider,
+						locale: callback.searchParams.get("locale") ?? "ca",
+						redirect: callback.searchParams.get("redirect") ?? "",
+					}),
 				});
-				if (result.error) throw result.error;
+				const result = await response.json();
+				if (!response.ok || typeof result.url !== "string") throw new Error("OAuth failed");
+				window.location.assign(result.url);
 			} catch {
 				if (error) {
 					error.textContent = button.dataset.errorMessage ?? "";

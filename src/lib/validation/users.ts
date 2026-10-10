@@ -21,12 +21,8 @@ export const createUserSchema = z.object({
 		.regex(/^\+?[0-9\s-]{6,20}$/, "Teléfono inválido"),
 	email: z
 		.email("Email inválido")
-		.max(254, "Email demasiado largo")
+		.max(200, "Email demasiado largo")
 		.transform((value) => value.toLowerCase()),
-	passkey: z
-		.string()
-		.min(12, "La contraseña debe tener al menos 12 caracteres")
-		.max(128, "La contraseña no puede superar 128 caracteres"),
 	username: z
 		.string()
 		.trim()
@@ -35,18 +31,11 @@ export const createUserSchema = z.object({
 			"Username: 3-15 caracteres (letras, números, punto o guion bajo)",
 		),
 	role: roleSchema.default("client"),
-});
+}).strict();
 
 export const updateUserSchema = createUserSchema
 	.partial()
 	.refine((data) => Object.keys(data).length > 0, "Nada que actualizar");
-
-export const loginSchema = z.object({
-	username: z.string().trim().min(1, "Username obligatorio"),
-	passkey: z.string().min(1, "Passkey obligatorio"),
-	redirect: z.string().max(2048).optional(),
-	locale: z.enum(["ca", "es", "en", "fr"]).optional(),
-});
 
 export function formatValidationError(error: z.ZodError) {
 	return {

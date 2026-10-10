@@ -2,7 +2,6 @@ import type { APIRoute } from "astro";
 import type { UsuarioRole } from "@/interfaces/auth";
 import { authorize } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { hashPasskey } from "@/lib/passkey";
 import { publicUser } from "@/lib/users";
 import {
 	createUserSchema,
@@ -71,7 +70,6 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 			fullName: data.fullName,
 			phone: data.phone,
 			email: data.email,
-			passkey: hashPasskey(data.passkey),
 			username: data.username,
 			role: data.role,
 		},

@@ -1,0 +1,59 @@
+---
+import { getDictionary, localizedPath, LOCALES } from "@/config/i18n";
+import type { Locale } from "@/interfaces/common";
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const dict = getDictionary(locale);
+const labels = dict.nativeAuth;
+const languageLabel = dict.app.misc.language;
+---
+<div class="flex shrink-0 items-center gap-2">
+	<details data-header-menu class="relative">
+		<summary class="flex min-h-10 cursor-pointer list-none items-center gap-1 rounded-lg px-2 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2" aria-label={languageLabel}>
+			<span aria-hidden="true" class="material-symbols-outlined text-lg">translate</span>
+			{locale.toUpperCase()}
+			<span aria-hidden="true" class="material-symbols-outlined text-lg">expand_more</span>
+		</summary>
+		<nav aria-label={languageLabel} class="absolute right-0 top-full z-50 mt-1 min-w-36 rounded-lg border border-outline-variant bg-surface-container-lowest p-1 text-on-surface shadow-ambient">
+			{LOCALES.map((language) => <a href={localizedPath(`${Astro.url.pathname}${Astro.url.search}`, language)} hreflang={language} lang={language} aria-current={language === locale ? "page" : undefined} class="block rounded-md px-4 py-3 text-sm hover:bg-surface-container-high focus-visible:outline-2">{dict.common.lang[language]}</a>)}
+		</nav>
+	</details>
+	<details data-header-menu class="relative">
+		<summary class="flex min-h-10 cursor-pointer list-none items-center rounded-lg px-2 focus-visible:outline-2 focus-visible:outline-offset-2" aria-label={labels.theme}>
+			<span data-theme-icon aria-hidden="true" class="material-symbols-outlined text-lg">contrast</span>
+		</summary>
+		<div class="absolute right-0 top-full z-50 mt-1 min-w-36 rounded-lg border border-outline-variant bg-surface-container-lowest p-1 text-on-surface shadow-ambient">
+			{(["light", "dark", "system"] as const).map((theme) => <button type="button" data-theme-mode={theme} aria-pressed="false" class="block w-full rounded-md px-4 py-3 text-left text-sm hover:bg-surface-container-high focus-visible:outline-2">{labels[theme]}</button>)}
+		</div>
+	</details>
+</div>
+<script>
+	import { useInitTheme, useSetThemeMode, type ThemeMode } from "katanakit-js";
+	function apply(mode: ThemeMode, resolved: "light" | "dark") {
+		document.documentElement.style.colorScheme = resolved;
+		document.querySelector('meta[name="theme-color"]')?.setAttribute("content", resolved === "dark" ? "#101820" : "#f8f9fa");
+		for (const button of document.querySelectorAll("[data-theme-mode]")) button.setAttribute("aria-pressed", String(button.getAttribute("data-theme-mode") === mode));
+		for (const icon of document.querySelectorAll("[data-theme-icon]")) icon.textContent = mode === "system" ? "contrast" : resolved === "dark" ? "dark_mode" : "light_mode";
+	}
+	useInitTheme({ storageKey: "ep-theme", defaultMode: "system", onChange: apply });
+	for (const button of document.querySelectorAll<HTMLButtonElement>("[data-theme-mode]")) {
+		button.addEventListener("click", () => {
+			const mode = button.dataset.themeMode;
+			if (mode !== "light" && mode !== "dark" && mode !== "system") return;
+			useSetThemeMode(mode);
+			button.closest("details")?.removeAttribute("open");
+		});
+	}
+	document.addEventListener("click", (event) => {
+		for (const details of document.querySelectorAll<HTMLDetailsElement>("[data-header-menu]")) {
+			if (event.target instanceof Node && !details.contains(event.target)) details.open = false;
+		}
+	});
+	document.addEventListener("keydown", (event) => {
+		if (event.key !== "Escape") return;
+		for (const details of document.querySelectorAll<HTMLDetailsElement>("[data-header-menu][open]")) {
+			details.open = false;
+			details.querySelector("summary")?.focus();
+		}
+	});
+</script>

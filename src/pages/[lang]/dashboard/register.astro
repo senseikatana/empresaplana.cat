@@ -3,7 +3,7 @@ import { localizedPath } from "@/config/i18n/routing";
 import AuthLayout from "@/layouts/AuthLayout.astro";
 import { getLocale, getDictionary } from "@/config/i18n";
 import { getSession } from "@/lib/auth";
-import { oauthProviders } from "@/config/config.env";
+import { configuredOAuthProviders } from "@/lib/insforge-auth";
 import SocialAuthButtons from "@/components/auth/SocialAuthButtons.astro";
 
 export const prerender = false;
@@ -13,6 +13,7 @@ if (session) return Astro.redirect(localizedPath(session.role === "client" || se
 
 const locale = getLocale(Astro.params.lang);
 const dict = getDictionary(locale);
+const oauthProviders = await configuredOAuthProviders();
 ---
 
 <AuthLayout title={dict.app.register.title} locale={locale}>
@@ -34,22 +35,6 @@ const dict = getDictionary(locale);
 				type="text"
 				autocomplete="name"
 				maxlength="60"
-				required
-				class="min-h-12 w-full rounded-lg border border-outline-variant bg-surface px-4 text-base text-on-surface transition focus:border-coastal-teal focus:outline-none focus:ring-2 focus:ring-coastal-teal/20"
-			/>
-		</div>
-		<div>
-			<label for="username" class="mb-2 block text-sm font-semibold text-on-surface">
-				{dict.app.auth.username}
-			</label>
-			<input
-				id="username"
-				name="username"
-				type="text"
-				autocomplete="username"
-				autocapitalize="none"
-				minlength="3"
-				maxlength="32"
 				required
 				class="min-h-12 w-full rounded-lg border border-outline-variant bg-surface px-4 text-base text-on-surface transition focus:border-coastal-teal focus:outline-none focus:ring-2 focus:ring-coastal-teal/20"
 			/>
@@ -135,7 +120,6 @@ const dict = getDictionary(locale);
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
 						name: fields.get("name"),
-						username: fields.get("username"),
 						email: fields.get("email"),
 						password: fields.get("passkey"),
 						locale,

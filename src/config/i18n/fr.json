@@ -1,4 +1,10 @@
 {
+	"nativeAuth": {
+		"verifyTitle": "Vérifiez votre adresse e-mail", "verifyNote": "Saisissez le code reçu par e-mail. Si vous avez reçu un lien, ouvrez-le pour vérifier votre compte.",
+		"verified": "Adresse vérifiée. Vous pouvez vous connecter.", "code": "Code de vérification", "verify": "Vérifier", "resend": "Renvoyer le code", "sent": "Consultez votre messagerie.",
+		"resetTitle": "Réinitialiser le mot de passe", "resetNote": "Demandez un code par e-mail et utilisez-le pour définir un nouveau mot de passe.", "newPassword": "Nouveau mot de passe", "reset": "Modifier le mot de passe",
+		"failure": "Impossible de terminer l'opération. Vérifiez les informations et réessayez.", "theme": "Thème", "light": "Clair", "dark": "Sombre", "system": "Système"
+	},
 	"ai": {
 		"title": "Assistant IA",
 		"description": "Générez du texte avec le Model Gateway InsForge et OpenRouter.",
@@ -1136,6 +1142,7 @@
 			"cancelled": "Service annulé"
 		},
 		"feedback": {
+			"failure": "Impossible d'enregistrer ou de charger le signalement. Réessayez.",
 			"thanks": "Merci pour votre signalement !",
 			"thanksDesc": "Votre contribution nous aide à améliorer la ponctualité des itinéraires.",
 			"confirm": "Confirmer le signalement",

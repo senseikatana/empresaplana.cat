@@ -14,10 +14,10 @@ if (args.includes("--dry-run")) {
 		apiKeyConfigured: Boolean(ENV.resendApiKey),
 	});
 } else {
-	await sendTransactionalEmail({
+	const id = await sendTransactionalEmail({
 		to: recipient,
 		subject: "Prueba de correo | Empresa Plana",
-		text: "El envío transaccional de Empresa Plana con Better Auth y Resend está funcionando. Este correo es una prueba solicitada desde el entorno de InsForge.",
+		text: "Este correo es una prueba del envío transaccional de Empresa Plana con Resend. Los correos de autenticación se gestionan en InsForge.",
 	});
-	console.log("Resend accepted the test email. Check the recipient inbox.");
+	console.log(`Resend accepted the test email (${id}). Inspect it with: bun run email:manage get ${id}`);
 }

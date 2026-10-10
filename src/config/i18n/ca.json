@@ -1,4 +1,10 @@
 {
+	"nativeAuth": {
+		"verifyTitle": "Verifica el teu correu", "verifyNote": "Introdueix el codi enviat al teu correu. Si has rebut un enllaç, obre'l per verificar el compte.",
+		"verified": "Correu verificat. Ja pots iniciar sessió.", "code": "Codi de verificació", "verify": "Verificar", "resend": "Reenviar codi", "sent": "Revisa el teu correu.",
+		"resetTitle": "Recuperar contrasenya", "resetNote": "Sol·licita un codi al teu correu i fes-lo servir per definir una nova contrasenya.", "newPassword": "Nova contrasenya", "reset": "Actualitzar contrasenya",
+		"failure": "No s'ha pogut completar l'operació. Comprova les dades i torna-ho a provar.", "theme": "Tema", "light": "Clar", "dark": "Fosc", "system": "Sistema"
+	},
 	"ai": {
 		"title": "Assistent d'IA",
 		"description": "Genera text amb el Model Gateway d'InsForge i OpenRouter.",
@@ -1136,6 +1142,7 @@
 			"cancelled": "Servei cancel·lat"
 		},
 		"feedback": {
+			"failure": "No s'ha pogut desar o carregar el report. Torna-ho a provar.",
 			"thanks": "Gràcies pel teu report!",
 			"thanksDesc": "La teva aportació ens ajuda a millorar la puntualitat de les rutes.",
 			"confirm": "Confirmar report",

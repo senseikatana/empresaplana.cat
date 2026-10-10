@@ -2,7 +2,6 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 import { authorize } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { hashPasskey, verifyPasskey } from "@/lib/passkey";
 import { publicUser } from "@/lib/users";
 import { formatValidationError } from "@/lib/validation/users";
 
@@ -26,18 +25,7 @@ const updateAccountSchema = z.object({
 		.trim()
 		.regex(/^$|^\+?[0-9\s-]{6,20}$/, "Teléfono inválido")
 		.optional(),
-	email: z
-		.email("Email inválido")
-		.max(254, "Email demasiado largo")
-		.transform((v) => v.toLowerCase())
-		.optional(),
-	newPassword: z
-		.string()
-		.min(12, "La contraseña debe tener al menos 12 caracteres")
-		.max(128, "La contraseña no puede superar 128 caracteres")
-		.optional(),
-	currentPasskey: z.string().min(1, "Passkey actual requerido").optional(),
-});
+}).strict();
 
 // ── GET /api/account ────────────────────────────────────────────────────────
 export const GET: APIRoute = async ({ cookies }) => {
@@ -72,47 +60,10 @@ export const PATCH: APIRoute = async ({ request, cookies }) => {
 	}
 	const data = parsed.data;
 
-	// Sensitive fields require currentPasskey
-	const changingEmail = data.email !== undefined;
-	const changingPassword = data.newPassword !== undefined;
-
-	if (changingEmail || changingPassword) {
-		if (!data.currentPasskey) {
-			return Response.json(
-				{ error: "current_passkey_required" },
-				{ status: 400 },
-			);
-		}
-		const existing = await prisma().user.findUnique({
-			where: { id: user.id },
-			select: { passkey: true },
-		});
-		if (!existing || !verifyPasskey(data.currentPasskey, existing.passkey)) {
-			return Response.json({ error: "invalid_passkey" }, { status: 401 });
-		}
-	}
-
-	// Check email uniqueness
-	if (data.email) {
-		const clash = await prisma().user.findFirst({
-			where: { email: data.email, NOT: { id: user.id } },
-		});
-		if (clash) {
-			return Response.json(
-				{ error: "conflict", field: "email" },
-				{ status: 409 },
-			);
-		}
-	}
-
 	const updateData: Record<string, unknown> = {};
 	if (data.name !== undefined) updateData.name = data.name;
 	if (data.fullName !== undefined) updateData.fullName = data.fullName;
 	if (data.phone !== undefined) updateData.phone = data.phone;
-	if (data.email !== undefined) updateData.email = data.email;
-	if (data.newPassword !== undefined) {
-		updateData.passkey = hashPasskey(data.newPassword);
-	}
 
 	if (Object.keys(updateData).length === 0) {
 		return Response.json({ error: "nothing_to_update" }, { status: 400 });

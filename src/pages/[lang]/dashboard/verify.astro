@@ -1,0 +1,39 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import { getLocale, getDictionary, localizedPath } from "@/config/i18n";
+const locale = getLocale(Astro.params.lang);
+const dict = getDictionary(locale);
+const copy = dict.nativeAuth;
+const email = Astro.url.searchParams.get("email") ?? "";
+export const prerender = false;
+---
+<AuthLayout title={copy.verifyTitle} locale={locale}>
+	<h1 class="text-3xl font-bold text-deep-navy">{copy.verifyTitle}</h1>
+	<p class="mt-4 text-on-surface-variant">{copy.verifyNote}</p>
+	<form id="verify-form" class="mt-6 grid gap-4">
+		<label>{dict.app.register.email}<input type="email" name="email" value={email} autocomplete="email" required class="mt-2 w-full rounded-lg border border-outline-variant bg-surface p-3" /></label>
+		<label>{copy.code}<input name="otp" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" class="mt-2 w-full rounded-lg border border-outline-variant bg-surface p-3" /></label>
+		<button type="submit" class="rounded-lg bg-deep-navy p-3 text-white">{copy.verify}</button>
+		<button type="button" id="resend-verification" class="rounded-lg border border-outline-variant p-3">{copy.resend}</button>
+	</form>
+	<p id="verify-status" role="status" aria-live="polite" class="mt-4 text-on-surface"></p>
+	<a href={localizedPath("/dashboard/login", locale)} class="mt-4 block font-semibold text-deep-navy">{dict.app.auth.login}</a>
+	<script define:vars={{ locale, failure: copy.failure, sent: copy.sent }}>
+		const form = document.getElementById("verify-form");
+		const status = document.getElementById("verify-status");
+		async function verify(resend) {
+			for (const button of form.querySelectorAll("button")) button.disabled = true;
+			try {
+				const fields = new FormData(form);
+				const response = await fetch("/api/auth/verify", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: fields.get("email"), ...(resend ? {} : { otp: fields.get("otp") }), resend, locale }) });
+				const data = await response.json();
+				if (!response.ok) { status.textContent = data.message ?? failure; return; }
+				if (data.next) window.location.assign(data.next);
+				else status.textContent = sent;
+			} catch { status.textContent = failure; }
+			finally { for (const button of form.querySelectorAll("button")) button.disabled = false; }
+		}
+		form.addEventListener("submit", (event) => { event.preventDefault(); verify(false); });
+		document.getElementById("resend-verification").addEventListener("click", () => verify(true));
+	</script>
+</AuthLayout>

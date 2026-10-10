@@ -6,11 +6,12 @@ popular timetable downloads, airport transfers, and coach hire.
 
 ## Stack
 
-- Astro with the Node standalone adapter and React islands
+- Astro with the Node standalone adapter and Vue islands
 - TypeScript, Tailwind CSS v4, and Bun
 - Prisma 7 with PostgreSQL via `@prisma/adapter-pg`
-- Better Auth OAuth with Google/GitHub, `jose` app sessions, scrypt password
-  hashes, and Zod validation
+- Native InsForge Auth (email/password, Google/GitHub, server-owned cookies),
+  Prisma application profiles and Zod validation
+- KatanaKit light/dark/system themes and one responsive language dropdown
 - Catalan, Spanish, English, and French interface dictionaries
 
 ## Requirements
@@ -23,9 +24,8 @@ popular timetable downloads, airport transfers, and coach hire.
 
 ```sh
 cp .env.example .env
-# Set DATABASE_URL and AUTH_SECRET in .env.
-# OAuth credentials are optional locally; configure Google/GitHub to enable
-# those sign-in buttons. Set BETTER_AUTH_URL to the canonical app origin.
+# Set DATABASE_URL, INSFORGE_URL and INSFORGE_ANON_KEY in .env.
+# Native OAuth providers are configured in the InsForge dashboard.
 bun install
 bun run db:generate
 bun run dev
@@ -33,18 +33,17 @@ bun run dev
 
 The development site runs at `http://localhost:4321`.
 
-To enable Google and GitHub sign-in, set `GOOGLE_CLIENT_ID`,
-`GOOGLE_CLIENT_SECRET`, `GITHUB_CLIENT_ID`, and `GITHUB_CLIENT_SECRET`. Register
-these callback URLs with the providers:
+OAuth callbacks in Google/GitHub must point to the InsForge backend:
+`{INSFORGE_URL}/api/auth/oauth/google/callback` (or `github/callback`).
+The app return is `{APP_URL}/api/auth/exchange`; leave `APP_URL` blank locally
+to use the request origin. Allowed returns and native email delivery are managed
+with `insforge.toml` through the InsForge CLI. Password recovery uses email codes.
 
-- `http://localhost:4321/api/auth/callback/google`
-- `http://localhost:4321/api/auth/callback/github`
-
-For production, replace `BETTER_AUTH_URL` with the canonical HTTPS origin and
-register the matching callback URLs. Then apply the added authentication
-tables and nullable password field to the configured PostgreSQL database with
-`bun run db:push`. Social sign-up creates client accounts; existing users are
-matched only when the provider confirms the email as verified.
+Apply the native-auth SQL migration on an isolated InsForge branch before
+promotion. It removes the obsolete auth tables and local passwords, preserving
+business data. Do not promote it while an older application still depends on
+those tables. Application profiles link only by `User.insforgeId`, never by email
+to inherit privileged roles. New verified identities always start as clients.
 
 ## Commands
 
@@ -53,7 +52,7 @@ matched only when the provider confirms the email as verified.
 | `bun run dev` | Start the Astro development server |
 | `bun run build` | Build the Node server and client assets |
 | `bun run preview` | Preview the production build |
-| `bun run test` | Run Astro diagnostics |
+| `bun run test` | Run Astro diagnostics and Bun tests |
 | `bun run check` | Run Biome checks |
 | `bun run db:generate` | Generate the Prisma client |
 | `bun run db:migrate` | Create and apply a development migration |
@@ -64,15 +63,20 @@ matched only when the provider confirms the email as verified.
 
 The public navigation links to login and registration. Self-registration
 creates a client account, which can view and update its own profile at
-`/perfil`; administrators and managers are routed to the private company
+`/[lang]/perfil`; administrators and managers are routed to the private company
 dashboard. Only administrators can assign roles or access user and integration
 management. These restrictions are enforced by server middleware and APIs,
 not just by the navigation UI.
 
+Demo profiles do not have native login credentials. Admin-created application
+profiles are not InsForge identities; use native registration/OAuth for sign-in
+and promote the resulting profile in user management. Profile passwords are
+changed through the native reset flow; identity emails are managed by InsForge.
+
 ## Project layout
 
 - `src/pages/` — public pages and dashboard routes
-- `src/components/` — reusable Astro components and the React tracking island
+- `src/components/` — reusable Astro components and the Vue tracking island
 - `src/config/i18n/` — translated interface content
 - `src/data/` — contact details, services, and route timetable links
 - `src/lib/` — authentication, database, search, and tracking helpers

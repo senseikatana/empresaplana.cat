@@ -23,6 +23,7 @@
 }
 
 @import "tailwindcss";
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* Tailwind v4 removed the pointer cursor from interactive elements.
    Restore it globally (except disabled controls). */
@@ -49,6 +50,44 @@
 	/* energetic-orange (CTAs only) */
 	--brand-neutral: #f8f9fa;
 	/* background */
+}
+
+:root[data-theme="dark"] {
+	color-scheme: dark;
+	--brand-neutral: #101820;
+	--color-surface: #101820;
+	--color-surface-dim: #0b1118;
+	--color-surface-bright: #24303d;
+	--color-surface-container-lowest: #141e29;
+	--color-surface-container-low: #1a2633;
+	--color-surface-container: #223040;
+	--color-surface-container-high: #29394a;
+	--color-surface-container-highest: #334557;
+	--color-surface-variant: #334557;
+	--color-surface-gray: #223040;
+	--color-text-main: #edf2f8;
+	--color-on-background: #edf2f8;
+	--color-on-surface: #edf2f8;
+	--color-on-surface-variant: #bdc9d8;
+	--color-outline: #8795a8;
+	--color-outline-variant: #475a70;
+	--color-primary-fixed: #223c67;
+	--color-secondary-container: #16484b;
+	--color-on-secondary-container: #99e8ed;
+	--color-error: #ffb4ab;
+	--color-on-error: #690005;
+	--color-error-container: #611d1b;
+	--color-on-error-container: #ffdad6;
+}
+
+:root[data-theme="dark"] .text-deep-navy {
+	color: var(--color-inverse-primary);
+}
+:root[data-theme="dark"] .hover\:text-deep-navy:hover {
+	color: var(--color-inverse-primary);
+}
+.bg-energetic-orange.text-on-background {
+	color: var(--color-on-tertiary-fixed);
 }
 
 /* ── Empresa Plana design tokens (mirror of src/assets/DESIGN.md) ───────── */

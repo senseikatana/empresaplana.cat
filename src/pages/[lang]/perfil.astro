@@ -109,40 +109,13 @@ const createdAt = user.createdAt
 							type="email"
 							autocomplete="email"
 							value={user.email}
-							data-initial={user.email}
-							required
+							readonly
 							class="min-h-12 w-full rounded-lg border border-outline-variant bg-surface px-4 text-base text-on-surface transition focus:border-coastal-teal focus:outline-none focus:ring-2 focus:ring-coastal-teal/20"
 						/>
 					</div>
 
 					<div class="sm:col-span-2">
-						<p class="text-sm font-semibold text-on-surface">{dict.app.panel.passwordHint}</p>
-					</div>
-					<div>
-						<label for="newPassword" class="mb-2 block text-sm font-semibold text-on-surface">
-							{dict.app.panel.newPassword}
-						</label>
-						<input
-							id="newPassword"
-							name="newPassword"
-							type="password"
-							autocomplete="new-password"
-							minlength="12"
-							maxlength="128"
-							class="min-h-12 w-full rounded-lg border border-outline-variant bg-surface px-4 text-base text-on-surface transition focus:border-coastal-teal focus:outline-none focus:ring-2 focus:ring-coastal-teal/20"
-						/>
-					</div>
-					<div>
-						<label for="currentPasskey" class="mb-2 block text-sm font-semibold text-on-surface">
-							{dict.app.panel.currentPassword}
-						</label>
-						<input
-							id="currentPasskey"
-							name="currentPasskey"
-							type="password"
-							autocomplete="current-password"
-							class="min-h-12 w-full rounded-lg border border-outline-variant bg-surface px-4 text-base text-on-surface transition focus:border-coastal-teal focus:outline-none focus:ring-2 focus:ring-coastal-teal/20"
-						/>
+						<a href={localizedPath("/dashboard/reset", locale)} class="font-semibold text-deep-navy underline underline-offset-4">{dict.nativeAuth.resetTitle}</a>
 					</div>
 
 					<div class="flex flex-wrap items-center gap-4 sm:col-span-2">
@@ -182,18 +155,13 @@ const createdAt = user.createdAt
 			if (!(button instanceof HTMLButtonElement)) return;
 			status?.classList.add("hidden");
 
-			const fields = new FormData(profileForm);
 			const payload = {};
-			for (const key of ["fullName", "phone", "email"]) {
+			for (const key of ["fullName", "phone"]) {
 				const input = profileForm.elements.namedItem(key);
 				if (input instanceof HTMLInputElement && input.value.trim() !== input.dataset.initial) {
 					payload[key] = input.value.trim();
 				}
 			}
-			const newPassword = String(fields.get("newPassword") ?? "");
-			const currentPasskey = String(fields.get("currentPasskey") ?? "");
-			if (newPassword) payload.newPassword = newPassword;
-			if ((payload.email || newPassword) && currentPasskey) payload.currentPasskey = currentPasskey;
 
 			if (Object.keys(payload).length === 0) {
 				if (status) {
@@ -218,7 +186,7 @@ const createdAt = user.createdAt
 					}
 					return;
 				}
-				const inputs = ["fullName", "phone", "email"];
+				const inputs = ["fullName", "phone"];
 				for (const name of inputs) {
 					const input = profileForm.elements.namedItem(name);
 					if (input instanceof HTMLInputElement) input.dataset.initial = input.value.trim();

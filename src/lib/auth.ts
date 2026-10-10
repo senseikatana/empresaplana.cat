@@ -1,94 +1,67 @@
-import "dotenv/config";
 import type { AstroCookies } from "astro";
-import { jwtVerify, SignJWT } from "jose";
+import { Prisma } from "../../generated/prisma/client";
 import type { SessionUser, UsuarioRole } from "@/interfaces/auth";
 import { isRole } from "@/lib/acl";
 import { prisma } from "@/lib/db";
+import { clearNativeSession, nativeAuthClient } from "@/lib/insforge-auth";
+import { z } from "zod";
 
-const SESSION_COOKIE = "ep_session";
-const SESSION_MAX_AGE = 60 * 60 * 24 * 7;
-const ISSUER = "empresaplana";
-
-function secret(): Uint8Array {
-	const value = process.env.AUTH_SECRET;
-	if (!value) {
-		throw new Error(
-			"AUTH_SECRET is not set. Copy .env.example to .env and set a long random secret.",
-		);
+const identitySchema = z.object({
+	id: z.uuid(), email: z.email(), emailVerified: z.literal(true),
+	profile: z.record(z.string(), z.unknown()).nullable().optional(),
+});
+export async function resolveNativeUser(input: unknown): Promise<SessionUser> {
+	const identity = identitySchema.parse(input);
+	const db = prisma();
+	let user = await db.user.findUnique({ where: { insforgeId: identity.id } });
+	if (!user) {
+		const name = typeof identity.profile?.name === "string" ? identity.profile.name.slice(0, 60) : identity.email.split("@")[0].slice(0, 60);
+		try {
+			user = await db.user.create({
+				data: {
+					insforgeId: identity.id, username: `u_${identity.id.replaceAll("-", "").slice(0, 13)}`,
+					email: identity.email, emailVerified: true, name, fullName: name, phone: "", role: "client",
+				},
+			});
+		} catch (error) {
+			if (!(error instanceof Prisma.PrismaClientKnownRequestError) || error.code !== "P2002") throw error;
+			user = await db.user.findUnique({ where: { insforgeId: identity.id } });
+			if (!user) throw error;
+		}
 	}
-	return new TextEncoder().encode(value);
-}
-
-export async function signSessionToken(user: SessionUser): Promise<string> {
-	return new SignJWT({ username: user.username, role: user.role })
-		.setSubject(String(user.id))
-		.setIssuer(ISSUER)
-		.setIssuedAt()
-		.setExpirationTime("7d")
-		.setProtectedHeader({ alg: "HS256" })
-		.sign(secret());
-}
-
-export async function getSession(
-	cookies: AstroCookies,
-): Promise<SessionUser | null> {
-	const token = cookies.get(SESSION_COOKIE)?.value;
-	if (!token) return null;
-	let payload: Awaited<ReturnType<typeof verifySessionToken>>;
-	try {
-		payload = await verifySessionToken(token);
-	} catch {
-		return null;
+	if (user.email !== identity.email || !user.emailVerified) {
+		user = await db.user.update({ where: { id: user.id }, data: { email: identity.email, emailVerified: true } });
 	}
-
-	const id = Number(payload.sub);
-	if (!Number.isInteger(id) || id <= 0) return null;
-
-	const user = await prisma().user.findUnique({
-		where: { id },
-		select: { username: true, role: true },
-	});
-	if (!user || !isRole(user.role)) return null;
-
-	return { id, username: user.username, role: user.role };
+	if (!isRole(user.role)) throw new Error("Invalid application role for InsForge identity.");
+	return { id: user.id, username: user.username, role: user.role };
 }
-
-async function verifySessionToken(token: string) {
-	const { payload } = await jwtVerify(token, secret(), { issuer: ISSUER });
-	return payload;
+const sessions = new WeakMap<AstroCookies, Promise<SessionUser | null>>();
+export function getSession(cookies: AstroCookies): Promise<SessionUser | null> {
+	const cached = sessions.get(cookies);
+	if (cached) return cached;
+	const pending = loadSession(cookies);
+	sessions.set(cookies, pending);
+	return pending;
 }
-
-export function setSessionCookie(cookies: AstroCookies, token: string): void {
-	cookies.set(SESSION_COOKIE, token, {
-		httpOnly: true,
-		sameSite: "lax",
-		secure: import.meta.env.PROD,
-		path: "/",
-		maxAge: SESSION_MAX_AGE,
-	});
+async function loadSession(cookies: AstroCookies): Promise<SessionUser | null> {
+	if (!cookies.get("insforge_access_token")?.value) return null;
+	const { data, error } = await nativeAuthClient(cookies).auth.getCurrentUser();
+	if (error) {
+		if (error.statusCode === 401 || error.statusCode === 403) {
+			clearNativeSession(cookies);
+			return null;
+		}
+		throw new Error(`InsForge session validation failed (${error.statusCode}).`);
+	}
+	if (!data?.user || !data.user.emailVerified) return null;
+	return resolveNativeUser(data.user);
 }
-
-export function clearSessionCookie(cookies: AstroCookies): void {
-	cookies.delete(SESSION_COOKIE, { path: "/" });
-}
-
+export const clearSessionCookie = clearNativeSession;
 export async function authorize(cookies: AstroCookies, role?: UsuarioRole) {
 	const session = await getSession(cookies);
-	if (!session) {
-		return {
-			user: null,
-			response: Response.json({ error: "unauthorized" }, { status: 401 }),
-		};
-	}
-	if (
-		role &&
-		session.role !== role &&
-		!(role !== "manager" && session.role === "admin")
-	) {
-		return {
-			user: null,
-			response: Response.json({ error: "forbidden" }, { status: 403 }),
-		};
+	if (!session) return { user: null, response: Response.json({ error: "unauthorized" }, { status: 401 }) };
+	if (role && session.role !== role && session.role !== "admin") {
+		return { user: null, response: Response.json({ error: "forbidden" }, { status: 403 }) };
 	}
 	return { user: session, response: null };
 }

@@ -1,0 +1,18 @@
+<meta name="theme-color" content="#f8f9fa" />
+<script is:inline>
+	(() => {
+		let mode = "system";
+		try {
+			const raw = localStorage.getItem("ep-theme");
+			const stored = raw?.startsWith('"') ? JSON.parse(raw) : raw;
+			if (["light", "dark", "system"].includes(stored)) mode = stored;
+		} catch (error) {
+			console.warn("Theme preference could not be loaded.", error.name);
+		}
+		const resolved = mode === "system" ? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : mode;
+		document.documentElement.dataset.theme = resolved;
+		document.documentElement.classList.toggle("dark", resolved === "dark");
+		document.documentElement.style.colorScheme = resolved;
+		document.querySelector('meta[name="theme-color"]')?.setAttribute("content", resolved === "dark" ? "#101820" : "#f8f9fa");
+	})();
+</script>

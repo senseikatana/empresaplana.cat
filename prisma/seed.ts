@@ -7,7 +7,6 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../generated/prisma/client";
-import { hashPasskey } from "../src/lib/passkey";
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) throw new Error("DATABASE_URL is not set");
@@ -19,7 +18,6 @@ const prisma = new PrismaClient({
 const DEMO_USERS = [
   {
     username: "cliente",
-    passkey: "12345678",
     name: "Marc",
     fullName: "Marc Vidal Roca",
     email: "marc.vidal@example.cat",
@@ -28,7 +26,6 @@ const DEMO_USERS = [
   },
   {
     username: "trabajador",
-    passkey: "12345678",
     name: "Laura",
     fullName: "Laura Ferrer Solé",
     email: "laura.ferrer@empresaplana.cat",
@@ -37,7 +34,6 @@ const DEMO_USERS = [
   },
   {
     username: "admin",
-    passkey: "12345678",
     name: "Sergi",
     fullName: "Sergi Plana",
     email: "sergi.plana@empresaplana.cat",
@@ -55,7 +51,6 @@ async function main() {
       update: {},
       create: {
         username: user.username,
-        passkey: hashPasskey(user.passkey),
         name: user.name,
         fullName: user.fullName,
         email: user.email,

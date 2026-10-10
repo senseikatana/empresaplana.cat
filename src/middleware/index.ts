@@ -1,6 +1,7 @@
 import type { MiddlewareHandler } from "astro";
 import { getSession } from "@/lib/auth";
-import { auth } from "@/config/auth.config";
+import { updateSession } from "@insforge/sdk/ssr/middleware";
+import { authCookieStore, insforgeConfig } from "@/lib/insforge-auth";
 import {
 	getLocale,
 	isLocale,
@@ -24,7 +25,7 @@ import { canAccessDashboardPath, dashboardHomeForRole } from "@/lib/acl";
 
 const DASHBOARD_PATTERN = /^\/dashboard(?:\/|$)/;
 
-const PUBLIC_AUTH_PATHS = new Set(["/dashboard/login", "/dashboard/register"]);
+const PUBLIC_AUTH_PATHS = new Set(["/dashboard/login", "/dashboard/register", "/dashboard/verify", "/dashboard/reset"]);
 
 function isPublicAuthPath(pathname: string): boolean {
 	return PUBLIC_AUTH_PATHS.has(pathname);
@@ -58,11 +59,15 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
 			);
 		}
 	}
-	const betterAuthSession = await auth.api.getSession({
-		headers: context.request.headers,
-	});
-	context.locals.user = betterAuthSession?.user ?? null;
-	context.locals.session = betterAuthSession?.session ?? null;
+	context.locals.user = null;
+	if (!isAsset && context.url.pathname !== "/api/auth/refresh") {
+		const store = authCookieStore(context.cookies);
+		const result = await updateSession({ ...insforgeConfig(), requestCookies: store, responseCookies: store });
+		if (result.error && result.error.statusCode !== 401 && result.error.statusCode !== 403) {
+			console.error("InsForge session refresh failed", result.error.statusCode);
+			return new Response("Authentication service unavailable", { status: 503 });
+		}
+	}
 
 	const pathname = unlocalizedPath(context.url.pathname);
 	const locale = getLocale(firstSegment);
@@ -78,6 +83,7 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
 	}
 
 	const session = await getSession(context.cookies);
+	context.locals.user = session;
 
 	if (!session) {
 		const redirect = encodeURIComponent(
