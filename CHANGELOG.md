@@ -78,6 +78,22 @@ What's news:
   - `src/pages/index.astro`
 - [ ] bun add v1.4.2 (744846f84) feat: update documentation for agents
 
+## [0.4.0] - 2026-10-10
+
+Highlights: fix: update CI workflows to use latest actions and tools.
+
+- [x] 🐛 fix: update CI workflows to use latest actions and tools
+  - `.github/workflows/verify.yml`
+  - `.husky/pre-commit`
+  - `.husky/pre-push`
+  - `package.json`
+  - `test/playwright.config.ts`
+- [x] 🚀 feat: configure ci with verify workflow
+- [x] 🐛 fix: update release scripts and documentation to reflect strict versioning (#13)
+- [x] 🚀 feat: update design tokens and management CRUD documentation
+- [x] 🚀 feat: update package.json version to 0.1.0 (#11)
+- [x] 🚀 feat: update file paths in AGENTS.md and tsconfig.json to include test dire
+
 ## [0.3.2] - 2026-10-10
 
 Highlights: feat: configure ci with verify workflow and fix: update release scripts and documentation to reflect strict versioning (#13).
