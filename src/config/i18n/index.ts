@@ -13,9 +13,9 @@ export type {
 
 export {
 	DEFAULT_LOCALE,
-	LOCALES,
-	isLocale,
 	getLocale,
+	isLocale,
+	LOCALES,
 	localizedPath,
 	unlocalizedPath,
 } from "./routing";

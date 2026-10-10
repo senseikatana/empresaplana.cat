@@ -28,6 +28,12 @@ Run everything from this directory:
 - `bun run build` — builds `dist/` (server entry + client assets)
 - `bun run preview` — serves the production build
 - `bun run start` — runs the standalone Node server from `dist/server/entry.mjs`
+- `bun run format` / `bun run check:fix` — apply safe Biome fixes, including import ordering.
+- `bun run check` — check Biome formatting, imports and lint without changing files.
+- `bun run typecheck` — run Astro's TypeScript checks.
+- `bun run test:unit` — run Bun tests; database integration tests are skipped unless
+  `CRUD_TEST_BASE_URL` and verified admin/worker test credentials are configured.
+- `bun run test` — run Biome, Astro checks and Bun tests in sequence.
 - `bun run deploy:insforge` — rebuilds and updates `empresaplana-web` in InsForge Compute.
   Requires the linked CLI project and `flyctl` (also detected in `~/.fly/bin`).
   Loads `.env.production`, `.env.local`, then `.env`, exporting only app runtime variables

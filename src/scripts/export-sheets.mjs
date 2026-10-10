@@ -2,9 +2,9 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { createDb } from "./lib/db.mjs";
 import {
-	ROOT,
 	buildSpreadsheet,
 	loadEnv,
+	ROOT,
 	toCsv,
 } from "./lib/sheets-format.mjs";
 

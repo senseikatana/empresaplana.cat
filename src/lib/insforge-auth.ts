@@ -1,11 +1,11 @@
-import type { AstroCookies } from "astro";
 import {
+	type CookieOptions,
+	type CookieStore,
+	clearAuthCookies,
 	createAuthActions,
 	createServerClient,
-	clearAuthCookies,
-	type CookieStore,
-	type CookieOptions,
 } from "@insforge/sdk/ssr";
+import type { AstroCookies } from "astro";
 import { ENV } from "@/config/config.env";
 
 export function insforgeConfig() {

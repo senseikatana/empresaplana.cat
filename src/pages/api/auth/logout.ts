@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
-import { clearNativeSession, nativeAuthActions } from "@/lib/insforge-auth";
 import { authFailure } from "@/lib/auth-request";
+import { clearNativeSession, nativeAuthActions } from "@/lib/insforge-auth";
 export const prerender = false;
 export const POST: APIRoute = async ({ request, cookies }) => {
 	const origin = request.headers.get("Origin");

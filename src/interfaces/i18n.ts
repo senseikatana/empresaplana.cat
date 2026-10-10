@@ -1,3 +1,4 @@
+import type es from "@/config/i18n/es.json";
 import type { About } from "@/interfaces/about";
 import type { HomeVariant1, HomeVariant2 } from "@/interfaces/booking";
 import type { BusTracking } from "@/interfaces/bus-tracking";
@@ -62,7 +63,7 @@ export interface I18nDictionary {
 	about: About;
 	legal: Legal;
 	busTracking: BusTracking;
-	app: Record<string, any>;
+	app: typeof es.app;
 }
 export interface LocalizedPageProps {
 	locale: Locale;

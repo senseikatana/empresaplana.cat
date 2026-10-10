@@ -1,7 +1,7 @@
-import { createClient } from "@libsql/client";
 import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { createClient } from "@libsql/client";
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const BASE = "https://empresaplana.cat";
@@ -222,7 +222,7 @@ for (const [lineId, line] of lines) {
 			redirect: "manual",
 		});
 		const loc = resp.headers.get("location");
-		if (loc && loc.endsWith(".pdf")) {
+		if (loc?.endsWith(".pdf")) {
 			line.pdf = loc;
 			line.name = pdfName(loc) || line.name;
 		}

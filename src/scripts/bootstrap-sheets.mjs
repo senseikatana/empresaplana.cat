@@ -1,9 +1,9 @@
-import { SignJWT } from "jose";
 import { createPrivateKey } from "node:crypto";
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { SignJWT } from "jose";
 import { createDb } from "./lib/db.mjs";
-import { ROOT, loadEnv, buildSpreadsheet } from "./lib/sheets-format.mjs";
+import { buildSpreadsheet, loadEnv, ROOT } from "./lib/sheets-format.mjs";
 
 const env = loadEnv();
 const credPath = env.GOOGLE_SERVICE_ACCOUNT_JSON;
@@ -168,7 +168,9 @@ for (const [title, rows] of Object.entries(out)) {
 }
 
 const leftover = [...existing.keys()].filter((t) => !desired.includes(t));
-console.log(`\nListo: ${desired.length} pestañas sincronizadas desde Postgres.`);
+console.log(
+	`\nListo: ${desired.length} pestañas sincronizadas desde Postgres.`,
+);
 if (leftover.length > 0)
 	console.log(`AVISO: pestañas extra no tocadas: ${leftover.join(", ")}`);
 

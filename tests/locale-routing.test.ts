@@ -33,7 +33,10 @@ describe("locale filesystem routing", () => {
 			"/dashboard/gestion",
 		);
 		assert.equal(unlocalizedPath("/es"), "/");
-		assert.equal(localizedPath("/ca/rutas-horarios?lang=ca#r", "es"), "/rutas-horarios#r");
+		assert.equal(
+			localizedPath("/ca/rutas-horarios?lang=ca#r", "es"),
+			"/rutas-horarios#r",
+		);
 		assert.equal(localizedPath("/en", "es"), "/");
 	});
 	it("leaves API, assets, external links and fragments unchanged", () => {

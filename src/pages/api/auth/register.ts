@@ -1,8 +1,7 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { nativeAuthActions } from "@/lib/insforge-auth";
-import { resolveNativeUser } from "@/lib/auth";
 import { localizedPath } from "@/config/i18n/routing";
+import { resolveNativeUser } from "@/lib/auth";
 import {
 	appOrigin,
 	authBody,
@@ -10,6 +9,7 @@ import {
 	invalidAuthBody,
 	localeSchema,
 } from "@/lib/auth-request";
+import { nativeAuthActions } from "@/lib/insforge-auth";
 export const prerender = false;
 const schema = z
 	.object({

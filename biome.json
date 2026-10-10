@@ -4,12 +4,10 @@
 		"includes": [
 			"src/**/*.ts",
 			"src/**/*.tsx",
-			"scripts/**/*.mjs",
-			"scripts/**/*.js",
-			"db/**/*.ts",
+			"src/**/*.mjs",
+			"tests/**/*.ts",
 			"astro.config.mjs",
-			"drizzle.config.ts",
-			"index.ts",
+			"prisma.config.ts",
 			"package.json",
 			"tsconfig.json",
 			"biome.json"

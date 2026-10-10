@@ -2,6 +2,13 @@
 import { describe, expect, test } from "bun:test";
 import { hasCapability } from "@/lib/acl";
 import {
+	expiryState,
+	ManagementError,
+	managementError,
+	numericId,
+	pageSchema,
+} from "@/lib/management";
+import {
 	initialManagementValues,
 	isResource,
 	managementCapability,
@@ -9,13 +16,6 @@ import {
 	managementSchemas,
 	resourceNames,
 } from "@/lib/management-schemas";
-import {
-	expiryState,
-	managementError,
-	ManagementError,
-	numericId,
-	pageSchema,
-} from "@/lib/management";
 
 describe("management validation and permissions", () => {
 	test("covers the fifteen agreed entities and rejects unknown resource names", () => {

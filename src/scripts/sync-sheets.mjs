@@ -1,9 +1,9 @@
-import { SignJWT } from "jose";
 import { createPrivateKey } from "node:crypto";
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { SignJWT } from "jose";
 import { createDb } from "./lib/db.mjs";
-import { ROOT, loadEnv, parseSpreadsheet } from "./lib/sheets-format.mjs";
+import { loadEnv, parseSpreadsheet, ROOT } from "./lib/sheets-format.mjs";
 
 const env = loadEnv();
 const credPath = env.GOOGLE_SERVICE_ACCOUNT_JSON;
@@ -81,11 +81,10 @@ await db.query('DELETE FROM "SchedulesOnLine"');
 await db.query('DELETE FROM "Line"');
 
 for (const [id, l] of lines.entries()) {
-	await db.query('INSERT INTO "Line" (id, name, "pdfUrl") VALUES ($1, $2, $3)', [
-		id,
-		l.name,
-		l.pdfUrl,
-	]);
+	await db.query(
+		'INSERT INTO "Line" (id, name, "pdfUrl") VALUES ($1, $2, $3)',
+		[id, l.name, l.pdfUrl],
+	);
 }
 console.log(`   ${lines.size} líneas insertadas`);
 

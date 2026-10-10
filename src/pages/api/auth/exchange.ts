@@ -1,8 +1,8 @@
 import type { APIRoute } from "astro";
 import { getLocale, localizedPath } from "@/config/i18n/routing";
-import { nativeAuthActions, clearNativeSession } from "@/lib/insforge-auth";
-import { resolveNativeUser } from "@/lib/auth";
 import { postLoginDestination } from "@/lib/acl";
+import { resolveNativeUser } from "@/lib/auth";
+import { clearNativeSession, nativeAuthActions } from "@/lib/insforge-auth";
 export const prerender = false;
 export const GET: APIRoute = async ({ cookies, url, redirect }) => {
 	const locale = getLocale(cookies.get("ep_oauth_locale")?.value);

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { authorize } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatValidationError } from "@/lib/validation/users";
+import type { Conversation } from "../../../../generated/prisma/client";
 
 export const prerender = false;
 
@@ -113,7 +114,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
 	const { conversationId, body: msgBody } = parsed.data;
 
-	let conversation;
+	let conversation: Conversation | null;
 	if (conversationId) {
 		// Verify participation
 		const participant = await prisma().conversationParticipant.findUnique({

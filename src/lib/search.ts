@@ -1,4 +1,3 @@
-import { prisma } from "@/lib/db";
 import type {
 	Departure,
 	LineSummary,
@@ -8,6 +7,7 @@ import type {
 	ThroughPair,
 	TransferOption,
 } from "@/interfaces/search";
+import { prisma } from "@/lib/db";
 
 const MAX_DEPARTURES_SHOWN = 24;
 const MAX_DEPARTURES_PER_LEG = 6;

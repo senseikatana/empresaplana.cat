@@ -1,5 +1,5 @@
-import { z } from "zod";
 import type { InsForgeError } from "@insforge/sdk";
+import { z } from "zod";
 import { ENV } from "@/config/config.env";
 export const localeSchema = z.enum(["ca", "es", "en", "fr"]).default("es");
 export function appOrigin(request: Request): string {

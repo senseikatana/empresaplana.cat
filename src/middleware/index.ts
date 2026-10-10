@@ -1,7 +1,5 @@
-import type { MiddlewareHandler } from "astro";
-import { getSession } from "@/lib/auth";
 import { updateSession } from "@insforge/sdk/ssr/middleware";
-import { authCookieStore, insforgeConfig } from "@/lib/insforge-auth";
+import type { MiddlewareHandler } from "astro";
 import {
 	DEFAULT_LOCALE,
 	getLocale,
@@ -10,6 +8,8 @@ import {
 	unlocalizedPath,
 } from "@/config/i18n/routing";
 import { canAccessDashboardPath, dashboardHomeForRole } from "@/lib/acl";
+import { getSession } from "@/lib/auth";
+import { authCookieStore, insforgeConfig } from "@/lib/insforge-auth";
 
 /**
  * Astro middleware — locale redirects and dashboard/profile auth guard.

@@ -1,10 +1,10 @@
 import type { AstroCookies } from "astro";
-import { Prisma } from "../../generated/prisma/client";
+import { z } from "zod";
 import type { SessionUser, UsuarioRole } from "@/interfaces/auth";
 import { isRole } from "@/lib/acl";
 import { prisma } from "@/lib/db";
 import { clearNativeSession, nativeAuthClient } from "@/lib/insforge-auth";
-import { z } from "zod";
+import { Prisma } from "../../generated/prisma/client";
 
 const identitySchema = z.object({
 	id: z.uuid(),
@@ -74,7 +74,7 @@ async function loadSession(cookies: AstroCookies): Promise<SessionUser | null> {
 			`InsForge session validation failed (${error.statusCode}).`,
 		);
 	}
-	if (!data?.user || !data.user.emailVerified) return null;
+	if (!data?.user?.emailVerified) return null;
 	return resolveNativeUser(data.user);
 }
 export const clearSessionCookie = clearNativeSession;

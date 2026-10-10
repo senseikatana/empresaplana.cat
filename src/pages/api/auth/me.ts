@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
-import { prisma } from "@/lib/db";
 import { authorize, clearSessionCookie } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 import { publicUser } from "@/lib/users";
 
 export const prerender = false;

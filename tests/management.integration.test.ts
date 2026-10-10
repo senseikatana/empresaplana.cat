@@ -16,8 +16,15 @@ describe.skipIf(!base)("management API against InsForge", () => {
 		const origin = new URL(base);
 		if (!["127.0.0.1", "localhost"].includes(origin.hostname))
 			throw new Error("Integration tests only run against a local server.");
-		if (!process.env.CRUD_TEST_EMAIL || !process.env.CRUD_TEST_PASSWORD || !process.env.CRUD_TEST_WORKER_EMAIL || !process.env.CRUD_TEST_WORKER_PASSWORD) {
-			throw new Error("Configure verified native InsForge admin and worker test credentials.");
+		if (
+			!process.env.CRUD_TEST_EMAIL ||
+			!process.env.CRUD_TEST_PASSWORD ||
+			!process.env.CRUD_TEST_WORKER_EMAIL ||
+			!process.env.CRUD_TEST_WORKER_PASSWORD
+		) {
+			throw new Error(
+				"Configure verified native InsForge admin and worker test credentials.",
+			);
 		}
 		const marker = `CRUD-${randomUUID().slice(0, 8)}`;
 		const created: { resource: ResourceName; id: string | number }[] = [];
@@ -77,7 +84,10 @@ describe.skipIf(!base)("management API against InsForge", () => {
 			password: process.env.CRUD_TEST_PASSWORD,
 			locale: "es",
 		});
-		cookie = login.response.headers.getSetCookie().map((value) => value.split(";")[0]).join("; ");
+		cookie = login.response.headers
+			.getSetCookie()
+			.map((value) => value.split(";")[0])
+			.join("; ");
 		expect(cookie).not.toBe("");
 		try {
 			const { data: team } = await request("/api/users");
@@ -285,8 +295,10 @@ describe.skipIf(!base)("management API against InsForge", () => {
 				password: process.env.CRUD_TEST_WORKER_PASSWORD,
 				locale: "es",
 			});
-			const workerCookie =
-				worker.response.headers.getSetCookie().map((value) => value.split(";")[0]).join("; ");
+			const workerCookie = worker.response.headers
+				.getSetCookie()
+				.map((value) => value.split(";")[0])
+				.join("; ");
 			const forbidden = await fetch(new URL("/api/management/rutas", base), {
 				headers: { cookie: workerCookie },
 			});

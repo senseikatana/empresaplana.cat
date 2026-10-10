@@ -1,8 +1,8 @@
-import { SignJWT } from "jose";
 import { createPrivateKey } from "node:crypto";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { ROOT, loadEnv } from "./lib/sheets-format.mjs";
+import { SignJWT } from "jose";
+import { loadEnv, ROOT } from "./lib/sheets-format.mjs";
 
 /**
  * Escribe datos de EJEMPLO (2 líneas con horarios) en la hoja plantilla.
@@ -44,7 +44,10 @@ const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
 });
 const tokenJson = await tokenRes.json();
 if (!tokenJson.access_token) {
-	console.error("Error obteniendo access token:", JSON.stringify(tokenJson).slice(0, 400));
+	console.error(
+		"Error obteniendo access token:",
+		JSON.stringify(tokenJson).slice(0, 400),
+	);
 	process.exit(1);
 }
 const accessToken = tokenJson.access_token;
@@ -69,7 +72,12 @@ const out = {
 		["11", "Salou – Reus", "https://empresaplana.cat/descargas/11.pdf"],
 	],
 	"46 - Tarragona – Cambrils": [
-		["Tarragona — Estació d'Autobusos", "Salou — Estació", "La Pineda — Passeig", "Cambrils — Psg. d'Albert"],
+		[
+			"Tarragona — Estació d'Autobusos",
+			"Salou — Estació",
+			"La Pineda — Passeig",
+			"Cambrils — Psg. d'Albert",
+		],
 		["08:00", "08:30", "08:40", "08:55"],
 		["10:00", "10:30", "", "10:55"],
 		["12:00", "12:30", "12:40", "12:55"],
@@ -91,7 +99,9 @@ const desired = Object.keys(out);
 
 console.log("1) leyendo pestañas existentes ...");
 const info = await sheetsApi(`${api}?fields=sheets.properties(sheetId,title)`);
-const existing = new Map(info.sheets.map((s) => [s.properties.title, s.properties.sheetId]));
+const existing = new Map(
+	info.sheets.map((s) => [s.properties.title, s.properties.sheetId]),
+);
 
 const batch = [];
 const DEFAULT_TITLES = ["Hoja 1", "Sheet1", "Feuille 1"];
@@ -110,7 +120,9 @@ if (
 	});
 	existing.delete(firstSheet.properties.title);
 	existing.set(desired[0], firstSheet.properties.sheetId);
-	console.log(`   renombro "${firstSheet.properties.title}" -> "${desired[0]}"`);
+	console.log(
+		`   renombro "${firstSheet.properties.title}" -> "${desired[0]}"`,
+	);
 }
 
 for (const title of desired) {
@@ -130,7 +142,10 @@ if (batch.length > 0) {
 console.log("2) escribiendo valores ...");
 for (const [title, rows] of Object.entries(out)) {
 	const encoded = encodeURIComponent(title);
-	await sheetsApi(`${api}/values/${encoded}:clear`, { method: "POST", body: JSON.stringify({}) });
+	await sheetsApi(`${api}/values/${encoded}:clear`, {
+		method: "POST",
+		body: JSON.stringify({}),
+	});
 	const range = `${encoded}!A1:${columnLetter(maxCols(rows))}${rows.length}`;
 	await sheetsApi(`${api}/values/${range}?valueInputOption=RAW`, {
 		method: "PUT",

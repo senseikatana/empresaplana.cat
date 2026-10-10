@@ -1,12 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { Prisma } from "../../generated/prisma/client";
 import { prisma } from "@/lib/db";
 import {
-	managementSchemas,
 	managementFields,
+	managementSchemas,
 	type ResourceName,
 } from "@/lib/management-schemas";
+import { Prisma } from "../../generated/prisma/client";
 
 type DB = Prisma.TransactionClient;
 export type ManagementRow = { id: string | number } & Record<string, unknown>;

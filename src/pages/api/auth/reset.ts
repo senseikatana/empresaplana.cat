@@ -1,6 +1,5 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { nativeAuthClient, clearNativeSession } from "@/lib/insforge-auth";
 import { localizedPath } from "@/config/i18n/routing";
 import {
 	appOrigin,
@@ -9,6 +8,7 @@ import {
 	invalidAuthBody,
 	localeSchema,
 } from "@/lib/auth-request";
+import { clearNativeSession, nativeAuthClient } from "@/lib/insforge-auth";
 export const prerender = false;
 export const POST: APIRoute = async ({ request, cookies }) => {
 	try {
