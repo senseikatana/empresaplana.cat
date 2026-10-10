@@ -45,7 +45,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 	}
 	const data = parsed.data;
 
-	const existingEmail = await prisma().user.findUnique({
+	const existingEmail = await prisma().user.findFirst({
 		where: { email: data.email },
 	});
 	if (existingEmail) {

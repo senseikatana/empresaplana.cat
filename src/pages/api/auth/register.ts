@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { prisma } from "@/lib/db";
 import { setSessionCookie, signSessionToken } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 import { hashPasskey } from "@/lib/passkey";
 import { publicUser } from "@/lib/users";
 import { formatValidationError } from "@/lib/validation/users";
@@ -48,7 +48,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 	const data = parsed.data;
 
 	// Check existing user by email
-	const existingEmail = await prisma().user.findUnique({
+	const existingEmail = await prisma().user.findFirst({
 		where: { email: data.email },
 	});
 	if (existingEmail) {

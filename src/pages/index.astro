@@ -23,8 +23,7 @@ const siteInfo = getSiteInfo({
 const localePath = (path: string) => `${path}?lang=${locale}`;
 const pdfLocale = locale === "fr" ? "es" : locale;
 const routeSearchAction = `${localePath("/rutas-horarios")}#results`;
-const heroImage =
-	"https://lh3.googleusercontent.com/aida/AP1WRLuR0px2Ux0FRFwHGZhcyWf4jP8-thYfkTg-Qa9-C0NDlDE89WqHVKUW_V7Hg0Bhyu5wtCeB06RMgrQyVKqq9ea9G47HaWea0cqUfbVlTGjpDLvAL5TSZmlkqRBc6_XcGL6oIVa__QtUFgQWl9QRlaiHrS-THbWgvgczz8HBIZp_u9020eaPbdx9cOZskITDjTlhM7nTQo4K8yGXI5sMX2v9rNQ_xIdJpHM1N4OLNBcL3rg0QdCJt2GmyIk";
+const heroImage = "/images/empresa-plana-fleet.jpg";
 ---
 
 <BaseLayout
@@ -63,7 +62,7 @@ const heroImage =
 			>
 				{common.brand}
 			</a>
-			<nav class="hidden items-center gap-7 text-sm font-semibold text-on-surface-variant md:flex" aria-label={common.brand}>
+			<nav class="hidden items-center gap-7 text-sm font-semibold text-on-surface-variant lg:flex" aria-label={common.brand}>
 				<a class="transition-colors hover:text-deep-navy" href={localePath("/servicios-discrecionales")}>
 					{common.nav.services}
 				</a>
@@ -90,7 +89,7 @@ const heroImage =
 					))}
 				</div>
 				<a
-					class="inline-flex min-h-11 items-center justify-center rounded-full bg-energetic-orange px-5 text-sm font-bold text-on-background shadow-[0_4px_12px_rgba(1,57,144,0.16)] transition-colors hover:bg-tertiary-fixed-dim focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-deep-navy"
+					class="inline-flex min-h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-energetic-orange px-5 text-sm font-bold text-on-background shadow-[0_4px_12px_rgba(1,57,144,0.16)] transition-colors hover:bg-tertiary-fixed-dim focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-deep-navy"
 					href={localePath("/rutas-horarios")}
 				>
 					{common.nav.bookNow}
@@ -98,7 +97,7 @@ const heroImage =
 			</div>
 		</div>
 		<nav
-			class="overflow-x-auto border-t border-outline-variant/30 px-margin-mobile md:hidden"
+			class="overflow-x-auto border-t border-outline-variant/30 px-margin-mobile lg:hidden"
 			aria-label={common.brand}
 		>
 			<div class="mx-auto flex max-w-container-max items-center gap-6 py-3 text-sm font-semibold text-on-surface-variant">
@@ -123,7 +122,9 @@ const heroImage =
 			<img
 				class="absolute inset-0 h-full w-full object-cover object-center"
 				src={heroImage}
-				alt="Autocar d'Empresa Plana circulant per una carretera costanera mediterrània"
+				alt=""
+				width="1294"
+				height="1009"
 				fetchpriority="high"
 				decoding="async"
 			/>
@@ -232,7 +233,7 @@ const heroImage =
 						{dict.homeVariant1.routes.title}
 					</h2>
 					<p class="mt-3 max-w-2xl leading-7 text-on-surface-variant">
-						{dict.routes.directTitle}
+						{dict.routes.results.directTitle}
 					</p>
 				</div>
 				<a
