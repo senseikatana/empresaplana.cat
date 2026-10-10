@@ -1,7 +1,11 @@
 #!/usr/bin/env sh
-# Puerta completa antes de subir nada al remoto: si esto falla, nada sale del
-# equipo. Cubre formato, tipos, tests unitarios, tests E2E y coherencia de version.
+# NO se ejecutan tests aqui.
 #
-# NO compila: `astro build` queda fuera a proposito. La puerta debe validar
-# el codigo, no gastar minutos ni disco en generar `dist/`.
-bun run verify
+# La puerta completa (unit + E2E + tipos) corre UNA sola vez, en CI, en el job
+# "gate". Ese job es el required status check que bloquea el merge, asi que
+# quitarla de aqui no relaja nada: solo elimina la duplicacion que hacia que
+# cada push te frenara ~35s antes de que el CI hiciera exactamente lo mismo.
+#
+# Aqui queda solo el formato, que tarda ~1s y evita gastar un ciclo de CI en
+# codigo que Biome va a rechazar de todas formas.
+bun run check

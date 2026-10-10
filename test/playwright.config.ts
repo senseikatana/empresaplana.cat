@@ -7,7 +7,12 @@ export default defineConfig({
 	testDir: "./e2e",
 	fullyParallel: true,
 	forbidOnly: true,
-	retries: 0,
+	// Sin reintentos, un unico flake de infraestructura bloquea un push entero.
+	// El fallo observado es una carrera en la limpieza de traces entre workers
+	// ("browserContext.close: ENOENT"), no una asercion: los tests pasaban. En
+	// local se mantiene 0 para no enmascarar regresiones; en CI el runner esta
+	// mas cargado y se tolerate.
+	retries: process.env.CI ? 2 : 0,
 	workers: 2,
 	reporter: [
 		["list"],
