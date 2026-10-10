@@ -7,30 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
-
-Highlights: fix: deploy:cloudflare: deploy the Worker using wrangler.cloudflare.jsonc.
-
-- [x] 🐛 fix: deploy:cloudflare: deploy the Worker using wrangler.cloudflare.jsonc
-  - `.env.example`
-  - `.gitignore`
-  - `AGENTS.md`
-  - `astro.config.mjs`
-  - `bun.lock`
-  - `migrations/20261010092222_initial-prisma-schema.sql`
-  - `package.json`
-  - `prisma/schema.prisma`
-  - `src/components/auth/SocialAuthButtons.astro`
-  - `src/config/auth.config.ts`
-  - `src/config/config.env.ts`
-  - `src/env.d.ts`
-  - `src/lib/auth-client.ts`
-  - `src/lib/email.ts`
-  - `src/lib/oauth-users.ts`
-  - `src/middleware/index.ts`
-  - `src/pages/api/auth/[...all].ts`
-  - `wrangler.cloudflare.jsonc`
-
 ## [1.0.0] - 2026-10-10
 
 What's news:
@@ -101,6 +77,35 @@ What's news:
   - `src/pages/api/users/index.ts`
   - `src/pages/index.astro`
 - [ ] bun add v1.4.2 (744846f84) feat: update documentation for agents
+
+## [0.1.4] - 2026-10-10
+
+Highlights: fix: deploy:cloudflare: deploy the Worker using wrangler.cloudflare.jsonc.
+
+- [x] 🐛 fix: deploy:cloudflare: deploy the Worker using wrangler.cloudflare.jsonc
+  - `.env.example`
+  - `.gitignore`
+  - `AGENTS.md`
+  - `astro.config.mjs`
+  - `bun.lock`
+  - `migrations/20261010092222_initial-prisma-schema.sql`
+  - `package.json`
+  - `prisma/schema.prisma`
+  - `src/components/auth/SocialAuthButtons.astro`
+  - `src/config/auth.config.ts`
+  - `src/config/config.env.ts`
+  - `src/env.d.ts`
+  - `src/lib/auth-client.ts`
+  - `src/lib/email.ts`
+  - `src/lib/oauth-users.ts`
+  - `src/middleware/index.ts`
+  - `src/pages/api/auth/[...all].ts`
+  - `wrangler.cloudflare.jsonc`
+- [x] ♻️ refactor(auth): centralize Better Auth configuration
+- [x] 🐛 fix!: improve Better Auth for Google and GitHub OAuth
+- [x] 🔹 ]7;file://localhost/home/senseikatana/Proyectos/empresaplana-astrobun add v1.4.3 (c6da4a4d3) feat: auth and i18n implemented
+- [x] 🔹 ]7;file://localhost/home/senseikatana/Proyectos/empresaplana-astrobun add v1.4.3 (c6da4a4d3) feat: add PRODUCT.md and auth
+- [x] 🚀 feat: refresh standalone Astro website
 
 ## [0.1.3] - 2026-10-10
 
