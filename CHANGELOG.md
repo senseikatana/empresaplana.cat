@@ -78,6 +78,36 @@ What's news:
   - `src/pages/index.astro`
 - [ ] bun add v1.4.2 (744846f84) feat: update documentation for agents
 
+## [0.3.2] - 2026-10-10
+
+Highlights: feat: configure ci with verify workflow and fix: update release scripts and documentation to reflect strict versioning (#13).
+
+- [x] 🚀 feat: configure ci with verify workflow
+  - `.github/workflows/verify.yml`
+  - `.gitignore`
+  - `.husky/commit-msg`
+  - `.husky/post-checkout`
+  - `.husky/post-merge`
+  - `.husky/pre-commit`
+  - `.husky/pre-push`
+  - `.husky/prepare-commit-msg`
+  - `AGENTS.md`
+  - `README.md`
+  - `docs/PORTING.md`
+  - `docs/RELEASING.md`
+  - `package.json`
+  - `src/scripts/commit-guard.mjs`
+- [x] 🐛 fix: update release scripts and documentation to reflect strict versioning (#13)
+  - `AGENTS.md`
+  - `README.md`
+  - `docs/RELEASING.md`
+  - `package.json`
+  - `src/scripts/release-versions.mjs`
+- [x] 🚀 feat: update design tokens and management CRUD documentation
+- [x] 🚀 feat: update package.json version to 0.1.0 (#11)
+- [x] 🚀 feat: update file paths in AGENTS.md and tsconfig.json to include test dire
+- [x] 🐛 fix: remove fly.toml configuration
+
 ## [0.3.1] - 2026-10-10
 
 Highlights: feat: update design tokens and management CRUD documentation, plus 1 more change.
