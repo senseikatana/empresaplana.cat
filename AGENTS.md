@@ -116,6 +116,13 @@ Canonical tokens live in `src/assets/DESIGN.md` (mirror of the Stitch
   de búsqueda de líneas: `Line` (id = id de la hoja), `SchedulesOnLine`
   (paradas denormalizadas en `stopsJson`) y `LineConnection` (encadenado
   mismo-bus: fromLineId → atStop → toLineId, waitMin default 0).
+- Fleet operations (ported from the Bolt prototype, migration
+  `20261010130218_fleet-operations`): `VehicleDocument` (ITV, insurance,
+  tachograph… with `expiresOn`), `Incident` and `Maintenance`, linked to
+  `Bus`/`Driver` with `ON DELETE RESTRICT`, CHECK enums and server-only RLS.
+  Managed in the dashboard CRUD as `documentos`, `incidencias` and
+  `mantenimiento`; `/dashboard/gestion` shows KPIs and documents expiring
+  within 30 days (`EXPIRY_WARNING_DAYS`). Demo rows are tagged `[DEMO]`.
 - `prisma.config.ts` — `dotenv/config` + `env("DATABASE_URL")`.
 - `src/lib/db.ts` — singleton lazy `prisma()` con `PrismaPg` + `import
   "dotenv/config"` (Astro NO carga `.env` en `process.env` automáticamente).

@@ -10,6 +10,7 @@ import {
 	resourceNames,
 } from "@/lib/management-schemas";
 import {
+	expiryState,
 	managementError,
 	ManagementError,
 	numericId,
@@ -17,8 +18,8 @@ import {
 } from "@/lib/management";
 
 describe("management validation and permissions", () => {
-	test("covers the twelve agreed entities and rejects unknown resource names", () => {
-		expect(resourceNames).toHaveLength(12);
+	test("covers the fifteen agreed entities and rejects unknown resource names", () => {
+		expect(resourceNames).toHaveLength(15);
 		expect(isResource("usuarios")).toBe(false);
 		for (const name of resourceNames) {
 			expect(isResource(name)).toBe(true);
@@ -124,6 +125,42 @@ describe("management validation and permissions", () => {
 			managementFields("autobuses").find((field) => field.name === "company")
 				?.nullable,
 		).toBe(false);
+	});
+	test("validates fleet documents, incidents and maintenance", () => {
+		const fields = (resource: Parameters<typeof managementFields>[0]) =>
+			Object.fromEntries(
+				managementFields(resource).map((field) => [field.name, field]),
+			);
+		expect(fields("documentos").expiresOn.type).toBe("date");
+		expect(fields("documentos").busId.relation).toBe("vehicles");
+		expect(fields("incidencias").busId.nullable).toBe(true);
+		expect(fields("incidencias").status.options).toEqual([
+			"open",
+			"in_progress",
+			"resolved",
+		]);
+		expect(fields("mantenimiento").cost.type).toBe("number");
+		expect(
+			managementSchemas.documentos.safeParse({
+				...initialManagementValues("documentos"),
+				busId: -1001,
+				expiresOn: "2026-02-30",
+			}).success,
+		).toBe(false);
+		expect(
+			managementSchemas.mantenimiento.safeParse({
+				...initialManagementValues("mantenimiento"),
+				busId: -1001,
+				serviceOn: "2026-01-10",
+				description: "Cambio de aceite",
+				cost: -1,
+			}).success,
+		).toBe(false);
+		const today = new Date("2026-01-10T12:00:00Z");
+		expect(expiryState("2026-01-09", today)).toBe("expired");
+		expect(expiryState("2026-01-10", today)).toBe("expiring");
+		expect(expiryState("2026-02-09", today)).toBe("expiring");
+		expect(expiryState("2026-02-10", today)).toBe("valid");
 	});
 	test("returns explicit errors for invalid records and missing dependencies", () => {
 		expect(
