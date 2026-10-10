@@ -78,6 +78,144 @@ What's news:
   - `src/pages/index.astro`
 - [ ] bun add v1.4.2 (744846f84) feat: update documentation for agents
 
+## [0.3.0] - 2026-10-10
+
+Highlights: feat: update file paths in AGENTS.md and tsconfig.json to include test dire and fix: remove fly.toml configuration, plus 5 more changes.
+
+- [x] 🚀 feat: update file paths in AGENTS.md and tsconfig.json to include test dire
+  - `.dockerignore`
+  - `AGENTS.md`
+  - `tsconfig.json`
+- [x] 🐛 fix: remove fly.toml configuration
+  - `fly.toml`
+- [x] 🚀 feat(.dockerignore): add cwd, errors and locale
+  - `.dockerignore`
+  - `.gitignore`
+  - `AGENTS.md`
+  - `Dockerfile`
+  - `biome.json`
+  - `bun.lock`
+  - `fly.toml`
+  - `package.json`
+  - `src/pages/[lang]/dashboard/gestion/[seccion].astro`
+  - `test/e2e/site.spec.ts`
+  - `test/fixtures/auth-server.mjs`
+  - `test/playwright.config.ts`
+  - `tests/ai.test.ts`
+- [x] 🐛 fix!: update package.json for astro and bun commands
+  - `AGENTS.md`
+  - `astro.config.mjs`
+  - `biome.json`
+  - `package.json`
+  - `prisma.config.ts`
+  - `src/config/i18n/index.ts`
+  - `src/interfaces/i18n.ts`
+  - `src/lib/auth-request.ts`
+  - `src/lib/auth.ts`
+  - `src/lib/insforge-auth.ts`
+  - `src/lib/management-api.ts`
+  - `src/lib/management.ts`
+  - `src/lib/search.ts`
+  - `src/middleware/index.ts`
+  - `src/pages/api/auth/exchange.ts`
+  - `src/pages/api/auth/login.ts`
+  - `src/pages/api/auth/logout.ts`
+  - `src/pages/api/auth/me.ts`
+  - `src/pages/api/auth/oauth.ts`
+  - `src/pages/api/auth/refresh.ts`
+  - `src/pages/api/auth/register.ts`
+  - `src/pages/api/auth/reset.ts`
+  - `src/pages/api/auth/verify.ts`
+  - `src/pages/api/chat/index.ts`
+  - `src/scripts/bootstrap-sheets.mjs`
+  - `src/scripts/demo-sheets.mjs`
+  - `src/scripts/deploy-insforge.mjs`
+  - `src/scripts/export-sheets.mjs`
+  - `src/scripts/lib/sheets-format.mjs`
+  - `src/scripts/seed.mjs`
+  - `src/scripts/sync-sheets.mjs`
+  - `tests/ai.test.ts`
+  - `tests/locale-routing.test.ts`
+  - `tests/management.integration.test.ts`
+  - `tests/management.test.ts`
+  - `tests/site-info.test.ts`
+- [x] 🐛 fix: locale prefix management for UI routes and redirects (#9)
+  - `AGENTS.md`
+  - `astro.config.mjs`
+  - `package.json`
+  - `src/components/auth/SocialAuthButtons.astro`
+  - `src/config/i18n/routing.ts`
+  - `src/config/site-info.ts`
+  - `src/interfaces/i18n.ts`
+  - `src/lib/ai.ts`
+  - `src/lib/auth-request.ts`
+  - `src/lib/auth.ts`
+  - `src/lib/email.ts`
+  - `src/lib/get-public-user.ts`
+  - `src/lib/insforge-auth.ts`
+  - `src/lib/management-schemas.ts`
+  - `src/lib/management.ts`
+  - `src/lib/search.ts`
+  - `src/lib/validation/users.ts`
+  - `src/middleware/index.ts`
+  - `src/pages/[lang]/dashboard/ia.astro`
+  - `src/pages/api/account.ts`
+  - `src/pages/api/auth/exchange.ts`
+  - `src/pages/api/auth/login.ts`
+  - `src/pages/api/auth/logout.ts`
+  - `src/pages/api/auth/oauth.ts`
+  - `src/pages/api/auth/refresh.ts`
+  - `src/pages/api/auth/register.ts`
+  - `src/pages/api/auth/reset.ts`
+  - `src/pages/api/auth/verify.ts`
+  - `src/pages/api/budget.ts`
+  - `src/pages/api/chat/index.ts`
+  - `src/pages/api/users/[id].ts`
+  - `src/scripts/manage-emails.ts`
+  - `src/scripts/test-email.ts`
+  - `tests/acl.test.ts`
+  - `tests/locale-routing.test.ts`
+  - `tsconfig.json`
+- [x] 🐛 fix: locale prefix management for UI routes and redirects
+  - `AGENTS.md`
+  - `astro.config.mjs`
+  - `package.json`
+  - `src/components/auth/SocialAuthButtons.astro`
+  - `src/config/i18n/routing.ts`
+  - `src/config/site-info.ts`
+  - `src/interfaces/i18n.ts`
+  - `src/lib/ai.ts`
+  - `src/lib/auth-request.ts`
+  - `src/lib/auth.ts`
+  - `src/lib/email.ts`
+  - `src/lib/get-public-user.ts`
+  - `src/lib/insforge-auth.ts`
+  - `src/lib/management-schemas.ts`
+  - `src/lib/management.ts`
+  - `src/lib/search.ts`
+  - `src/lib/validation/users.ts`
+  - `src/middleware/index.ts`
+  - `src/pages/[lang]/dashboard/ia.astro`
+  - `src/pages/api/account.ts`
+  - `src/pages/api/auth/exchange.ts`
+  - `src/pages/api/auth/login.ts`
+  - `src/pages/api/auth/logout.ts`
+  - `src/pages/api/auth/oauth.ts`
+  - `src/pages/api/auth/refresh.ts`
+  - `src/pages/api/auth/register.ts`
+  - `src/pages/api/auth/reset.ts`
+  - `src/pages/api/auth/verify.ts`
+  - `src/pages/api/budget.ts`
+  - `src/pages/api/chat/index.ts`
+  - `src/pages/api/users/[id].ts`
+  - `src/scripts/manage-emails.ts`
+  - `src/scripts/test-email.ts`
+  - `tests/acl.test.ts`
+  - `tests/locale-routing.test.ts`
+  - `tsconfig.json`
+- [x] 🐛 fix: bump package version in package.json (#8)
+  - `package.json`
+
 ## [0.2.3] - 2026-10-10
 
 Highlights: feat: bump version to 0.1.0 in package.json.
