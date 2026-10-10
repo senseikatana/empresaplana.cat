@@ -7,11 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [1.0.0] - 2026-07-26
+
+### Added
+- Initial release of the project.
+- Complete folder structure and baseline configuration.
+- Comprehensive `.gitignore`, `LICENSE`, and documentation files.
+- Responsive design layout and UI components.
+
+### Changed
+- Standardized project configurations and clean commit workflow.
+
+### Fixed
+- Resolved nested repository issues and gitlink submodule conflicts.
+
+## [0.1.1] - 2026-10-10
 
 What's news:
 
-- [ ] feat: update documentation for agents
+- [ ] bun add v1.4.2 (744846f84) feat: update documentation for agents
   - `.env.example`
   - `.gitignore`
   - `AGENTS.md`
@@ -171,16 +185,3 @@ What's news:
   - `src/styles/global.css`
   - `tsconfig.json`
 
-## [1.0.0] - 2026-07-26
-
-### Added
-- Initial release of the project.
-- Complete folder structure and baseline configuration.
-- Comprehensive `.gitignore`, `LICENSE`, and documentation files.
-- Responsive design layout and UI components.
-
-### Changed
-- Standardized project configurations and clean commit workflow.
-
-### Fixed
-- Resolved nested repository issues and gitlink submodule conflicts.
