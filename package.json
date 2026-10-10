@@ -32,6 +32,7 @@
 		"db:seed": "bunx tsx prisma/seed.ts",
 		"db:setup": "prisma db push && prisma generate",
 		"release:check": "node src/scripts/release-versions.mjs",
+		"release:check:strict": "node src/scripts/release-versions.mjs --strict",
 		"release:version": "node src/scripts/release-versions.mjs",
 		"prepare": "husky"
 	},

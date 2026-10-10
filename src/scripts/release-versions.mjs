@@ -111,50 +111,102 @@ function report(state) {
 }
 
 /**
- * Each source is compared against the newest of the others, so a single stale
- * value is reported rather than three pairwise disagreements.
+ * The git tag is the authoritative record of what actually shipped: it is
+ * created deliberately and is immutable in practice. CHANGELOG.md is prose a
+ * human edits, and it drifts -- so it must never dictate the expected version,
+ * or a stray heading would make the check impossible to satisfy.
  */
-function drift(state) {
-	const present = [state.manifest, state.tag, state.changelog].filter(
-		(value) => typeof value === "string",
-	);
-	if (present.length < 2) return [];
-	const newest = present.reduce((best, value) =>
-		compare(value, best) > 0 ? value : best,
-	);
-	const problems = [];
-	if (state.manifest !== newest) {
-		problems.push(`package.json is ${state.manifest}, expected ${newest}`);
-	}
-	if (state.tag !== newest) {
-		problems.push(
-			`git tag is ${state.tag ? `v${state.tag}` : "missing"}, expected v${newest}`,
-		);
-	}
-	if (state.changelog !== newest) {
-		problems.push(
-			`CHANGELOG.md newest heading is ${state.changelog ?? "missing"}, expected ${newest}`,
-		);
-	}
-	return problems;
+function expectedVersion(state) {
+	if (state.tag) return state.tag;
+	if (state.manifest) return state.manifest;
+	return state.changelog;
 }
 
-function check() {
+/**
+ * Two severities, deliberately. A manifest/tag disagreement is a broken release
+ * and fails. A changelog disagreement is stale prose and warns, because fixing it
+ * means editing or tagging history, which is a human decision.
+ */
+function drift(state) {
+	const expected = expectedVersion(state);
+	const hard = [];
+	const advisory = [];
+
+	if (state.manifest !== expected) {
+		hard.push({
+			problem: `package.json is ${state.manifest}, expected ${expected}`,
+			fix: `bun run release:version -- --to ${expected}`,
+		});
+	}
+
+	if (state.changelog && state.changelog !== expected) {
+		const phantom = state.tag ? compare(state.changelog, state.tag) > 0 : false;
+		advisory.push({
+			problem: `CHANGELOG.md newest heading is ${state.changelog}, expected ${expected}`,
+			kind: phantom ? "phantom" : "stale",
+		});
+	}
+
+	return { expected, hard, advisory };
+}
+
+/** Changelog advice, matched to the kind of drift, because the fix differs. */
+function changelogAdvice({ problem, kind }) {
+	const lines = [problem];
+	if (kind === "phantom") {
+		lines.push(
+			"    This heading records a release that has no tag. Either that release",
+			"    really shipped and is missing its tag, or the heading is wrong. A",
+			"    script will not delete release history or invent tags -- decide here.",
+			'  - if it shipped:  git tag -a v<version> -m "Release <version>"',
+			"  - if it did not:  delete the heading from CHANGELOG.md by hand",
+		);
+	} else {
+		lines.push(
+			`    CHANGELOG.md is behind. Add a "## [${expectedVersion(collect())}]" heading.`,
+			"    release:version adds it only when the changelog has no newer heading.",
+		);
+	}
+	return lines;
+}
+
+function check(strict) {
 	const state = collect();
 	report(state);
-	const problems = drift(state);
-	if (problems.length === 0) {
+	const { expected, hard, advisory } = drift(state);
+
+	console.log(
+		`\nexpected ${expected} (from ${state.tag ? "git tag" : "manifest"})`,
+	);
+
+	if (hard.length === 0 && advisory.length === 0) {
 		console.log("\nOK: all version sources agree.");
 		return 0;
 	}
-	console.error("\nout of sync:");
-	for (const problem of problems) console.error(`  - ${problem}`);
-	console.error("\nRun: bun run release:version -- --to <version>");
-	return 1;
+
+	for (const problem of hard) {
+		console.error(
+			`\nout of sync:\n  - ${problem.problem}\n  fix: ${problem.fix}`,
+		);
+	}
+
+	if (advisory.length > 0) {
+		const heading = strict
+			? "out of sync:"
+			: "warning (does not fail --check):";
+		console.error(`\n${heading}`);
+		for (const problem of advisory) {
+			for (const line of changelogAdvice(problem)) console.error(line);
+		}
+	}
+
+	if (hard.length > 0 || (strict && advisory.length > 0)) return 1;
+	console.error("\nmanifest and tag agree; the changelog needs a manual edit.");
+	return 0;
 }
 
 function parseArgs(argv) {
-	const options = { to: null, tag: false };
+	const options = { to: null, tag: false, strict: false };
 	for (let index = 0; index < argv.length; index++) {
 		const arg = argv[index];
 		if (arg === "--to") {
@@ -163,6 +215,8 @@ function parseArgs(argv) {
 			options.to = arg.slice("--to=".length);
 		} else if (arg === "--tag") {
 			options.tag = true;
+		} else if (arg === "--strict") {
+			options.strict = true;
 		} else {
 			throw new Error(`Unknown argument: ${arg}`);
 		}
@@ -215,7 +269,7 @@ const CHANGELOG_RESULT = {
 	current: (version) => [`  CHANGELOG.md  already documents ${version}`],
 	ahead: (version, existing) => [
 		`  CHANGELOG.md  documents ${existing}, ahead of target ${version}; left unchanged`,
-		"                -> release:check will keep flagging this until it is resolved",
+		"                -> this is a warning, not a failure; it needs a human decision",
 	],
 	"no-heading": (version) => [
 		`  CHANGELOG.md  no release heading found; add a section for ${version} by hand`,
@@ -276,8 +330,9 @@ function setVersion() {
 }
 
 function main() {
-	const isSet = process.argv.slice(2).length > 0;
-	return isSet ? setVersion() : check();
+	const options = parseArgs(process.argv.slice(2));
+	if (options.to) return setVersion();
+	return check(options.strict);
 }
 
 try {
