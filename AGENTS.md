@@ -309,9 +309,12 @@ the updated HTML/PNG from Stitch into a scratch directory outside the repo, then
 
 ## Releases
 
-`bun run release:check` fails when `package.json`, the latest git tag and
-`CHANGELOG.md` disagree, so the version in `package.json` cannot silently drift.
-`bun run release:version -- --to 0.4.0` syncs the manifest, tag and changelog.
+`bun run release:check` fails when `package.json` disagrees with the latest git
+tag, and warns when `CHANGELOG.md` does. The tag is the authority on what shipped;
+a changelog mismatch warns rather than fails because resolving it means adding a
+tag or editing release history by hand. `bun run release:check:strict` promotes
+the warning to a failure. `bun run release:version -- --to 0.4.0` syncs the
+manifest and adds a changelog heading when one is missing.
 See `docs/RELEASING.md`.
 
 ## Portability

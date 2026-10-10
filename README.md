@@ -58,7 +58,8 @@ to inherit privileged roles. New verified identities always start as clients.
 | `bun run db:migrate` | Create and apply a development migration |
 | `bun run db:seed` | Seed development data |
 | `bun run sync:sheets` | Sync route schedules from Google Sheets |
-| `bun run release:check` | Verify `package.json`, git tag and changelog agree |
+| `bun run release:check` | Verify `package.json` matches the latest git tag |
+| `bun run release:check:strict` | Also fail on `CHANGELOG.md` drift |
 | `bun run release:version -- --to 1.0.0` | Set the version everywhere (add `--tag` to tag) |
 
 ## Accounts and access
