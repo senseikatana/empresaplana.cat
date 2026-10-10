@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.3] - 2026-10-10
+
+Highlights: fix: update husky and package.json for correct version, plus 1 more change.
+
+- [x] 🐛 fix: update husky and package.json for correct version
+  - `.husky/pre-push`
+  - `package.json`
+- [x] 🐛 fix(package): update package version to 0.4.0
+  - `package.json`
+- [x] 🐛 fix: update CI workflows and ignore files
+- [x] 🐛 fix: update PORTING.md and package.json
+- [x] 🚀 feat: add verify workflow and update AGENTS.md and docs/RELEASING.md
+- [x] 🐛 fix: update CI workflows to use latest actions and tools
+
 ## [0.4.2] - 2026-10-10
 
 Highlights: fix: update CI workflows and ignore files, plus 1 more change.
