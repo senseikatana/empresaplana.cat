@@ -96,7 +96,7 @@ Run everything from this directory:
 
 ## Design system
 
-Canonical tokens live in `src/assets/DESIGN.md` (mirror of the Stitch
+Canonical tokens live in `DESIGN.md` at the repo root (mirror of the Stitch
 "Empresa Plana - Branding" design system). Key facts:
 
 - Brand colors: `deep-navy` `#013990`, `coastal-teal` `#13AEB8`,
@@ -117,10 +117,9 @@ Canonical tokens live in `src/assets/DESIGN.md` (mirror of the Stitch
   `/rutas-horarios`, `/mobile`, `/donde-estamos`, `/home-variant-1`,
   `/donde-estamos-mobile`, `/home-variant-2`, `/servicios-discrecionales`,
   `/rastreig` (bus tracking demo), plus `/` (hub linking all screens).
-- `stitch-export/` — raw exports from Stitch (HTML + PNG per screen). Use these
-  as the source of truth when regenerating pages.
-- `src/config/i18n/` — all site copy (ES/EN/CA) in `es.json` / `en.json` /
-  `ca.json` (406 keys, identical shape). Includes pages, about, full legal
+- `src/config/i18n/` — all site copy in `es.json` / `en.json` / `ca.json` /
+  `fr.json` (1040 leaf keys each, verified identical in shape). Spanish is the
+  default locale. Includes pages, about, full legal
   texts (notice, cookies, privacy) and the bus-tracking UI, formerly scraped
   into `src/data/`.
 
@@ -202,7 +201,8 @@ Canonical tokens live in `src/assets/DESIGN.md` (mirror of the Stitch
 ## Management CRUD
 
 - `/[lang]/dashboard/gestion/{rutas,autobuses,paradas,horarios,conductores,
-  notificaciones,reportes,oficinas,presupuestos,lineas,horarios-linea,conexiones}`
+  notificaciones,reportes,oficinas,presupuestos,lineas,horarios-linea,conexiones,
+  documentos,incidencias,mantenimiento}`
   reads live InsForge data with search, pagination, detail, create, edit and
   confirmed deletion. No browser-local demo store is used.
 - `src/lib/management-schemas.ts` owns zod validation, field metadata and
@@ -219,7 +219,7 @@ Canonical tokens live in `src/assets/DESIGN.md` (mirror of the Stitch
   derived from ordered stop JSON. Times currently cover a single calendar day.
   Google Sheets sync overwrites these search tables; preserve edits in Sheets.
 - `CRUD_TEST_BASE_URL=http://127.0.0.1:4322 bun test tests/management.integration.test.ts`
-  exercises all twelve entities against a local running server and InsForge,
+  exercises all fifteen entities against a local running server and InsForge,
   creating only isolated test records and deleting them afterwards. Optional
   `CRUD_TEST_EMAIL`/`CRUD_TEST_PASSWORD` and `CRUD_TEST_WORKER_EMAIL`/
   `CRUD_TEST_WORKER_PASSWORD` must identify verified native test accounts with
@@ -294,16 +294,39 @@ Canonical tokens live in `src/assets/DESIGN.md` (mirror of the Stitch
   or styling breaks.
 - `astro.config.mjs` must import from `astro/config` (not `astro/defineConfig`)
   and wire `tailwindcss()` from `@tailwindcss/vite` under `vite.plugins`.
-- `AGENTS.md` / `DESIGN.md` / `stitch-export/` live at the repo root of this
+- `AGENTS.md` / `DESIGN.md` / `PRODUCT.md` live at the repo root of this
   project; do not nest another git repo here (`.git` already exists at root).
 - Never commit `.env` (copy from `.env.example` when needed).
 
 ## Regenerating pages from Stitch
 
-1. Re-export the updated screen HTML/PNG into `stitch-export/`.
-2. Transform each HTML: strip `<head>`, keep `<body>` inner content, then wrap
+Stitch exports are not kept in this repository. To regenerate a screen, export
+the updated HTML/PNG from Stitch into a scratch directory outside the repo, then:
+
+1. Transform each HTML: strip `<head>`, keep `<body>` inner content, then wrap
    in `BaseLayout` with `export const prerender = false;`.
-3. Run `bun run build` and verify all routes.
+2. Run `bun run build` and verify all routes.
+
+## Releases
+
+`bun run release:check` fails when `package.json`, the latest git tag and
+`CHANGELOG.md` disagree, so the version in `package.json` cannot silently drift.
+`bun run release:version -- --to 0.4.0` syncs the manifest, tag and changelog.
+See `docs/RELEASING.md`.
+
+## Portability
+
+The domain core is framework-independent. `prisma/schema.prisma`, the migrations,
+`src/config/i18n/*.json`, `src/styles/global.css` and 13 of the 16 `src/lib`
+modules import nothing from Astro and port to any stack unchanged.
+
+Only three core modules are coupled: `auth.ts`, `insforge-auth.ts` and
+`management-api.ts` (Astro cookies and `APIContext`).
+
+Before rewriting any of them, read `docs/PORTING.md`. It records the layer map,
+the security and data-integrity invariants that must survive a rewrite, and the
+route mapping. Do not port from `CHANGELOG.md` — its `[1.0.0]` section describes
+a release with no tag behind it.
 
 <!-- INSFORGE:START -->
 ## InsForge backend

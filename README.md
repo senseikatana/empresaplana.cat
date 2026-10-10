@@ -58,6 +58,8 @@ to inherit privileged roles. New verified identities always start as clients.
 | `bun run db:migrate` | Create and apply a development migration |
 | `bun run db:seed` | Seed development data |
 | `bun run sync:sheets` | Sync route schedules from Google Sheets |
+| `bun run release:check` | Verify `package.json`, git tag and changelog agree |
+| `bun run release:version -- --to 1.0.0` | Set the version everywhere (add `--tag` to tag) |
 
 ## Accounts and access
 
@@ -82,6 +84,20 @@ changed through the native reset flow; identity emails are managed by InsForge.
 - `src/lib/` — authentication, database, search, and tracking helpers
 - `prisma/` — PostgreSQL schema and seed data
 - `DESIGN.md` — visual system and brand tokens
+- `docs/PORTING.md` — how to export this domain to a different framework
+- `docs/RELEASING.md` — version and release workflow
+
+## Portability
+
+The domain core is framework-independent. The database schema, the migrations,
+the four translation dictionaries, the design tokens and 13 of the 16 `src/lib`
+modules import nothing from Astro, and port to any stack unchanged. Only
+`auth.ts`, `insforge-auth.ts` and `management-api.ts` are coupled to Astro
+cookies and `APIContext`.
+
+See `docs/PORTING.md` for the layer map, the security and data-integrity
+invariants a rewrite must preserve, and the route mapping for another
+framework.
 
 Never commit `.env`, database credentials, Google service-account keys, or
 generated Prisma output.
