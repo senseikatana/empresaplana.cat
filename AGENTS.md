@@ -313,7 +313,9 @@ the updated HTML/PNG from Stitch into a scratch directory outside the repo, then
 E2E, and `release:check`. It **never builds** — `astro build` is deliberately
 outside the gate, because the gate validates the code, not `dist/`.
 
-There is no CI. Hooks stay fast; the full gate is run explicitly:
+GitHub Actions runs `bun run build` (full gate + production build) on pull
+requests and pushes to `main`, without production credentials or deployment.
+Hooks stay fast; the full local gate is run explicitly:
 
 - `.husky/pre-commit` — `lint-staged` only. Formats staged files; about 1s.
 - `.husky/pre-push` — `bun run check` (Biome) only. About 1s.

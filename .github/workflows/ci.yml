@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validation:
+    name: Verification and production build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CI: "true"
+      HUSKY: "0"
+      # Prisma generation needs a URL, but CI never connects to a database.
+      DATABASE_URL: postgresql://localhost:5432/ci
+      INSFORGE_URL: http://127.0.0.1:4401
+      INSFORGE_ANON_KEY: e2e-local-fixture
+      APP_URL: http://127.0.0.1:4400
+    steps:
+      - name: Checkout source and release tags
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22.23.3"
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.4.3"
+
+      - name: Cache Bun package downloads
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-${{ runner.arch }}-bun-1.4.3-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-bun-1.4.3-
+
+      - name: Install locked dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: bun run db:generate
+
+      - name: Install Chromium and system dependencies
+        run: bunx playwright install --with-deps chromium
+
+      - name: Run Biome, types, unit tests, E2E, release checks, and build
+        run: bun run build
+
+      - name: Upload Playwright failure reports
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: playwright-failure-reports
+          path: |
+            test/playwright-report/
+            test/test-results/
+          if-no-files-found: ignore
+          retention-days: 7

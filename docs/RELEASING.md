@@ -11,13 +11,23 @@ Runs Biome, `astro check`, unit tests, Playwright E2E and `release:check`. It
 gate validates code, not `dist/`. `bun run build` still runs the gate first and
 then builds.
 
-There is no CI in this project. `.github/` is gitignored on purpose.
+GitHub Actions runs `bun run build` on pull requests and pushes to `main` in
+`.github/workflows/ci.yml`. This runs the full gate below, then the production
+build, with pinned Node and Bun versions and cached Bun package downloads.
+CI fetches release tags, generates the Prisma client using a placeholder local
+database URL, and installs Chromium for both desktop and mobile E2E projects.
+Authentication uses the local test fixture; no production credentials, live
+integration tests, database migrations, seeding, or deployment are involved.
+Failures appear in the PR's **Verification and production build** check and
+step logs; Playwright reports, screenshots and traces are retained as failure
+artifacts for seven days.
 
 | Where | Command | Cost |
 | --- | --- | --- |
 | `.husky/pre-commit` | `lint-staged` | ~1s |
 | `.husky/pre-push` | `check` | ~1s |
 | `bun run verify` | full gate | ~40s |
+| GitHub Actions | `bun run build` (full gate + build) | runner-dependent |
 
 The hooks stay fast on purpose: a gate that runs on every push trains people to
 reach for `--no-verify`, and then it protects nothing. So run `bun run verify`
