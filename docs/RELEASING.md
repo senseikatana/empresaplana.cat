@@ -33,14 +33,28 @@ properties — that do not exist locally.
 
 ## The version
 
-The version lives in three places. `src/scripts/release-versions.mjs` keeps them
-from drifting apart.
+The version lives in three places, and the code that writes them is **not** in
+this repository.
 
-| Source | Records |
-| --- | --- |
-| `package.json` | the manifest version npm/bun resolve |
-| git tag `vX.Y.Z` | the released revision |
-| `CHANGELOG.md` | the newest `## [X.Y.Z]` heading |
+| Source | Records | Written by |
+| --- | --- | --- |
+| `package.json` | the manifest version npm/bun resolve | `_git_release_sync_versions` |
+| git tag `vX.Y.Z` | the released revision | `_git_release_core` |
+| `CHANGELOG.md` | the newest `## [X.Y.Z]` heading | `_git_release_write_changelog` |
+
+All three run from the global `onGit push --release` command, defined in
+`~/.zsh/functions/git.zsh`. That file is loaded via the zsh fpath; the copies in
+`snippets-codes-vault/` and `youtube-videos-demos/` are backups and are not
+loaded. `_git_release_sync_versions` edits the manifest through the git index
+with `sed` rather than `jq`, deliberately: `jq` reorders keys and breaks this
+repo's tab formatting.
+
+`src/scripts/release-versions.mjs` does **not** ship releases. It verifies and
+repairs. Running it by hand is the right response to drift, not the normal path.
+
+One consequence worth knowing: because the release path stages the manifest from
+the git index rather than the working tree, an uncommitted `package.json` bump is
+invisible to it.
 
 ## Check before committing
 

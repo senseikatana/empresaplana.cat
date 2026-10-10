@@ -1,13 +1,13 @@
 #!/usr/bin/env sh
-# NO se ejecutan tests aqui. La puerta completa corre explicitamente:
-# bun run verify
+# Solo formato. Nada mas.
 #
-# Este hook hace dos cosas baratas que evitan errores caros:
-#   1. formato (Biome)          ~1s
-#   2. que el manifest no quede atrasado  ~70ms
+# Aqui NO va release:check. El toolchain de releases vive FUERA del repo
+# (~/.zsh/functions/git.zsh) y es el que crea los estados inconsistentes, asi
+# que comprobar la version en cada push solo producia bloqueos falsos sobre
+# codigo perfectamente correcto.
 #
-# El 2 existe por un incidente real: un release escribio v0.4.2 en
-# package.json y, 48 segundos despues, un commit manual lo revirtio a 0.4.0.
-# El guard de anti-downgrade del toolchain global no lo ve, porque solo observa
-# los cambios que el propio toolchain hace. Esta comprobacion si las ve.
-bun run check && bun run release:check
+# La deriva de version sigue bloqueando donde importa de verdad:
+#   bun run verify   (y por tanto deploy:insforge)
+# Es decir: nunca llega a produccion con el manifest desfasado, pero si puedes
+# subir codigo mientras tanto.
+bun run check

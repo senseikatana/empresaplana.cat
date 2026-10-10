@@ -133,10 +133,23 @@ function drift(state) {
 	const advisory = [];
 
 	if (state.manifest !== expected) {
-		hard.push({
-			problem: `package.json is ${state.manifest}, expected ${expected}`,
-			fix: `bun run release:version -- --to ${expected}`,
-		});
+		// Direction matters. Telling someone to set an AHEAD manifest back to the
+		// tag would silently undo a release that already shipped, so an ahead
+		// manifest gets tag advice instead of a rollback.
+		const ahead = compare(state.manifest, expected) > 0;
+		hard.push(
+			ahead
+				? {
+						problem: `package.json is ${state.manifest}, ahead of tag v${expected}`,
+						kind: "untagged",
+						fix: `git tag -a v${state.manifest} -m "Release ${state.manifest}"`,
+					}
+				: {
+						problem: `package.json is ${state.manifest}, expected ${expected}`,
+						kind: "behind",
+						fix: `bun run release:version -- --to ${expected}`,
+					},
+		);
 	}
 
 	if (state.changelog && state.changelog !== expected) {
@@ -185,9 +198,15 @@ function check(strict) {
 	}
 
 	for (const problem of hard) {
-		console.error(
-			`\nout of sync:\n  - ${problem.problem}\n  fix: ${problem.fix}`,
-		);
+		console.error(`\nout of sync:\n  - ${problem.problem}`);
+		if (problem.kind === "untagged") {
+			console.error(
+				"    A release wrote package.json and CHANGELOG.md but its tag was\n" +
+					"    never created. Tagging is the missing step; do NOT roll the\n" +
+					"    manifest back, that would undo a release that already shipped.",
+			);
+		}
+		console.error(`  fix: ${problem.fix}`);
 	}
 
 	if (advisory.length > 0) {
