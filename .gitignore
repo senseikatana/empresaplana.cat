@@ -11,10 +11,8 @@ bun.lockb
 !.env.example
 !.prettierrc
 !.eslintrc.json
-# Sin CI: .github queda fuera del repositorio de forma explicita.
-# La regla `.*` de arriba ya lo ignoraba; se repite para que quede constancia
-# de que es una decision, no un descuido.
-.github/
+# Versionar los workflows pese a la regla `.*`.
+!.github/
 # Sin esta negacion, `.*` impediria versionar los hooks.
 # .husky/_ se vuelve a excluir al final del archivo (shims generados).
 !.husky/
