@@ -1168,18 +1168,20 @@
 		},
 		"alerts": {
 			"threshold": 3,
-			"thresholdLabel": "Signalements négatifs pour alerter",
-			"notifiedTitle": "Alerte envoyée",
-			"notifiedBody": "Après 3 signalements négatifs sur cet itinéraire, l'entreprise et le coordonnateur des chauffeurs ont été notifiés.",
-			"coordinatorNotified": "Le coordonnateur du groupe de chauffeurs a reçu une alerte.",
-			"companyNotified": "L'entreprise a reçu une alerte.",
-			"strikesLeft": "Signalements restants avant notification",
+			"thresholdLabel": "Signalements négatifs avant enregistrement de l'incident",
+			"notifiedTitle": "Incident enregistré",
+			"notifiedBody": "Assez de signalements négatifs se sont accumulés sur cette ligne pour aujourd'hui. L'incident est enregistré avec sa ligne, ses arrêts et ses horaires, et il est visible dans le panneau de gestion d'Empresa Plana.",
+			"coordinatorNotified": "Les signalements sont enregistrés dans le panneau de gestion, avec leur ligne, leur arrêt et leur horaire.",
+			"companyNotified": "L'enregistrement est permanent et peut être consulté dans le panneau de gestion.",
+			"strikesLeft": "Signalements négatifs restants avant enregistrement de l'incident",
 			"resolved": "Incident résolu"
 		},
 		"stats": {
 			"punctuality": "Ponctualité",
 			"reports": "Signalements aujourd'hui",
-			"onTimeRate": "% à l'heure"
+			"onTimeRate": "% à l'heure",
+			"sample": "Signalements",
+			"basis": "Pourcentage calculé à partir des signalements envoyés aujourd'hui par les utilisateurs. Ce n'est pas une mesure de la flotte : avec peu de signalements, le chiffre n'est pas concluant."
 		},
 		"status": {
 			"pending": "En attente",
@@ -1198,6 +1200,23 @@
 			"cleanliness": "Propreté",
 			"submit": "Envoyer l'évaluation",
 			"thanks": "Merci pour votre évaluation !"
+		},
+		"panel": {
+			"title": "Ponctualité des lignes",
+			"subtitle": "Agrégat des signalements envoyés par les utilisateurs, jour par jour.",
+			"line": "Ligne",
+			"date": "Jour de service",
+			"onTimeRate": "À l'heure",
+			"negative": "Négatifs",
+			"sample": "Signalements",
+			"status": "État",
+			"ok": "Aucun incident",
+			"escalated": "Incident enregistré",
+			"empty": "Pas encore assez de signalements pour afficher des données.",
+			"disclaimer": "Ces chiffres proviennent des signalements des utilisateurs, et non d'une mesure directe des véhicules. C'est un indicateur d'opinion : utilisez-le comme un signal, pas comme un certificat.",
+			"window": "{days} derniers jours",
+			"lastSeen": "Dernier signalement",
+			"unavailable": "Les données n'ont pas pu être consultées pour le moment. Réessayez plus tard."
 		}
 	},
 	"management": {
@@ -1216,7 +1235,8 @@
 			"conexiones": "Correspondances sans changement de bus",
 			"documentos": "Documents des véhicules",
 			"incidencias": "Incidents",
-			"mantenimiento": "Maintenance"
+			"mantenimiento": "Maintenance",
+			"escalaciones": "Incidents escaladés"
 		},
 		"fields": {
 			"code": "Code",
@@ -1344,7 +1364,12 @@
 			"expiryAlerts": "Alertes d'expiration",
 			"noExpiryAlerts": "Aucun document expiré ou sur le point d'expirer.",
 			"expiresInDays": "expire dans {days} jours",
-			"expiredDaysAgo": "expiré depuis {days} jours"
+			"expiredDaysAgo": "expiré depuis {days} jours",
+			"serviceDate": "Jour de service",
+			"negativeCount": "Signalements négatifs",
+			"threshold": "Seuil",
+			"resolvedBy": "Résolu par",
+			"acknowledged": "Reconnue"
 		},
 		"common": {
 			"add": "Ajouter",

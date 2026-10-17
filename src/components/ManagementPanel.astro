@@ -34,7 +34,7 @@ const columnKeys: Record<ResourceName, string[]> = {
 	horarios: ["routeId", "departure", "arrival", "days", "status"],
 	conductores: ["name", "phone", "license", "busNumber", "status"],
 	notificaciones: ["title", "type", "routeId", "read"],
-	reportes: ["lineId", "stop", "action", "minutesLate"],
+	reportes: ["lineId", "stop", "action", "minutesLate", "serviceDate"],
 	oficinas: ["name", "city", "address", "phone"],
 	presupuestos: ["clientName", "email", "departureCity", "arrivalCity", "status"],
 	lineas: ["name", "pdfUrl"],
@@ -43,6 +43,7 @@ const columnKeys: Record<ResourceName, string[]> = {
 	documentos: ["busLabel", "docType", "reference", "expiresOn", "expiryState"],
 	incidencias: ["occurredOn", "busLabel", "severity", "status", "description"],
 	mantenimiento: ["serviceOn", "busLabel", "kind", "status", "cost"],
+	escalaciones: ["lineId", "serviceDate", "negativeCount", "threshold", "status", "resolvedBy"],
 };
 const cell = (value: unknown, key?: string): string => {
 	if (value === null || value === undefined) return "—";

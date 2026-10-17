@@ -30,6 +30,7 @@
 		"check:fix": "biome check --write .",
 		"db:generate": "prisma generate",
 		"db:push": "prisma db push",
+		"db:drift": "node src/scripts/verify-migrations.mjs",
 		"db:migrate": "prisma migrate dev",
 		"db:seed": "bunx tsx prisma/seed.ts",
 		"db:setup": "prisma db push && prisma generate",

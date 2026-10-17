@@ -6,6 +6,7 @@ import {
 	managementSchemas,
 	type ResourceName,
 } from "@/lib/management-schemas";
+import { serviceWindow } from "@/lib/tracking-store";
 import { Prisma } from "../../generated/prisma/client";
 
 type DB = Prisma.TransactionClient;
@@ -61,11 +62,20 @@ function definition<S extends z.ZodObject>(
 	};
 }
 const toDay = (value: string) => new Date(`${value}T00:00:00.000Z`);
+/**
+ * Normaliza una fila para el panel: fechas de día a `YYYY-MM-DD`, decimales a
+ * número.
+ *
+ * El sufijo no es solo `On`: `serviceDate` también es un día y, sin cubrirlo,
+ * quedaba como `Date` y el esquema zod la rechazaba en cada actualización.
+ */
 function plain<T extends Record<string, unknown>>(row: T): T {
+	const isDay = (key: string): boolean =>
+		key.endsWith("On") || key.endsWith("Date");
 	return Object.fromEntries(
 		Object.entries(row).map(([key, value]) => [
 			key,
-			value instanceof Date && key.endsWith("On")
+			value instanceof Date && isDay(key)
 				? value.toISOString().slice(0, 10)
 				: Prisma.Decimal.isDecimal(value)
 					? Number(value)
@@ -250,21 +260,40 @@ export const management = {
 			db.notification.delete({ where: { id: numericId(id) } }),
 	}),
 	reportes: definition(managementSchemas.reportes, {
-		list: (db, page, q) =>
-			db.report.findMany({
-				...page,
-				where: search(["lineId", "stop", "comment", "action"], q),
-				orderBy: { id: "desc" },
-			}),
+		list: async (db, page, q) =>
+			(
+				await db.report.findMany({
+					...page,
+					where: search(["lineId", "stop", "comment", "action"], q),
+					orderBy: { id: "desc" },
+				})
+			).map(plain),
 		count: (db, q) =>
 			db.report.count({
 				where: search(["lineId", "stop", "comment", "action"], q),
 			}),
-		find: (db, id) => db.report.findUnique({ where: { id: numericId(id) } }),
-		write: (db, id, data) =>
-			id === undefined
-				? db.report.create({ data })
-				: db.report.update({ where: { id: numericId(id) }, data }),
+		find: async (db, id) => {
+			const row = await db.report.findUnique({
+				where: { id: numericId(id) },
+			});
+			return row && plain(row);
+		},
+		write: (db, id, { serviceDate, ...data }) => {
+			// `serviceDate` llega como "YYYY-MM-DD" desde el formulario y Prisma
+			// espera un DateTime. Sin la conversión, o bien la base recibe un string
+			// o bien no se le pone fecha y el reporte queda fuera del agregado.
+			const payload = { ...data, serviceDate: toDay(serviceDate) };
+			return id === undefined
+				? // Creado desde el panel: es un reporte del operador, no ciudadano.
+					// Solo se fija aquí — al actualizar no se envía `source`, de modo que
+					// un reporte de origen ciudadano no deja de serlo al editarlo.
+					db.report
+						.create({ data: { ...payload, source: "operator" } })
+						.then(plain)
+				: db.report
+						.update({ where: { id: numericId(id) }, data: payload })
+						.then(plain);
+		},
 		remove: (db, id) => db.report.delete({ where: { id: numericId(id) } }),
 	}),
 	oficinas: definition(managementSchemas.oficinas, {
@@ -467,6 +496,95 @@ export const management = {
 						.then(plain);
 		},
 		remove: (db, id) => db.maintenance.delete({ where: { id: numericId(id) } }),
+	}),
+	// Escalados por ventana de servicio. El operador puede aquí reconocer o
+	// cerrar una incidencia, que es lo que antes no existía: el contador de
+	// reportes se acumulaba para siempre sin forma de resetearlo.
+	escalaciones: definition(managementSchemas.escalaciones, {
+		list: (db, page, q) =>
+			db.escalation.findMany({
+				...page,
+				where: search(["lineId", "status", "resolvedBy", "note"], q),
+				orderBy: [{ status: "asc" }, { serviceDate: "desc" }, { id: "desc" }],
+			}),
+		count: (db, q) =>
+			db.escalation.count({
+				where: search(["lineId", "status", "resolvedBy", "note"], q),
+			}),
+		find: async (db, id) => {
+			const row = await db.escalation.findUnique({
+				where: { id: numericId(id) },
+				include: { reports: true },
+			});
+			return row && plain(row);
+		},
+		write: async (db, id, { serviceDate, status, resolvedBy, ...rest }) => {
+			// La ventana se deriva del día de servicio: es lo que acota el umbral a
+			// un solo día. El CHECK exige que `resolvedAt` exista si y solo si el
+			// estado es `resolved`.
+			const { start, end } = serviceWindow(
+				new Date(`${serviceDate}T12:00:00Z`),
+			);
+
+			if (id === undefined) {
+				return db.escalation
+					.create({
+						data: {
+							...rest,
+							serviceDate: start,
+							windowStart: start,
+							windowEnd: end,
+							status,
+							resolvedAt: status === "resolved" ? new Date() : null,
+							resolvedBy: status === "resolved" ? resolvedBy || null : null,
+						},
+					})
+					.then(plain);
+			}
+
+			// En una actualización, `negativeCount` y `threshold` son propiedad del
+			// sistema: los calcula `addReport` al abrir el escalado. Si el formulario
+			// pudiera reescribirlos, la traza que respalda la reclamación sería
+			// manipulable desde el propio panel.
+			// `resolvedAt` solo se fija la primera vez: re-sellar en cada guardado
+			// destruye la fecha real de resolución.
+			const current = await db.escalation.findUnique({
+				where: { id: numericId(id) },
+			});
+			const becomesResolved = status === "resolved" && !current?.resolvedAt;
+
+			return db.escalation
+				.update({
+					where: { id: numericId(id) },
+					data: {
+						lineId: rest.lineId,
+						note: rest.note,
+						serviceDate: start,
+						windowStart: start,
+						windowEnd: end,
+						status,
+						...(becomesResolved ? { resolvedAt: new Date() } : {}),
+						// Salir de "resolved" obliga a limpiar `resolvedAt` por el CHECK,
+						// y también `resolvedBy`: `status=open` con un resolvedBy es una
+						// fila contradictoria.
+						...(status === "resolved"
+							? { resolvedBy: resolvedBy || current?.resolvedBy || "" }
+							: { resolvedAt: null, resolvedBy: "" }),
+					},
+				})
+				.then(plain);
+		},
+		remove: async (db, id) => {
+			// El borrado en cascada se llevaría por delante los reportes que son la
+			// evidencia. Se rechaza mientras queden enlazados.
+			const linked = await db.escalation.count({
+				where: { id: numericId(id), reports: { some: {} } },
+			});
+			if (linked > 0) {
+				throw new ManagementError("escalation_has_evidence", 400, "reports");
+			}
+			return db.escalation.delete({ where: { id: numericId(id) } });
+		},
 	}),
 } satisfies Record<ResourceName, Definition>;
 

@@ -36,11 +36,17 @@ const keys = [
 	"INSFORGE_ANON_KEY",
 	"OPENROUTER_API_KEY",
 	"OPENROUTER_CHAT_MODEL",
+	"TRACKING_HASH_SECRET",
 ];
 const env = Object.fromEntries(
 	keys.filter((key) => process.env[key]).map((key) => [key, process.env[key]]),
 );
-for (const key of ["DATABASE_URL", "INSFORGE_URL", "INSFORGE_ANON_KEY"]) {
+for (const key of [
+	"DATABASE_URL",
+	"INSFORGE_URL",
+	"INSFORGE_ANON_KEY",
+	"TRACKING_HASH_SECRET",
+]) {
 	if (!env[key]) throw new Error(`${key} is required for deployment.`);
 }
 Object.assign(env, {

@@ -108,6 +108,7 @@ describe.skipIf(!base)("management API against InsForge", () => {
 				"lineas",
 				"horarios-linea",
 				"conexiones",
+				"escalaciones",
 			]) {
 				const { data } = await request(`/api/management/${resource}?limit=1`);
 				expect(data.rows.length).toBeLessThanOrEqual(1);

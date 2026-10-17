@@ -4,22 +4,112 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import BusTrackingPanel from "@/components/BusTrackingPanel.vue";
 import { getSiteInfo, getCanonicalUrl } from "@/config/site-info";
 import { getLocale, getDictionary } from "@/config/i18n";
+import { getPunctuality } from "@/lib/tracking-store";
 
 export const prerender = false;
 
 const locale = getLocale(Astro.params.lang);
 const dict = getDictionary(locale);
 const siteInfo = getSiteInfo({
-	title: dict.busTracking.title,
-	description: dict.busTracking.subtitle,
+	title: dict.busTracking.panel.title,
+	description: dict.busTracking.panel.subtitle,
 	lang: locale,
-	ogTitle: dict.busTracking.title,
-	ogDescription: dict.busTracking.subtitle,
+	ogTitle: dict.busTracking.panel.title,
+	ogDescription: dict.busTracking.panel.subtitle,
 	canonicalUrl: getCanonicalUrl(Astro.url.pathname),
 });
 
+const PANEL_DAYS = 30;
+
+/**
+ * Datos agregados del cuadro de mando. Se calculan en el servidor: es una
+ * lectura pública acotada y no necesita un endpoint en el cliente.
+ */
+let buckets: Awaited<ReturnType<typeof getPunctuality>> = [];
+let loadFailed = false;
+try {
+	buckets = await getPunctuality({ days: PANEL_DAYS });
+} catch (error) {
+	// Sin datos acumulados, el formulario de reporte sigue siendo útil. Pero hay
+	// que distinguir "no hay reportes" de "no pudimos consultar": mostrar lo
+	// segundo como "todavía no hay datos suficientes" sería una afirmación falsa
+	// en público, y esta pantalla es justo la evidencia que se va a presentar.
+	console.error("Unable to load punctuality aggregates", error);
+	loadFailed = true;
+}
+
+interface PanelRow {
+	lineId: string;
+	total: number;
+	negative: number;
+	onTimeRate: number;
+	lastDate: string;
+	escalated: boolean;
+}
+
+/**
+ * Una fila por línea, agregada sobre TODA la ventana que anuncia el encabezado.
+ *
+ * Antes se colapsaba al último día reportado mientras el título decía "últimos
+ * 30 días": el rótulo no describía lo que se mostraba, y ordenar por un único
+ * día con denominadores incomparables no significa nada.
+ */
+const totals = new Map<string, PanelRow>();
+for (const bucket of buckets) {
+	const onTimeRate =
+		bucket.total > 0 ? Math.round((bucket.punctual / bucket.total) * 100) : 100;
+	const current = totals.get(bucket.lineId);
+	if (!current) {
+		totals.set(bucket.lineId, {
+			lineId: bucket.lineId,
+			total: bucket.total,
+			negative: bucket.negative,
+			onTimeRate,
+			lastDate: bucket.serviceDate,
+			escalated: bucket.escalated,
+		});
+		continue;
+	}
+	// Se acumula sobre el total de la ventana, no sobre el porcentaje del día.
+	current.onTimeRate = Math.round(
+		((current.onTimeRate * current.total + bucket.punctual) /
+			(current.total + bucket.total)) *
+			100,
+	);
+	current.total += bucket.total;
+	current.negative += bucket.negative;
+	current.escalated = current.escalated || bucket.escalated;
+	if (bucket.serviceDate > current.lastDate) current.lastDate = bucket.serviceDate;
+}
+
+const rows: PanelRow[] = [...totals.values()].sort(
+	(a, b) => a.onTimeRate - b.onTimeRate || a.lineId.localeCompare(b.lineId),
+);
+
+// Etiqueta de línea legible cuando existe en el read model público. Si no existe
+// se muestra el identificador crudo: inventar una etiqueta haría que una línea
+// desconocida pareciera la ruta de Penedès, que es exactamente el tipo de dato
+// falso que este cuadro de mando no debe producir.
+let lineLabels = new Map<string, string>();
+if (rows.length > 0) {
+	try {
+		const { prisma } = await import("@/lib/db");
+		const ids = rows.map((row) => Number(row.lineId)).filter(Number.isInteger);
+		if (ids.length > 0) {
+			const lines = await prisma().line.findMany({
+				where: { id: { in: ids } },
+				select: { id: true, name: true },
+			});
+			lineLabels = new Map(lines.map((line) => [String(line.id), line.name]));
+		}
+	} catch {
+		// Sin etiquetas: se muestra el identificador. No es motivo para fallar.
+	}
+}
+const labelFor = (id: string): string => lineLabels.get(id) ?? id;
+
 const lineId = "l68-penedes";
-const lineLabel = dict.routes.lines.cards.penedes.route;
+const lineLabelText = labelFor(lineId);
 const stops = [
 	{ id: "vilanova", name: "Vilanova i la Geltrú", time: "08:15" },
 	{ id: "cubelles", name: "Cubelles", time: "08:32" },
@@ -28,20 +118,82 @@ const stops = [
 ---
 
 <BaseLayout {...siteInfo} bodyClass="bg-background text-on-background font-body-md antialiased">
-	<header class="bg-deep-navy text-on-primary py-6 px-margin-mobile md:px-margin-desktop">
-		<div class="max-w-2xl mx-auto">
-			<a href={localizedPath("/", getLocale(Astro.params.lang))} class="font-body-md text-body-md text-on-primary/70 hover:text-secondary-fixed transition-colors">
-				← {dict.common.brand}
-			</a>
-			<h1 class="font-headline-lg text-headline-lg font-bold mt-2">{dict.busTracking.title}</h1>
+	<main class="flex-grow px-margin-mobile md:px-margin-desktop py-stack-lg">
+		<div class="max-w-4xl mx-auto space-y-stack-lg">
+			<header>
+				<h1 class="font-headline-lg text-headline-lg text-deep-navy">{dict.busTracking.panel.title}</h1>
+				<p class="mt-2 text-body-md text-on-surface-variant">{dict.busTracking.panel.subtitle}</p>
+			</header>
+
+			<section class="bg-surface-container-lowest rounded-xl border border-outline-variant/20 ambient-shadow p-6">
+				<h2 class="font-headline-md text-headline-md text-deep-navy mb-1">{dict.busTracking.panel.window.replace("{days}", String(PANEL_DAYS))}</h2>
+
+				{
+					loadFailed ? (
+						<p role="alert" class="py-4 text-body-md text-error">
+							{dict.busTracking.panel.unavailable}
+						</p>
+					) : rows.length === 0 ? (
+						<p class="text-body-md text-on-surface-variant py-4">{dict.busTracking.panel.empty}</p>
+					) : (
+						<div class="overflow-x-auto mt-4">
+							<table class="w-full text-left border-collapse">
+								<thead>
+									<tr class="border-b border-outline-variant/40">
+										<th scope="col" class="py-3 pr-4 font-label-md text-label-md uppercase text-on-surface-variant">{dict.busTracking.panel.line}</th>
+										<th scope="col" class="py-3 pr-4 font-label-md text-label-md uppercase text-on-surface-variant">{dict.busTracking.panel.onTimeRate}</th>
+										<th scope="col" class="py-3 pr-4 font-label-md text-label-md uppercase text-on-surface-variant">{dict.busTracking.panel.negative}</th>
+										<th scope="col" class="py-3 pr-4 font-label-md text-label-md uppercase text-on-surface-variant">{dict.busTracking.panel.sample}</th>
+										<th scope="col" class="py-3 pr-4 font-label-md text-label-md uppercase text-on-surface-variant">{dict.busTracking.panel.lastSeen}</th>
+										<th scope="col" class="py-3 font-label-md text-label-md uppercase text-on-surface-variant">{dict.busTracking.panel.status}</th>
+									</tr>
+								</thead>
+								<tbody>
+									{rows.map((row) => (
+										<tr class="border-b border-outline-variant/20 last:border-0">
+											<td class="py-3 pr-4 text-on-surface">{labelFor(row.lineId)}</td>
+											<td class="py-3 pr-4">
+												<span class="font-label-md text-label-md tabular-nums text-deep-navy">{row.onTimeRate}%</span>
+												<span class="ml-2 inline-block h-2 w-24 rounded-full bg-surface-container overflow-hidden align-middle">
+													<span
+														class:list={["block h-full rounded-full", row.onTimeRate >= 80 ? "bg-coastal-teal" : row.onTimeRate >= 50 ? "bg-energetic-orange" : "bg-error"]}
+														style={`width: ${Math.max(2, row.onTimeRate)}%`}
+													/>
+												</span>
+											</td>
+											<td class="py-3 pr-4 tabular-nums text-on-surface-variant">{row.negative}</td>
+											<td class="py-3 pr-4 tabular-nums text-on-surface-variant">{row.total}</td>
+											<td class="py-3 pr-4 tabular-nums text-on-surface-variant">{row.lastDate}</td>
+											<td class="py-3">
+												<span
+													class:list={[
+														"inline-block rounded-full px-3 py-1 text-xs font-label-md",
+														row.escalated ? "bg-error-container text-on-error-container" : "bg-secondary-container text-on-secondary-container",
+													]}
+												>
+													{row.escalated ? dict.busTracking.panel.escalated : dict.busTracking.panel.ok}
+												</span>
+											</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+					)
+				}
+
+				<p class="mt-6 p-4 rounded-lg bg-surface-container text-body-md text-on-surface-variant">
+					{dict.busTracking.panel.disclaimer}
+				</p>
+			</section>
+
+			<BusTrackingPanel client:load lineId={lineId} lineLabel={lineLabelText} stops={stops} t={dict.busTracking} />
 		</div>
-	</header>
-	<main class="flex-grow max-w-2xl mx-auto px-margin-mobile md:px-margin-desktop py-stack-lg">
-		<BusTrackingPanel client:load lineId={lineId} lineLabel={lineLabel} stops={stops} t={dict.busTracking} />
 	</main>
+
 	<footer class="bg-deep-navy text-on-primary/80 py-stack-md px-margin-mobile md:px-margin-desktop">
-		<div class="max-w-2xl mx-auto font-body-md text-body-md">
-			{dict.common.footer.copyright}
+		<div class="max-w-4xl mx-auto font-body-md text-body-md">
+			<a href={localizedPath("/", locale)} class="hover:text-secondary-fixed transition-colors">← {dict.common.brand}</a>
 		</div>
 	</footer>
 </BaseLayout>

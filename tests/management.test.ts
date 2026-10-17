@@ -16,10 +16,11 @@ import {
 	managementSchemas,
 	resourceNames,
 } from "@/lib/management-schemas";
+import { startOfServiceDay } from "@/lib/tracking-store";
 
 describe("management validation and permissions", () => {
-	test("covers the fifteen agreed entities and rejects unknown resource names", () => {
-		expect(resourceNames).toHaveLength(15);
+	test("covers the sixteen agreed entities and rejects unknown resource names", () => {
+		expect(resourceNames).toHaveLength(16);
 		expect(isResource("usuarios")).toBe(false);
 		for (const name of resourceNames) {
 			expect(isResource(name)).toBe(true);
@@ -29,6 +30,158 @@ describe("management validation and permissions", () => {
 			expect(hasCapability("admin", managementCapability(name))).toBe(true);
 			expect(hasCapability("manager", managementCapability(name))).toBe(false);
 		}
+	});
+	test("keeps citizen line identifiers free of fleet relations", () => {
+		// `lineId` en reportes y escalados guarda identificadores de línea PÚBLICA
+		// ("l68-penedes"), que no existen en la tabla "Route" de flota. Si se
+		// declarara relación, validar un reporte ciudadano fallaría por referencia.
+		for (const resource of ["reportes", "escalaciones"] as const) {
+			const field = managementFields(resource).find((f) => f.name === "lineId");
+			expect(field?.type).toBe("text");
+			expect(field?.relation).toBeUndefined();
+		}
+		// En "horarios-linea" sí es una FK numérica a la tabla Line.
+		const scheduleLine = managementFields("horarios-linea").find(
+			(f) => f.name === "lineId",
+		);
+		expect(scheduleLine?.relation).toBe("lines");
+	});
+	test("validates escalated incidents against the canonical action vocabulary", () => {
+		const { reportes: reportSchema, escalaciones: escalationSchema } =
+			managementSchemas;
+		expect(reportSchema.shape.action.safeParse("onTime").success).toBe(true);
+		expect(reportSchema.shape.action.safeParse("notPassed").success).toBe(true);
+		// El vocabulario snake_case anterior queda rechazado.
+		expect(reportSchema.shape.action.safeParse("on_time").success).toBe(false);
+		expect(reportSchema.shape.action.safeParse("not_passed").success).toBe(
+			false,
+		);
+		expect(
+			escalationSchema.safeParse({
+				lineId: "l68-penedes",
+				serviceDate: "2026-10-17",
+				threshold: 3,
+				negativeCount: 3,
+				status: "resolved",
+				resolvedBy: "",
+				note: "",
+			}).success,
+		).toBe(true);
+		// La ventana del día se deriva en la capa de escritura, no del formulario.
+		expect(Object.keys(escalationSchema.shape).includes("windowStart")).toBe(
+			false,
+		);
+	});
+	test("escalaciones form fields reach the schema as the types it expects", () => {
+		// Regresión real: `threshold` y `negativeCount` no estaban en
+		// `numberFields`, así que el formulario enviaba "3" como texto y
+		// `z.number()` rechazaba TODA escritura — ni crear ni cerrar un escalado
+		// funcionaba desde el panel.
+		const byName = new Map(
+			managementFields("escalaciones").map((field) => [field.name, field]),
+		);
+		expect(byName.get("threshold")?.type).toBe("number");
+		expect(byName.get("negativeCount")?.type).toBe("number");
+		expect(byName.get("serviceDate")?.type).toBe("date");
+
+		// `initialManagementValues` tiene que arrancar con formas válidas: antes
+		// salían cadenas vacías que el esquema numérico rechazaba.
+		const initial = initialManagementValues("escalaciones");
+		expect(
+			managementSchemas.escalaciones.safeParse({
+				...initial,
+				lineId: "l68-penedes",
+				serviceDate: "2026-10-17",
+			}).success,
+		).toBe(true);
+	});
+	test("operator-entered reports carry the service day the aggregate needs", () => {
+		// Sin `serviceDate`, un reporte creado desde el panel se escribía con la
+		// fecha a NULL: aparecía en el listado del CRUD pero quedaba fuera de
+		// `getLineStats` y de `getPunctuality`. El operador veía su fila y el
+		// panel público no la contaba.
+		const byName = new Map(
+			managementFields("reportes").map((field) => [field.name, field]),
+		);
+		expect(byName.get("serviceDate")?.type).toBe("date");
+
+		const initial = initialManagementValues("reportes");
+		expect(
+			managementSchemas.reportes.safeParse({
+				...initial,
+				lineId: "l68-penedes",
+				serviceDate: "2026-10-17",
+			}).success,
+		).toBe(true);
+
+		// `serviceDate` es obligatorio: no se puede crear un reporte sin día.
+		expect(
+			managementSchemas.reportes.safeParse({
+				...initial,
+				lineId: "l68-penedes",
+				serviceDate: "",
+			}).success,
+		).toBe(false);
+	});
+	test("a service date survives the round trip through the panel", () => {
+		// `plain()` formateaba fechas solo para claves terminadas en "On".
+		// `serviceDate` no lo hace, así que llegaba al esquema como `Date` y el
+		// parser la rechazaba en cada guardado.
+		const day = "2026-10-17";
+		const fromDb: Record<string, unknown> = {
+			serviceDate: new Date(`${day}T12:00:00Z`),
+		};
+		const serialised = Object.fromEntries(
+			Object.entries(fromDb).map(([key, value]) => [
+				key,
+				value instanceof Date && (key.endsWith("On") || key.endsWith("Date"))
+					? value.toISOString().slice(0, 10)
+					: value,
+			]),
+		);
+		expect(serialised.serviceDate).toBe(day);
+		expect(
+			managementSchemas.escalaciones.safeParse({
+				lineId: "l68-penedes",
+				...serialised,
+				threshold: 3,
+				negativeCount: 3,
+				status: "open",
+				resolvedBy: "",
+				note: "",
+			}).success,
+		).toBe(true);
+	});
+	test("the service day is anchored to Europe/Madrid, not to UTC", () => {
+		// Un reporte hecho a las 00:30 en horario de verano (UTC+2) pertenece al
+		// día de servicio de ese día. Truncado en UTC caería en el anterior y los
+		// agregados del panel quedarían repartidos entre dos servicios distintos.
+		const summerNight = new Date("2026-07-17T00:30:00Z"); // 02:30 Madrid
+		expect(startOfServiceDay(summerNight).toISOString().slice(0, 10)).toBe(
+			"2026-07-17",
+		);
+
+		// La propiedad que de verdad importa: TODOS los instantes de un mismo día
+		// de Madrid producen exactamente el mismo límite de ventana, de modo que
+		// `serviceDate` y `windowStart` no pueden divergir.
+		const anchors = [
+			new Date("2026-07-16T22:30:00Z"), // 00:30 Madrid, 17/07
+			new Date("2026-07-17T10:00:00Z"), // 12:00 Madrid, 17/07
+			new Date("2026-07-17T22:30:00Z"), // 00:30 Madrid, 18/07 → otro día
+		];
+		expect(startOfServiceDay(anchors[0])).toEqual(
+			startOfServiceDay(anchors[1]),
+		);
+		expect(startOfServiceDay(anchors[0]).toISOString()).not.toBe(
+			startOfServiceDay(anchors[2]).toISOString(),
+		);
+
+		// Invierno (UTC+1): la hora ancla es la misma en UTC, lo único que cambia
+		// es la fecha. Eso es lo que hace que el corte no se mueva con el DST.
+		const winter = startOfServiceDay(new Date("2026-12-17T10:00:00Z"));
+		const summer = startOfServiceDay(new Date("2026-07-17T10:00:00Z"));
+		expect(winter.getUTCHours()).toBe(summer.getUTCHours());
+		expect(winter.toISOString().slice(0, 10)).toBe("2026-12-17");
 	});
 	test("accepts seeded negative IDs without accepting zero, floats or unsafe IDs", () => {
 		expect(numericId("-1001")).toBe(-1001);

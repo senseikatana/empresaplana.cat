@@ -185,14 +185,71 @@ model Budget {
 	@@index([status])
 }
 
+// Reportes ciudadanos de incidencia en una línea/parada.
+//
+// `source` distingue el reporteAnonimo de la app pública del que carga un
+// operador desde el panel. `serviceDate` agrupa por día de servicio (no por
+// hora de escritura), de modo que las estadísticas de puntualidad sean
+// comparables. `reporterKey` es un hash del cliente y sirve para deduplicar y
+// limitar envíos sin almacenar datos personales.
 model Report {
-	id          Int     @id @default(autoincrement())
-	lineId      String  @db.VarChar(40)
-	stop        String  @default("") @db.VarChar(200)
-	action      String  @db.VarChar(20)
+	id          Int      @id @default(autoincrement())
+	lineId      String   @db.VarChar(40)
+	stop        String   @default("") @db.VarChar(200)
+	stopId      String?  @db.VarChar(40)
+	action      String   @db.VarChar(20)
 	minutesLate Int?
-	comment     String? @db.VarChar(500)
+	comment     String?  @db.VarChar(500)
+	source      String   @default("citizen") @db.VarChar(20)
+	serviceDate DateTime? @db.Date
+	reporterKey String?  @db.VarChar(64)
 	createdAt   DateTime @default(now())
+
+	escalations Escalation[]
+
+	@@index([lineId])
+	@@index([createdAt])
+	@@index([lineId, serviceDate])
+	@@index([reporterKey])
+}
+
+// Escalado de una línea cuando la ventana de servicio acumula suficientes
+// reportes negativos.
+//
+// La ventana (serviceDate + windowStart/windowEnd) evita el defecto de contar
+// la historia completa de la línea: cada día de servicio tiene su propio
+// umbral. `status` pasa por open → acknowledged → resolved, de modo que
+// `resolvedAt` existe y el dashboard puede cerrar una incidencia en lugar de
+// dejarla escalada para siempre.
+model Escalation {
+	id            Int       @id @default(autoincrement())
+	lineId        String    @db.VarChar(40)
+	serviceDate   DateTime? @db.Date
+	windowStart   DateTime
+	windowEnd     DateTime
+	threshold     Int       @default(3)
+	negativeCount Int       @default(0)
+	status        String    @default("open") @db.VarChar(20)
+	notifiedAt    DateTime?
+	resolvedAt    DateTime?
+	resolvedBy    String?   @db.VarChar(120)
+	note          String?   @db.VarChar(1000)
+	reports       Report[]
+	createdAt     DateTime  @default(now())
+	updatedAt     DateTime  @default(now()) @updatedAt
+
+	@@index([lineId, status])
+	@@index([serviceDate])
+	@@index([status])
+}
+
+// Valoración de un viaje: estrellas y comentario opcional.
+model Review {
+	id        Int      @id @default(autoincrement())
+	lineId    String   @db.VarChar(40)
+	stars     Int
+	comment   String?  @db.VarChar(500)
+	createdAt DateTime @default(now())
 
 	@@index([lineId])
 	@@index([createdAt])

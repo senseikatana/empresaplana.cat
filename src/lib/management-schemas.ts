@@ -103,16 +103,23 @@ export const reportSchema = z
 	.object({
 		lineId: routeId,
 		stop: text(200),
+		// Vocabulario canónico camelCase: es el que aceptan el CHECK de
+		// "Report" y las claves i18n. Antes el CRUD usaba snake_case
+		// (on_time / not_passed) contra una API pública en camelCase.
 		action: z.enum([
 			"passed",
-			"on_time",
+			"onTime",
 			"late",
 			"early",
-			"not_passed",
+			"notPassed",
 			"cancelled",
 		]),
 		minutesLate: z.number().int().min(0).max(1440).nullable(),
 		comment: text(500).nullable(),
+		// Día de servicio. Obligatorio de cara al agregado: con `NULL` el reporte
+		// queda fuera de la ventana y no suma en el panel, aunque sí aparezca en
+		// el listado del CRUD.
+		serviceDate: z.iso.date(),
 	})
 	.strict();
 export const officeSchema = z
@@ -242,6 +249,22 @@ export const maintenanceSchema = z
 		cost: z.number().min(0).max(99999999.99),
 	})
 	.strict();
+// Escalado automático de una línea por acumulación de reportes negativos.
+// `windowStart`/`windowEnd` acotan el día de servicio: el umbral se evalúa por
+// ventana, no sobre el histórico completo de la línea.
+export const escalationSchema = z
+	.object({
+		lineId: routeId,
+		// Obligatorio: con la fecha vacía el escalado queda huérfano y, al no
+		// coincidir con ninguna ventana, `addReport` abriría un duplicado.
+		serviceDate: day,
+		threshold: z.number().int().min(1).max(999),
+		negativeCount: z.number().int().min(0).max(9999),
+		status: z.enum(["open", "acknowledged", "resolved"]),
+		resolvedBy: text(120),
+		note: text(1000),
+	})
+	.strict();
 
 export const managementSchemas = {
 	rutas: routeSchema,
@@ -259,6 +282,7 @@ export const managementSchemas = {
 	documentos: vehicleDocumentSchema,
 	incidencias: incidentSchema,
 	mantenimiento: maintenanceSchema,
+	escalaciones: escalationSchema,
 };
 export type ResourceName = keyof typeof managementSchemas;
 export const resourceNames = Object.keys(managementSchemas) as ResourceName[];
@@ -311,6 +335,10 @@ const numberFields = new Set([
 	"minutesLate",
 	"busId",
 	"cost",
+	// Sin estos, el formulario enviaba "3" como texto y `z.number()` rechazaba
+	// el guardado: ningún escalado se podía crear ni cerrar desde el panel.
+	"threshold",
+	"negativeCount",
 ]);
 const nullableFields = new Set([
 	"driverId",
@@ -328,7 +356,10 @@ const jsonFields = new Set(["path", "gps", "stopIds", "routeIds", "stopsJson"]);
 const relations: Record<string, ManagementField["relation"]> = {
 	driverId: "drivers",
 	routeId: "routes",
-	lineId: "routes",
+	// `lineId` NO lleva relación a propósito: la tabla "Report" y "Escalation"
+	// guardan identificadores de línea PÚBLICA ("l68-penedes"), que no existen en
+	// la tabla "Route" de flota. Mapearlo a "routes" hacía que validar un reporte
+	// ciudadano desde el panel fallara por referencia inexistente.
 	fromLineId: "lines",
 	toLineId: "lines",
 	busNumber: "buses",
@@ -339,6 +370,7 @@ const statusOptions: Partial<Record<ResourceName, readonly string[]>> = {
 	presupuestos: budgetSchema.shape.status.options,
 	incidencias: incidentSchema.shape.status.options,
 	mantenimiento: maintenanceSchema.shape.status.options,
+	escalaciones: escalationSchema.shape.status.options,
 };
 const selectOptions: Record<string, readonly string[]> = {
 	type: notificationSchema.shape.type.options,
@@ -350,12 +382,18 @@ const selectOptions: Record<string, readonly string[]> = {
 export function managementFields(resource: ResourceName): ManagementField[] {
 	return Object.keys(managementSchemas[resource].shape).map((name) => {
 		let type: InputType = numberFields.has(name) ? "number" : "text";
-		if (name === "lineId" && resource === "reportes") type = "text";
+		// `lineId` es texto libre en reportes y escalados (línea pública), y una
+		// FK numérica en "horarios-linea".
+		if (name === "lineId" && resource !== "horarios-linea") type = "text";
 		if (jsonFields.has(name)) type = "json";
 		if (["desc", "description", "comment", "purpose", "notes"].includes(name))
 			type = "textarea";
 		if (name === "email") type = "email";
 		if (name.endsWith("Day") || name.endsWith("On")) type = "date";
+		// Cubre serviceDate/serviceOn sin ampliar a todo sufijo "Date".
+		// Cubre serviceDate donde aparezca: es un día en todos los recursos que lo
+		// traen (reportes y escalaciones). `*On` lo cubre el sufijo de arriba.
+		if (name === "serviceDate") type = "date";
 		if (name.endsWith("Time") || name === "departure" || name === "arrival")
 			type = "time";
 		if (name === "color") type = "color";
@@ -403,7 +441,12 @@ export function initialManagementValues(
 			: {}),
 		...(resource === "conductores" ? { status: "active" } : {}),
 		...(resource === "notificaciones" ? { type: "info" } : {}),
-		...(resource === "reportes" ? { action: "late" } : {}),
+		...(resource === "reportes"
+			? {
+					action: "late",
+					serviceDate: new Date().toISOString().slice(0, 10),
+				}
+			: {}),
 		...(resource === "oficinas" ? { order: 0 } : {}),
 		...(resource === "presupuestos" ? { status: "received" } : {}),
 		...(resource === "conexiones" ? { waitMin: 0 } : {}),
@@ -411,6 +454,14 @@ export function initialManagementValues(
 		...(resource === "incidencias" ? { severity: "low", status: "open" } : {}),
 		...(resource === "mantenimiento"
 			? { kind: "preventive", status: "scheduled", cost: 0 }
+			: {}),
+		...(resource === "escalaciones"
+			? {
+					threshold: 3,
+					negativeCount: 0,
+					status: "open",
+					serviceDate: new Date().toISOString().slice(0, 10),
+				}
 			: {}),
 	});
 	return values;
