@@ -7,6 +7,70 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.0] - 2026-10-17
+
+Highlights: feat(adr): add action, actualDirs and addReport (#23), plus 4 more changes.
+
+- [x] 🚀 feat(adr): add action, actualDirs and addReport (#23)
+  - `.env.example`
+  - `Dockerfile`
+  - `docs/adr/ADR-0001-astro-con-render-en-servidor-y-adaptador-node-st.md`
+  - `docs/adr/ADR-0002-google-sheets-es-la-fuente-de-verdad-de-paradas.md`
+  - `docs/adr/ADR-0003-los-reportes-ciudadanos-persisten-en-postgres-no.md`
+  - `docs/adr/ADR-0004-el-escalado-se-juzga-por-ventana-de-dia-de-servi.md`
+  - `docs/adr/ADR-0005-sin-notificacion-automatica-por-correo-la-interf.md`
+  - `docs/adr/ADR-0006-las-apis-de-reporte-son-publicas-por-diseno-con.md`
+  - `docs/adr/ADR-0007-el-identificador-de-cliente-se-deriva-con-hmac-y.md`
+  - `docs/adr/ADR-0008-el-dia-de-servicio-se-ancla-en-europe-madrid-con.md`
+  - `docs/adr/ADR-0009-se-sirve-sin-prefijo-para-espanol-y-con-prefijo.md`
+  - `docs/adr/ADR-0010-el-contrato-de-tiempo-real-es-gtfs-realtime-ning.md`
+  - `docs/adr/ADR-0011-la-integracion-con-la-compania-es-por-fichero-xl.md`
+  - `docs/adr/ADR-0012-un-unico-gate-de-verificacion-y-astro-build-qued.md`
+  - `docs/adr/README.md`
+  - `docs/architecture/README.md`
+  - `docs/architecture/decisions/migration-mapping.md`
+  - `docs/decisions/README.md`
+  - `docs/decisions/manifest.json`
+  - `docs/program/README.md`
+  - `docs/reclamacion.md`
+  - `docs/risks/README.md`
+  - `migrations/20261017120000_tracking-persistence.sql`
+  - `package.json`
+  - `prisma.config.ts`
+  - `prisma/migrations_path`
+  - `prisma/schema.prisma`
+  - `src/components/BusTrackingPanel.vue`
+  - `src/components/ManagementPanel.astro`
+  - `src/config/i18n/ca.json`
+  - `src/config/i18n/en.json`
+  - `src/config/i18n/es.json`
+  - `src/config/i18n/fr.json`
+  - `src/interfaces/bus-tracking.ts`
+  - `src/interfaces/tracking-store.ts`
+  - `src/lib/management-schemas.ts`
+  - `src/lib/management.ts`
+  - `src/lib/rate-limit.ts`
+  - `src/lib/tracking-store.ts`
+  - `src/pages/[lang]/rastreig.astro`
+  - `src/pages/api/bus-tracking/punctuality.ts`
+  - `src/pages/api/bus-tracking/reports.ts`
+  - `src/pages/api/bus-tracking/reviews.ts`
+  - `src/scripts/deploy-insforge.mjs`
+  - `src/scripts/verify-migrations.mjs`
+  - `tests/management.integration.test.ts`
+  - `tests/management.test.ts`
+- [x] 🤖 ci: validate pull requests with existing production build gate
+  - `.github/workflows/ci.yml`
+  - `.gitignore`
+  - `AGENTS.md`
+  - `docs/RELEASING.md`
+  - `tests/ci-workflow.test.ts`
+- [x] 🧪 test: check locale dictionary parity
+  - `tests/translation-parity.test.ts`
+- [x] 🔹 Initial plan
+- [x] 🔹 Initial plan
+- [x] 🐛 fix(release): restore package.json to 0.4.4 after downgrade commits
+
 ## [0.4.5] - 2026-10-10
 
 Highlights: fix(release): restore package.json to 0.4.4 after downgrade commits, plus 2 more changes.
