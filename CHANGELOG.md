@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.6.0] - 2026-10-17
+
+Highlights: feat(workflows): add app and index.
+
+- [x] 🚀 feat(workflows): add app and index
+  - `.github/workflows/fly-deploy.yml`
+  - `fly.toml`
+  - `src/scripts/deploy-insforge.mjs`
+  - `tests/translation-parity.test.ts`
+- [x] 🚀 feat(adr): add action, actualDirs and addReport (#23)
+- [x] 🤖 ci: validate pull requests with existing production build gate
+- [x] 🧪 test: check locale dictionary parity
+- [x] 🔹 Initial plan
+- [x] 🔹 Initial plan
+
 ## [0.5.0] - 2026-10-17
 
 Highlights: feat(adr): add action, actualDirs and addReport (#23), plus 4 more changes.
