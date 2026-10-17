@@ -1,0 +1,71 @@
+# Lista declarada de migraciones SQL
+# prisma/migrations_path
+#
+# ═══════════════════════════════════════════════════════════════════════════
+# QUÉ ES ESTE FICHERO
+# ═══════════════════════════════════════════════════════════════════════════
+# Es la lista de qué cambios de base de datos existen, en qué orden se
+# aplican. No es código: es un inventario legible.
+#
+# Por qué existe: Prisma Migrate mira un directorio que NO existe en este
+# repo, y los comandos documentados (`db:push`, `db:setup`) ni siquiera leen
+# ficheros .sql. Es decir, el orden de las migraciones existía solo "de
+# memoria". Aquí queda por escrito.
+#
+# Quién lo usa:
+#   - tú, para ver de un vistazo qué se ha tocado
+#   - `bun run db:drift`, que comprueba que este listado y el disco coinciden
+#     y que nada está mezclado ni faltando
+#
+# ═══════════════════════════════════════════════════════════════════════════
+# REGLAS
+# ═══════════════════════════════════════════════════════════════════════════
+#  1. Nunca se reordena: el orden de este fichero es el orden de aplicación.
+#  2. Nunca se edita un fichero ya aplicado. Si algo está mal, se añade uno
+#     nuevo con fecha posterior que lo corrige.
+#  3. Todo .sql que exista en `migrations/` tiene que aparecer aquí.
+#     `bun run db:drift` falla si sobra uno en el disco o falta uno aquí.
+#  4. Las fechas se escriben como YYYYMMDDHHMMSS. El orden alfabético de esta
+#     lista es el orden cronológico.
+#
+# ═══════════════════════════════════════════════════════════════════════════
+# ORDEN DE APLICACIÓN — no tocar salvo para añadir al final
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# 01 · 20261010092222 · Base
+#     Los 16 modelos del negocio con sus tablas de auth heredadas.
+#
+migrations/20261010092222_initial-prisma-schema.sql
+#
+# 02 · 20261010112209 · Autenticación nativa InsForge
+#     Borra las tablas de auth obsoletas y añade el mapeo de identidad.
+#     NO tocar tablas auth_*: las controla InsForge.
+#
+migrations/20261010112209_insforge-auth-native.sql
+#
+# 03 · 20261010121912 · Avisos de servicio
+#     `service_alerts` en snake_case. Nota: el read model público no depende
+#     de esta tabla.
+#
+migrations/20261010121912_create-service-alerts.sql
+#
+# 04 · 20261010130218 · Operaciones de flota
+#     Documentos de vehículo, incidencias y mantenimiento.
+#     Usa ON DELETE RESTRICT: no se borran coches con expedientes.
+#
+migrations/20261010130218_fleet-operations.sql
+#
+# 05 · 20261017120000 · Persistencia de reportes ciudadanos  ← ACTIVA, CRÍTICA
+#     Columnas nuevas en Report, tablas Escalation y Review, índice único
+#     parcial contra escalados duplicados, y 18 restricciones CHECK que Prisma
+#     NO sabe generar.
+#
+#     SIN ESTE FICHERO los reportes vuelven a perderse en cada despliegue
+#     y el panel deja de ser evidencia. Si alguien lo borra, `bun run
+#     db:drift` se queja.
+#
+migrations/20261017120000_tracking-persistence.sql
+#
+# ═══════════════════════════════════════════════════════════════════════════
+# FIN DE LA LISTA — las migraciones nuevas se añaden DEBAJO de esta línea
+# ═══════════════════════════════════════════════════════════════════════════

@@ -1168,18 +1168,20 @@
 		},
 		"alerts": {
 			"threshold": 3,
-			"thresholdLabel": "Reports negatius per avisar",
-			"notifiedTitle": "Avís enviat",
-			"notifiedBody": "Després de 3 reports negatius en aquesta ruta, l'empresa i el coordinador de conductors han estat notificats.",
-			"coordinatorNotified": "El coordinador del grup de conductors ha rebut un avís.",
-			"companyNotified": "L'empresa ha rebut un avís.",
-			"strikesLeft": "Reports restants abans de notificar",
+			"thresholdLabel": "Reports negatius per registrar la incidència",
+			"notifiedTitle": "Incidència registrada",
+			"notifiedBody": "S'han acumulat prou reports negatius en aquesta línia per al dia d'avui. La incidència queda registrada amb la seva línia, les seves parades i les seves hores, i és visible al panell de gestió d'Empresa Plana.",
+			"coordinatorNotified": "Els reports queden registrats al panell de gestió, amb la seva línia, parada i hora.",
+			"companyNotified": "El registre és permanent i es pot consultar al panell de gestió.",
+			"strikesLeft": "Reports negatius restants abans de registrar la incidència",
 			"resolved": "Incidència resolta"
 		},
 		"stats": {
 			"punctuality": "Puntualitat",
 			"reports": "Reports avui",
-			"onTimeRate": "% a l'hora"
+			"onTimeRate": "% a l'hora",
+			"sample": "Reports",
+			"basis": "Percentatge calculat sobre els reports enviats avui pels usuaris. No és una mesura de la flota: amb pocs reports la dada no és concloent."
 		},
 		"status": {
 			"pending": "Pendent",
@@ -1198,6 +1200,23 @@
 			"cleanliness": "Neteja",
 			"submit": "Enviar valoració",
 			"thanks": "Gràcies per la teva valoració!"
+		},
+		"panel": {
+			"title": "Puntualitat de les línies",
+			"subtitle": "Agregat dels reports enviats pels usuaris, dia a dia.",
+			"line": "Línia",
+			"date": "Dia de servei",
+			"onTimeRate": "A l'hora",
+			"negative": "Negatius",
+			"sample": "Reports",
+			"status": "Estat",
+			"ok": "Sense incidències",
+			"escalated": "Incidència registrada",
+			"empty": "Encara no hi ha reports suficients per mostrar dades.",
+			"disclaimer": "Aquestes xifres provenen dels reports dels usuaris, no d'una medició directa dels vehicles. Són un indicador d'opinió: feu-les servir com a senyal, no com a certificat.",
+			"window": "Últims {days} dies",
+			"lastSeen": "Últim report",
+			"unavailable": "No s'han pogut consultar les dades en aquest moment. Torna-ho a provar més tard."
 		}
 	},
 	"management": {
@@ -1216,7 +1235,8 @@
 			"conexiones": "Connexions del mateix autobús",
 			"documentos": "Documents dels vehicles",
 			"incidencias": "Incidències",
-			"mantenimiento": "Manteniment"
+			"mantenimiento": "Manteniment",
+			"escalaciones": "Incidències escalades"
 		},
 		"fields": {
 			"code": "Codi",
@@ -1344,7 +1364,12 @@
 			"expiryAlerts": "Avisos de caducitat",
 			"noExpiryAlerts": "No hi ha documents caducats ni a punt de caducar.",
 			"expiresInDays": "caduca d'aquí a {days} dies",
-			"expiredDaysAgo": "caducat fa {days} dies"
+			"expiredDaysAgo": "caducat fa {days} dies",
+			"serviceDate": "Dia de servei",
+			"negativeCount": "Reports negatius",
+			"threshold": "Llindar",
+			"resolvedBy": "Resolt per",
+			"acknowledged": "Reconeguda"
 		},
 		"common": {
 			"add": "Afegir",

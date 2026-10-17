@@ -1,0 +1,71 @@
+{
+	"$schema": "./manifest.schema.json",
+	"generatedFrom": "repository reality as verified 2026-10-17",
+	"rules": [
+		"One record per decision family. Each record validates independently: a change may only move an ADR to superseded if an ADR inside the SAME family replaces it.",
+		"An ADR records the decision and the alternatives it discarded. Rationale lives in the ADR, never in a family manifest.",
+		"If an externally-owned file or service changes, the consumer ADR goes to needs-review. That is a consumer-side concern and does not invalidate the producer's decision record.",
+		"No control references itself. A risk points at the ADR that controls it; an ADR points at the risk it retires."
+	],
+	"schemaVersion": 1,
+	"families": [
+		{
+			"id": "architecture",
+			"title": "Runtime, hosting and rendering",
+			"owner": "engineering",
+			"state": "current",
+			"adr": ["0001", "0008"],
+			"risks": ["drift:fly-runtime", "drift:astro-major"],
+			"controlledBy": ["0001"]
+		},
+		{
+			"id": "data-authority",
+			"title": "Where the truth lives and which way it flows",
+			"owner": "engineering",
+			"state": "current",
+			"adr": ["0002", "0011"],
+			"risks": ["drift:sheets-template", "drift:prisma-client"],
+			"controlledBy": ["0002", "0011"]
+		},
+		{
+			"id": "tracking",
+			"title": "Report persistence, escalation and the honesty of the claim",
+			"owner": "engineering,product,legal",
+			"state": "current",
+			"adr": ["0003", "0004", "0005", "0007"],
+			"risks": ["drift:compute-ephemerality", "drift:resend-prod-block"],
+			"controlledBy": ["0003", "0004", "0005"]
+		},
+		{
+			"id": "auth",
+			"title": "Identity, roles and API protection",
+			"owner": "engineering",
+			"state": "current",
+			"adr": ["0006", "0009"],
+			"risks": ["drift:insforge-auth"],
+			"controlledBy": ["0006", "0009"]
+		},
+		{
+			"id": "realtime",
+			"title": "Vehicle position, ETA and the channel to the company",
+			"owner": "engineering,product",
+			"state": "proposed",
+			"adr": ["0010"],
+			"risks": ["drift:missing-stop-coordinates", "drift:no-trip-entity"],
+			"controlledBy": []
+		},
+		{
+			"id": "delivery",
+			"title": "Verification gates, releases and deployment",
+			"owner": "engineering",
+			"state": "current",
+			"adr": ["0012"],
+			"risks": ["drift:upstream-release-tooling"],
+			"controlledBy": ["0012"]
+		}
+	],
+	"notes": [
+		"The 'realtime' family is the only one without a controlling ADR: its blockers (stop coordinates, trip identity, position feed) are still open. No component may claim live ETA until that family reaches 'current'.",
+		"An ADR may appear in more than one family when it is load-bearing for both. Family state is computed from its own ADRs only."
+	]
+}

@@ -34,6 +34,30 @@ export interface BusTrackingStats {
 	punctuality: string;
 	reports: string;
 	onTimeRate: string;
+	sample: string;
+	/** Aclara que el porcentaje es una opinión, no una medición de flota. */
+	basis: string;
+}
+/** Cuadro de mando público de puntualidad agregada por línea y día. */
+export interface BusTrackingPanel {
+	title: string;
+	subtitle: string;
+	line: string;
+	date: string;
+	onTimeRate: string;
+	negative: string;
+	sample: string;
+	/** Último día de servicio con reporte de esa línea, dentro de la ventana. */
+	lastSeen: string;
+	status: string;
+	ok: string;
+	escalated: string;
+	empty: string;
+	/** Aviso cuando la consulta falla. Diferente de `empty`: no es "no hay datos". */
+	unavailable: string;
+	disclaimer: string;
+	/** Plantilla con marcador `{days}`. */
+	window: string;
 }
 export interface BusTrackingStatus {
 	pending: string;
@@ -65,4 +89,5 @@ export interface BusTracking {
 	stats: BusTrackingStats;
 	status: BusTrackingStatus;
 	review: BusReview;
+	panel: BusTrackingPanel;
 }

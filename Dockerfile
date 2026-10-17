@@ -1,7 +1,10 @@
 FROM oven/bun:1.4.3 AS bun
 
 FROM node:22-bookworm-slim AS base
-COPY --from=bun /usr/local/bin/bun /usr/local/bin/bun
+# Se copian `bun` y `bunx`. Antes solo se copiaba `bun`, y `bunx playwright
+# install` fallaba con `bunx: not found` (127) — `bunx` es un binario aparte
+# en oven/bun, no un alias de `bun`.
+COPY --from=bun /usr/local/bin/bun /usr/local/bin/bunx /usr/local/bin/
 WORKDIR /app
 
 FROM base AS build

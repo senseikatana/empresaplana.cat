@@ -1168,18 +1168,20 @@
 		},
 		"alerts": {
 			"threshold": 3,
-			"thresholdLabel": "Reportes negativos para avisar",
-			"notifiedTitle": "Aviso enviado",
-			"notifiedBody": "Tras 3 reportes negativos en esta ruta, la empresa y el coordinador de conductores han sido notificados.",
-			"coordinatorNotified": "El coordinador del grupo de conductores ha recibido un aviso.",
-			"companyNotified": "La empresa ha recibido un aviso.",
-			"strikesLeft": "Reportes restantes antes de notificar",
+			"thresholdLabel": "Reportes negativos para registrar la incidencia",
+			"notifiedTitle": "Incidencia registrada",
+			"notifiedBody": "Se han acumulado suficientes reportes negativos en esta línea para el día de hoy. La incidencia queda registrada con su línea, sus paradas y sus horas, y es visible en el panel de gestión de Empresa Plana.",
+			"coordinatorNotified": "Los reportes quedan registrados en el panel de gestión, con su línea, parada y hora.",
+			"companyNotified": "El registro es permanente y se puede consultar en el panel de gestión.",
+			"strikesLeft": "Reportes negativos restantes antes de registrar la incidencia",
 			"resolved": "Incidencia resuelta"
 		},
 		"stats": {
 			"punctuality": "Puntualidad",
 			"reports": "Reportes hoy",
-			"onTimeRate": "% a tiempo"
+			"onTimeRate": "% a tiempo",
+			"sample": "Reportes",
+			"basis": "Porcentaje calculado sobre los reportes enviados hoy por los usuarios. No es una medición de la flota: con pocos reportes la cifra no es concluyente."
 		},
 		"status": {
 			"pending": "Pendiente",
@@ -1198,6 +1200,23 @@
 			"cleanliness": "Limpieza",
 			"submit": "Enviar valoración",
 			"thanks": "¡Gracias por tu valoración!"
+		},
+		"panel": {
+			"title": "Puntualidad de las líneas",
+			"subtitle": "Agregado de los reportes enviados por los usuarios, día a día.",
+			"line": "Línea",
+			"date": "Día de servicio",
+			"onTimeRate": "A tiempo",
+			"negative": "Negativos",
+			"sample": "Reportes",
+			"status": "Estado",
+			"ok": "Sin incidencias",
+			"escalated": "Incidencia registrada",
+			"empty": "Todavía no hay reportes suficientes para mostrar datos.",
+			"disclaimer": "Estas cifras proceden de los reportes de los usuarios, no de una medición directa de los vehículos. Son un indicador de opinión: úsalas como señal, no como certificado.",
+			"window": "Últimos {days} días",
+			"lastSeen": "Último reporte",
+			"unavailable": "No se han podido consultar los datos en este momento. Inténtalo más tarde."
 		}
 	},
 	"management": {
@@ -1216,7 +1235,8 @@
 			"conexiones": "Conexiones del mismo autobús",
 			"documentos": "Documentos de vehículos",
 			"incidencias": "Incidencias",
-			"mantenimiento": "Mantenimiento"
+			"mantenimiento": "Mantenimiento",
+			"escalaciones": "Incidencias escaladas"
 		},
 		"fields": {
 			"code": "Código",
@@ -1344,7 +1364,12 @@
 			"expiryAlerts": "Avisos de caducidad",
 			"noExpiryAlerts": "No hay documentos caducados ni por caducar.",
 			"expiresInDays": "caduca en {days} días",
-			"expiredDaysAgo": "caducado hace {days} días"
+			"expiredDaysAgo": "caducado hace {days} días",
+			"serviceDate": "Día de servicio",
+			"negativeCount": "Reportes negativos",
+			"threshold": "Umbral",
+			"resolvedBy": "Resuelto por",
+			"acknowledged": "Reconocida"
 		},
 		"common": {
 			"add": "Añadir",

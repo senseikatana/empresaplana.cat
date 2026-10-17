@@ -1168,18 +1168,20 @@
 		},
 		"alerts": {
 			"threshold": 3,
-			"thresholdLabel": "Negative reports before alerting",
-			"notifiedTitle": "Alert sent",
-			"notifiedBody": "After 3 negative reports on this route, the company and the driver coordinator have been notified.",
-			"coordinatorNotified": "The driver group coordinator has been notified.",
-			"companyNotified": "The company has been notified.",
-			"strikesLeft": "Reports remaining before notifying",
+			"thresholdLabel": "Negative reports before logging the incident",
+			"notifiedTitle": "Incident logged",
+			"notifiedBody": "Enough negative reports have accumulated on this line for today. The incident is logged with its line, stops and times, and is visible in Empresa Plana's management panel.",
+			"coordinatorNotified": "Reports are recorded in the management panel with their line, stop and time.",
+			"companyNotified": "The record is permanent and can be consulted in the management panel.",
+			"strikesLeft": "Negative reports remaining before logging the incident",
 			"resolved": "Incident resolved"
 		},
 		"stats": {
 			"punctuality": "Punctuality",
 			"reports": "Reports today",
-			"onTimeRate": "% on time"
+			"onTimeRate": "% on time",
+			"sample": "Reports",
+			"basis": "Percentage calculated from reports submitted by users today. It is not a fleet measurement: with few reports the figure is not conclusive."
 		},
 		"status": {
 			"pending": "Pending",
@@ -1198,6 +1200,23 @@
 			"cleanliness": "Cleanliness",
 			"submit": "Send review",
 			"thanks": "Thanks for your review!"
+		},
+		"panel": {
+			"title": "Line punctuality",
+			"subtitle": "Aggregate of user-submitted reports, day by day.",
+			"line": "Line",
+			"date": "Service day",
+			"onTimeRate": "On time",
+			"negative": "Negative",
+			"sample": "Reports",
+			"status": "Status",
+			"ok": "No incidents",
+			"escalated": "Incident logged",
+			"empty": "Not enough reports yet to show data.",
+			"disclaimer": "These figures come from user reports, not from direct measurement of the vehicles. They are an opinion indicator: use them as a signal, not as a certificate.",
+			"window": "Last {days} days",
+			"lastSeen": "Latest report",
+			"unavailable": "The data could not be retrieved at this time. Please try again later."
 		}
 	},
 	"management": {
@@ -1216,7 +1235,8 @@
 			"conexiones": "Same-bus connections",
 			"documentos": "Vehicle documents",
 			"incidencias": "Incidents",
-			"mantenimiento": "Maintenance"
+			"mantenimiento": "Maintenance",
+			"escalaciones": "Escalated incidents"
 		},
 		"fields": {
 			"code": "Code",
@@ -1344,7 +1364,12 @@
 			"expiryAlerts": "Expiry alerts",
 			"noExpiryAlerts": "No expired or expiring documents.",
 			"expiresInDays": "expires in {days} days",
-			"expiredDaysAgo": "expired {days} days ago"
+			"expiredDaysAgo": "expired {days} days ago",
+			"serviceDate": "Service day",
+			"negativeCount": "Negative reports",
+			"threshold": "Threshold",
+			"resolvedBy": "Resolved by",
+			"acknowledged": "Acknowledged"
 		},
 		"common": {
 			"add": "Add",

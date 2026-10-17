@@ -101,7 +101,10 @@ async function submitReport() {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
-				lineId: submittedLine, stopId: selectedStop.value.id, action: action.value,
+				lineId: submittedLine,
+				stopId: selectedStop.value.id,
+				stopName: selectedStop.value.name,
+				action: action.value,
 				minutesLate: (action.value === "late" || action.value === "early") && minutesLate.value ? Number(minutesLate.value) : undefined,
 				comment: comment.value || undefined,
 			}),
@@ -193,10 +196,13 @@ async function submitReview() {
 					<span class="font-label-md text-label-md text-on-surface-variant">{{ t.stats.punctuality }} · {{ t.stats.onTimeRate }}: {{ stats.onTimeRate }}%</span>
 					<span class="font-label-md text-label-md text-deep-navy">{{ negativeCount }}/{{ threshold }}</span>
 				</div>
+				<!-- El denominador va siempre visible: sin él el porcentaje no significa nada. -->
+				<p class="mb-2 text-body-md text-on-surface-variant">{{ t.stats.sample }}: {{ stats.total }}</p>
 				<div role="progressbar" :aria-label="t.alerts.thresholdLabel" :aria-valuenow="negativeCount" :aria-valuemax="Math.max(threshold, negativeCount)" aria-valuemin="0" class="h-2 rounded-full bg-surface-container overflow-hidden">
 					<div class="h-full rounded-full transition-all" :class="escalated ? 'bg-error' : 'bg-energetic-orange'" :style="{ width: `${progress}%` }" />
 				</div>
 				<p class="mt-2 text-body-md text-on-surface-variant">{{ escalated ? t.alerts.notifiedBody : `${t.alerts.strikesLeft}: ${Math.max(0, threshold - negativeCount)}` }}</p>
+				<p class="mt-3 p-3 rounded-lg bg-surface-container text-body-md text-on-surface-variant">{{ t.stats.basis }}</p>
 				<div v-if="escalated" class="mt-3 p-4 rounded-lg bg-error-container/60 border border-error/30">
 					<p class="font-headline-md text-headline-md text-on-error-container">{{ t.alerts.notifiedTitle }}</p>
 					<ul class="mt-2 space-y-1 text-body-md text-on-error-container">
