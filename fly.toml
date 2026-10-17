@@ -13,7 +13,7 @@
 #                     de producción el primer CREATE TABLE ya existente rompía
 #                     la release. Ver docs/architecture/decisions/migration-mapping.md.
 
-app = 'empresaplana-cat'
+app = 'empresaplana'
 primary_region = 'fra'
 
 [build]

@@ -3,7 +3,7 @@
 	"type": "module",
 	"version": "0.6.0",
 	"engines": {
-		"node": ">=22.12.0"
+		"node": ">=22.12.0 <25"
 	},
 	"scripts": {
 		"dev": "astro dev",
@@ -37,10 +37,12 @@
 		"release:check": "node src/scripts/release-versions.mjs",
 		"release:check:strict": "node src/scripts/release-versions.mjs --strict",
 		"release:version": "node src/scripts/release-versions.mjs",
-		"prepare": "husky"
+		"prepare": "husky || true",
+		"build:vercel": "bun run db:generate && astro build"
 	},
 	"dependencies": {
 		"@astrojs/node": "^11.1.7",
+		"@astrojs/vercel": "^11.0.15",
 		"@astrojs/vue": "^7.0.3",
 		"@insforge/sdk": "^1.5.2",
 		"@prisma/adapter-pg": "^7.10.0",
@@ -78,5 +80,6 @@
 		"*.{js,jsx,ts,tsx,mjs,cjs}": [
 			"biome check --write --no-errors-on-unmatched"
 		]
-	}
+	},
+	"packageManager": "bun@1.4.3"
 }

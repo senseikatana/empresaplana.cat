@@ -10,6 +10,14 @@
 !tests/**
 !test/
 !test/**
+# `tests/ci-workflow.test.ts` lee `.github/workflows/ci.yml` para comprobar que la
+# CI ejecuta el gate. Como el contexto es una allowlist que arranca en `**`, sin
+# esta negación el test falla con ENOENT dentro del build y el despliegue entero
+# se cae antes de llegar a `astro build`.
+!.github/
+!.github/**
+!.vercelignore
+!vercel.json
 test/test-results/
 test/playwright-report/
 !prisma.config.ts
