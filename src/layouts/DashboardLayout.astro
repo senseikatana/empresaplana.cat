@@ -12,7 +12,7 @@
  * User data is passed as a prop from the page (fetched server-side).
  */
 import "@/styles/global.css";
-import { hasCapability, isRole, type Role } from "@/lib/acl";
+import { canAccessDashboardPath, isRole, type Role } from "@/lib/acl";
 import { getDictionary, getLocale } from "@/config/i18n";
 import HeaderPreferences from "@/components/HeaderPreferences.astro";
 import ThemeInit from "@/components/ThemeInit.astro";
@@ -54,15 +54,42 @@ const companyNav = [
 	{ label: dict.management.entities.lineas, icon: "alt_route", href: "/dashboard/gestion/lineas" },
 	{ label: dict.management.entities["horarios-linea"], icon: "event", href: "/dashboard/gestion/horarios-linea" },
 	{ label: dict.management.entities.conexiones, icon: "connecting_airports", href: "/dashboard/gestion/conexiones" },
-	...(role === "admin"
-		? [{ label: sectionNav.integrations, icon: "power", href: "/dashboard/gestion/integraciones" }]
-		: []),
-	...(role === "admin"
-		? [{ label: sectionNav.users, icon: "group", href: "/dashboard/gestion/usuarios" }]
-		: []),
+	{ label: sectionNav.integrations, icon: "power", href: "/dashboard/gestion/integraciones" },
+	{ label: sectionNav.users, icon: "group", href: "/dashboard/gestion/usuarios" },
 	{ label: dict.app.panel.messages, icon: "chat", href: "/dashboard/mensajes" },
 ];
-const navItems = role && hasCapability(role, "dashboard:access") ? companyNav : [];
+
+/**
+ * Sección propia de cada rol. Antes no existía: cliente y empleado aterrizaban
+ * en su dashboard sin ningún enlace lateral, y el menú de compañía se les
+ * mostraba entero (con `hasCapability(role, "dashboard:access")`, que los cuatro
+ * roles tienen) apuntando a rutas que el middleware les negaba.
+ *
+ * Reutiliza etiquetas que ya existen en `app.panel` y `app.gestion.nav`, así
+ * que no hace falta tocar los cuatro ficheros de i18n.
+ */
+const roleSectionNav: Partial<Record<Role, typeof companyNav>> = {
+	client: [
+		{ label: sectionNav.panel, icon: "dashboard", href: "/dashboard/cliente" },
+		{ label: dict.app.panel.favorites, icon: "favorite", href: "/dashboard/cliente/favoritas" },
+		{ label: dict.app.panel.quotes, icon: "request_quote", href: "/dashboard/cliente/cotizaciones" },
+		{ label: dict.app.panel.account, icon: "person", href: "/dashboard/cliente/cuenta" },
+	],
+	worker: [
+		{ label: sectionNav.panel, icon: "dashboard", href: "/dashboard/trabajador" },
+		{ label: dict.app.panel.lines, icon: "route", href: "/dashboard/trabajador/lineas" },
+		{ label: dict.app.panel.incidents, icon: "report_problem", href: "/dashboard/trabajador/incidencias" },
+		{ label: dict.app.panel.reports, icon: "bar_chart", href: "/dashboard/trabajador/reportes" },
+	],
+};
+
+// El menú se filtra con el mismo predicado que aplica el middleware: una sola
+// fuente de verdad, y nunca una entrada que vaya a ser rechazada al pulsarla.
+const navItems = role
+	? [...(roleSectionNav[role] ?? []), ...companyNav].filter((item) =>
+			canAccessDashboardPath(role, item.href),
+		)
+	: [];
 
 const footerNav = [
 	{ label: dict.app.panel.account, icon: "person", href: "/perfil" },

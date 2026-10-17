@@ -101,23 +101,60 @@ const ADMIN_ONLY_PATHS = [
 	"/dashboard/gestion/integraciones",
 ];
 
-const ROLE_SPECIFIC_PATHS = ["/dashboard/cliente", "/dashboard/trabajador"];
+/**
+ * Secciones que tienen un dueño: el rol indicado y solo él.
+ *
+ * Antes esta tabla se usaba al revés, para *negar*: `ROLE_SPECIFIC_PATHS`
+ * devolvía `false` para todo el mundo, así que `/dashboard/cliente` y
+ * `/dashboard/trabajador` no las alcanzaba ningún rol. Junto con el gate
+ * `isCompanyRole` de entrada, dejaba las cuatro páginas de empleado como
+ * rutas muertas.
+ */
+const ROLE_OWNED_SECTIONS: ReadonlyArray<readonly [string, Role]> = [
+	["/dashboard/cliente", "client"],
+	["/dashboard/trabajador", "worker"],
+];
+
+/**
+ * Secciones abiertas a cualquier rol con sesión.
+ *
+ * El chat estaba aquí porerror: los cuatro roles reciben `chat:access` y
+ * `chat:create` en `ROLE_CAPABILITIES`, y `mensajes.astro` solo pide sesión, así
+ * que la capability era inalcanzable para cliente y empleado.
+ */
+const SHARED_SECTIONS = ["/dashboard/mensajes"];
 
 export function canAccessDashboardPath(
 	role: unknown,
 	pathname: string,
 ): boolean {
 	pathname = unlocalizedPath(pathname);
-	if (!isCompanyRole(role)) return false;
+	if (!isRole(role)) return false;
 	if (pathname !== "/dashboard" && !pathname.startsWith("/dashboard/"))
 		return false;
+
+	// La raíz no decide nada: `dashboard/index.astro` redirige según el rol.
+	// Dejarla pasar evita un doble redirect cuando el rol no tiene sección.
+	if (pathname === "/dashboard") return true;
+
+	// Sección común a los cuatro roles.
 	if (
-		ROLE_SPECIFIC_PATHS.some(
+		SHARED_SECTIONS.some(
 			(path) => pathname === path || pathname.startsWith(`${path}/`),
 		)
 	) {
-		return false;
+		return true;
 	}
+
+	const owned = ROLE_OWNED_SECTIONS.find(
+		([prefix]) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+	);
+	// Sección con dueño: ni managers ni admins entran en la de otro rol.
+	if (owned) return owned[1] === role;
+
+	// El resto del dashboard (gestión, mensajes, IA) es de la compañía.
+	if (!isCompanyRole(role)) return false;
+
 	if (
 		role !== "admin" &&
 		ADMIN_ONLY_PATHS.some(
@@ -130,7 +167,11 @@ export function canAccessDashboardPath(
 }
 
 export function dashboardHomeForRole(role: Role): string {
-	return isCompanyRole(role) ? "/dashboard/gestion" : "/perfil";
+	// Cada rol aterriza en su propia sección: cliente y empleado en su mini
+	// dashboard, compañía en gestión.
+	if (role === "client") return "/dashboard/cliente";
+	if (role === "worker") return "/dashboard/trabajador";
+	return "/dashboard/gestion";
 }
 
 export function postLoginDestination(
