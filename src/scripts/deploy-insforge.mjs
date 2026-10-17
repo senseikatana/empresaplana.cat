@@ -14,8 +14,7 @@ process.chdir(root);
 config({ path: [".env.production", ".env.local", ".env"], quiet: true });
 
 const origin = new URL(
-	process.env.INSFORGE_DEPLOY_URL ??
-		"https://empresaplana-web-a09ce3e6-15aa-45cd-8882-d36e986600c2.fly.dev",
+	process.env.INSFORGE_DEPLOY_URL ?? "https://empresaplana-cat.fly.dev",
 );
 if (
 	origin.protocol !== "https:" ||
@@ -29,6 +28,16 @@ if (
 		"INSFORGE_DEPLOY_URL must be an HTTPS origin without a path.",
 	);
 }
+
+/**
+ * App de destino. El nombre tiene que coincidir con `app` de `fly.toml`: flyctl
+ * lanza el deploy a partir de ese fichero cuando se invoca `flyctl deploy` a
+ * secas (es el caso del workflow de GitHub), y si el script declarase otro app
+ * habría dos fuentes de verdad en pugna.
+ *
+ * Para volver al app anterior: INSFORGE_DEPLOY_APP=empresaplana-web
+ */
+const app = process.env.INSFORGE_DEPLOY_APP ?? "empresaplana-cat";
 
 const keys = [
 	"DATABASE_URL",
@@ -67,7 +76,7 @@ const args = [
 	"deploy",
 	".",
 	"--name",
-	"empresaplana-web",
+	app,
 	"--port",
 	"8080",
 	"--region",

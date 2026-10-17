@@ -35,7 +35,9 @@ function differences(
 			if (!Object.hasOwn(actual, key)) {
 				errors.push(`${locale}: missing key "${keyPath}"`);
 			} else {
-				errors.push(...differences(expected[key], actual[key], locale, keyPath));
+				errors.push(
+					...differences(expected[key], actual[key], locale, keyPath),
+				);
 			}
 		}
 		for (const key of Object.keys(actual).sort()) {
@@ -49,9 +51,18 @@ function differences(
 
 	if (Array.isArray(expected) && Array.isArray(actual)) {
 		const errors: string[] = [];
-		for (let index = 0; index < Math.min(expected.length, actual.length); index++) {
+		for (
+			let index = 0;
+			index < Math.min(expected.length, actual.length);
+			index++
+		) {
 			errors.push(
-				...differences(expected[index], actual[index], locale, `${path}[${index}]`),
+				...differences(
+					expected[index],
+					actual[index],
+					locale,
+					`${path}[${index}]`,
+				),
 			);
 		}
 		return errors;
@@ -62,7 +73,10 @@ function differences(
 
 function loadDictionary(locale: (typeof locales)[number]): unknown {
 	return JSON.parse(
-		readFileSync(new URL(`../src/config/i18n/${locale}.json`, import.meta.url), "utf8"),
+		readFileSync(
+			new URL(`../src/config/i18n/${locale}.json`, import.meta.url),
+			"utf8",
+		),
 	);
 }
 
@@ -71,7 +85,9 @@ describe("translation dictionary parity", () => {
 		const reference = loadDictionary("es");
 		const errors = locales
 			.filter((locale) => locale !== "es")
-			.flatMap((locale) => differences(reference, loadDictionary(locale), locale));
+			.flatMap((locale) =>
+				differences(reference, loadDictionary(locale), locale),
+			);
 
 		assert.deepEqual(errors, [], errors.join("\n"));
 	});
