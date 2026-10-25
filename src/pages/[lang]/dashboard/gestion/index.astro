@@ -53,67 +53,88 @@ const docsHref = localizedPath("/dashboard/gestion/documentos", locale);
 const daysLeft = (day: Date) => Math.round((day.getTime() - today.getTime()) / 86_400_000);
 
 const kpis = [
-	{ label: dict.app.gestion.nav.routes, value: routesCount, icon: "route" },
-	{ label: dict.app.gestion.nav.buses, value: busesCount, icon: "directions_bus" },
-	{ label: dict.app.gestion.nav.stops, value: stopsCount, icon: "location_on" },
-	{ label: dict.app.gestion.nav.drivers, value: driversCount, icon: "badge" },
+	{ label: dict.app.gestion.nav.routes, value: routesCount, icon: "route", color: "text-coastal-teal" },
+	{ label: dict.app.gestion.nav.buses, value: busesCount, icon: "directions_bus", color: "text-coastal-teal" },
+	{ label: dict.app.gestion.nav.stops, value: stopsCount, icon: "location_on", color: "text-coastal-teal" },
+	{ label: dict.app.gestion.nav.drivers, value: driversCount, icon: "badge", color: "text-coastal-teal" },
 ];
 const fleetKpis = [
-	{ label: fields.expiredDocuments, value: expiredDocs, icon: "gpp_bad", href: docsHref, alert: expiredDocs > 0 },
-	{ label: fields.expiringDocuments, value: expiringDocs, icon: "event_upcoming", href: docsHref, alert: expiringDocs > 0 },
-	{ label: fields.openIncidents, value: openIncidents, icon: "report_problem", href: localizedPath("/dashboard/gestion/incidencias", locale), alert: openIncidents > 0 },
-	{ label: fields.pendingMaintenance, value: pendingMaintenance, icon: "build", href: localizedPath("/dashboard/gestion/mantenimiento", locale), alert: false },
+	{ label: fields.expiredDocuments, value: expiredDocs, icon: "gpp_bad", href: docsHref, alert: expiredDocs > 0, color: expiredDocs > 0 ? "text-error" : "text-coastal-teal" },
+	{ label: fields.expiringDocuments, value: expiringDocs, icon: "event_upcoming", href: docsHref, alert: expiringDocs > 0, color: expiringDocs > 0 ? "text-warning" : "text-coastal-teal" },
+	{ label: fields.openIncidents, value: openIncidents, icon: "report_problem", href: localizedPath("/dashboard/gestion/incidencias", locale), alert: openIncidents > 0, color: openIncidents > 0 ? "text-error" : "text-coastal-teal" },
+	{ label: fields.pendingMaintenance, value: pendingMaintenance, icon: "build", href: localizedPath("/dashboard/gestion/mantenimiento", locale), alert: false, color: "text-coastal-teal" },
 ];
 ---
 
 <DashboardLayout title={dict.app.gestion.nav.panel} locale={locale} user={user}>
-	<div>
-		<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-deep-navy">
-			{dict.app.gestion.nav.panel}
-		</h1>
-		<p class="font-body-md text-body-md text-on-surface-variant mt-1">
-			{dict.app.title}
-		</p>
+	<div class="space-y-6">
+		<!-- Header -->
+		<div>
+			<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg font-bold text-deep-navy">
+				{dict.app.gestion.nav.panel}
+			</h1>
+			<p class="font-body-md text-body-md text-on-surface-variant mt-1">
+				{dict.app.title}
+			</p>
+		</div>
 
-		<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+		<!-- KPI Stats Grid (HyperUI style) -->
+		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 			{kpis.map((k) => (
-				<div class="bg-surface-container-lowest rounded-xl shadow-ambient border border-surface-variant p-6">
-					<div class="flex items-center gap-3">
-						<span class="material-symbols-outlined text-coastal-teal text-[28px]">{k.icon}</span>
+				<article class="flex flex-col gap-4 rounded-xl border border-surface-variant bg-surface-container-lowest p-6 shadow-ambient">
+					<div class="flex items-center justify-between">
 						<div>
-							<p class="font-headline-lg font-bold text-deep-navy">{k.value}</p>
 							<p class="font-label-md text-label-md text-on-surface-variant">{k.label}</p>
+							<p class="font-headline-lg font-bold text-deep-navy mt-1">{k.value}</p>
 						</div>
+						<span class="material-symbols-outlined {k.color} text-[32px] shrink-0" aria-hidden="true">{k.icon}</span>
 					</div>
-				</div>
+				</article>
 			))}
 		</div>
 
-		<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+		<!-- Fleet KPIs with links -->
+		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 			{fleetKpis.map((k) => (
-				<a href={k.href} class="bg-surface-container-lowest rounded-xl shadow-ambient border border-surface-variant p-6 hover:border-coastal-teal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coastal-teal">
-					<div class="flex items-center gap-3">
-						<span class:list={["material-symbols-outlined text-[28px]", k.alert ? "text-error" : "text-coastal-teal"]} aria-hidden="true">{k.icon}</span>
+				<a
+					href={k.href}
+					class="flex flex-col gap-4 rounded-xl border border-surface-variant bg-surface-container-lowest p-6 shadow-ambient hover:border-coastal-teal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coastal-teal transition-colors"
+				>
+					<div class="flex items-center justify-between">
 						<div>
-							<p class="font-headline-lg font-bold text-deep-navy">{k.value}</p>
 							<p class="font-label-md text-label-md text-on-surface-variant">{k.label}</p>
+							<p class="font-headline-lg font-bold text-deep-navy mt-1">{k.value}</p>
 						</div>
+						<span class="material-symbols-outlined {k.color} text-[32px] shrink-0" aria-hidden="true">{k.icon}</span>
 					</div>
 				</a>
 			))}
 		</div>
 
-		<section class="mt-8 bg-surface-container-lowest rounded-xl shadow-ambient border border-surface-variant p-6" aria-labelledby="expiry-alerts">
-			<h2 id="expiry-alerts" class="font-headline-md text-headline-md font-bold text-deep-navy">{fields.expiryAlerts}</h2>
+		<!-- Expiry Alerts Section -->
+		<section class="rounded-xl border border-surface-variant bg-surface-container-lowest p-6 shadow-ambient" aria-labelledby="expiry-alerts">
+			<div class="flex items-center justify-between">
+				<h2 id="expiry-alerts" class="font-headline-md text-headline-md font-bold text-deep-navy">
+					{fields.expiryAlerts}
+				</h2>
+				<a
+					href={docsHref}
+					class="text-sm font-semibold text-coastal-teal hover:underline"
+				>
+					Ver todos
+				</a>
+			</div>
 			{alerts.length === 0
-				? <p class="mt-3 text-on-surface-variant">{fields.noExpiryAlerts}</p>
+				? <p class="mt-4 text-on-surface-variant">{fields.noExpiryAlerts}</p>
 				: <ul class="mt-4 divide-y divide-outline-variant">
 					{alerts.map((doc) => {
 						const days = daysLeft(doc.expiresOn);
 						return (
 							<li class="flex flex-wrap items-center justify-between gap-2 py-3">
-								<a class="font-semibold text-deep-navy" href={`${docsHref}?view=${doc.id}`}>{doc.bus.number} · {fields[doc.docType] ?? doc.docType}</a>
-								<span class:list={["rounded-full px-3 py-1 text-xs font-semibold", days < 0 ? "bg-error-container text-on-error-container" : "bg-surface-container-high text-on-surface"]}>
+								<a class="font-semibold text-deep-navy hover:underline" href={`${docsHref}?view=${doc.id}`}>
+									{doc.bus.number} · {fields[doc.docType] ?? doc.docType}
+								</a>
+								<span class={`rounded-full px-3 py-1 text-xs font-semibold ${days < 0 ? "bg-error-container text-on-error-container" : "bg-surface-container-high text-on-surface"}`}>
 									{doc.expiresOn.toISOString().slice(0, 10)} · {(days < 0 ? fields.expiredDaysAgo : fields.expiresInDays).replace("{days}", String(Math.abs(days)))}
 								</span>
 							</li>
