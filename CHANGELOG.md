@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.7.1] - 2026-10-25
+
+Highlights: feat(dashboard): improve accessibility and management panel UI.
+
+- 🚀 feat(dashboard): improve accessibility and management panel UI `a25a49d`
+  - `src/components/ManagementPanel.astro`
+  - `src/config/i18n/ca.json`
+  - `src/config/i18n/en.json`
+  - `src/config/i18n/es.json`
+  - `src/config/i18n/fr.json`
+  - `src/layouts/DashboardLayout.astro`
+  - `src/pages/[lang]/dashboard/cliente/index.astro`
+  - `src/pages/[lang]/dashboard/gestion/index.astro`
+  - `src/pages/[lang]/dashboard/trabajador/index.astro`
+- 🚀 feat: update dashboard layout and navigation `0b31269`
+- 🐛 fix: update CI workflow tests to allow X-Forwarded-Host and accept any su `edc26a9`
+- 🐛 fix(acl): open the client and employee dashboards to their own role `009d848`
+- 🚀 feat(workflows): add app and index `5c917ed`
+- 🚀 feat(adr): add action, actualDirs and addReport (#23) `a461f98`
+
 ## [0.7.0] - 2026-10-25
 
 Highlights: feat: update dashboard layout and navigation.
