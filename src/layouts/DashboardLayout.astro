@@ -126,36 +126,46 @@ function isActive(href: string): boolean {
       rel="stylesheet"
     />
     <style is:global>
-      .nav-item-active {
-        background-color: rgba(19, 174, 184, 0.12);
-        color: var(--brand-secondary);
-      }
-      .nav-item-active .material-symbols-outlined {
-        color: var(--brand-secondary);
-      }
-      #app-sidebar {
-        transition: transform 0.3s ease;
+      /* El checkbox que controla la sidebar es hermano de <main>, no del
+         hamburger; `peer-focus-visible` no alcanza descendientes, así que el
+         anillo de foco se aplica con un selector de hermanos. `currentColor`
+         garantiza contraste en ambos temas y en forced-colors. */
+      #sidebar-toggle:focus-visible ~ main #sidebar-toggle-label {
+        outline: 2px solid currentColor;
+        outline-offset: 2px;
       }
     </style>
   </head>
-  <body class="bg-surface text-on-surface font-sans min-h-screen flex h-screen overflow-hidden">
-    <!-- Mobile overlay -->
-    <input type="checkbox" id="sidebar-toggle" class="peer sr-only" />
+  <body class="bg-surface text-on-surface font-sans min-h-dvh flex h-dvh overflow-hidden">
+    <a
+      href="#dashboard-main"
+      class="sr-only z-50 rounded-md bg-deep-navy text-sm font-medium text-white focus:not-sr-only focus:fixed focus:start-4 focus:top-4"
+    >
+      <span class="block px-4 py-2">{dict.app.misc.skipToContent}</span>
+    </a>
+
+    <!-- Overlay móvil -->
+    <input
+      type="checkbox"
+      id="sidebar-toggle"
+      aria-controls="app-sidebar"
+      class="peer sr-only lg:hidden"
+    />
 
     <label
       for="sidebar-toggle"
       aria-hidden="true"
-      class="fixed inset-0 z-30 hidden bg-black/50 peer-checked:block lg:hidden"
+      class="fixed inset-0 z-40 hidden touch-manipulation bg-black/50 peer-checked:block lg:hidden"
     ></label>
 
     <!-- Sidebar -->
     <aside
       id="app-sidebar"
-      class="fixed inset-y-0 start-0 z-40 flex w-64 -translate-x-full flex-col justify-between overflow-y-auto border-r border-outline-variant bg-surface-container-low transition-transform duration-300 peer-checked:translate-x-0 lg:static lg:shrink-0 lg:translate-x-0"
+      class="fixed inset-y-0 start-0 z-50 flex w-64 -translate-x-full flex-col justify-between overflow-y-auto overscroll-contain border-e border-outline-variant bg-surface-container-low transition-transform duration-300 motion-reduce:transition-none peer-checked:translate-x-0 max-lg:rtl:translate-x-full lg:static lg:shrink-0 lg:translate-x-0"
     >
       <div class="p-4">
         <div class="flex items-center gap-2.5 h-12">
-          <span class="material-symbols-outlined text-xl text-deep-navy">
+          <span class="material-symbols-outlined text-xl text-deep-navy" aria-hidden="true">
             directions_bus
           </span>
           <span class="font-bold text-on-surface truncate">
@@ -163,21 +173,22 @@ function isActive(href: string): boolean {
           </span>
         </div>
 
-        <nav aria-label="Dashboard" class="mt-4">
+        <nav aria-label={sectionNav.panel} class="mt-4">
           <ul class="space-y-1">
             {
               navItems.map((item) => (
                 <li>
                   <a
                     href={localizedPath(item.href, currentLocale)}
+                    aria-current={isActive(item.href) ? "page" : undefined}
                     class={`block rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                       isActive(item.href)
-                        ? "bg-primary-fixed text-primary-container"
+                        ? "bg-primary-fixed text-deep-navy"
                         : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"
                     }`}
                   >
                     <span class="flex items-center gap-3">
-                      <span class="material-symbols-outlined text-[20px] shrink-0">
+                      <span class="material-symbols-outlined text-[20px] shrink-0" aria-hidden="true">
                         {item.icon}
                       </span>
                       <span class="truncate">{item.label}</span>
@@ -198,7 +209,7 @@ function isActive(href: string): boolean {
               href={localizedPath(item.href, currentLocale)}
               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors mb-0.5"
             >
-              <span class="material-symbols-outlined text-[20px] shrink-0">
+              <span class="material-symbols-outlined text-[20px] shrink-0" aria-hidden="true">
                 {item.icon}
               </span>
               <span class="truncate">{item.label}</span>
@@ -221,8 +232,9 @@ function isActive(href: string): boolean {
             id="logout-btn"
             class="p-1.5 rounded-md hover:bg-surface-container-high text-on-surface-variant transition-colors"
             title={dict.app.nav.logout}
+            aria-label={dict.app.nav.logout}
           >
-            <span class="material-symbols-outlined text-[18px]">
+            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">
               logout
             </span>
           </button>
@@ -231,7 +243,7 @@ function isActive(href: string): boolean {
     </aside>
 
     <!-- Main content -->
-    <main class="flex flex-1 flex-col overflow-y-auto lg:ml-0">
+    <main id="dashboard-main" tabindex="-1" class="flex flex-1 flex-col overflow-y-auto">
       <!-- Top navbar -->
       <header
         class="sticky top-0 z-30 h-14 bg-surface-container-lowest/80 backdrop-blur-md border-b border-outline-variant flex items-center px-4 gap-3"
@@ -240,11 +252,9 @@ function isActive(href: string): boolean {
         <label
           for="sidebar-toggle"
           id="sidebar-toggle-label"
-          aria-expanded="false"
-          aria-controls="app-sidebar"
-          class="lg:hidden cursor-pointer p-1.5 rounded-md hover:bg-surface-container-high text-on-surface-variant"
+          class="lg:hidden cursor-pointer rounded-md p-1.5 touch-manipulation text-on-surface-variant transition-colors hover:bg-surface-container-high"
         >
-          <span class="sr-only">{dict.app.nav.toggleMenu ?? "Toggle menu"}</span>
+          <span class="sr-only">{dict.app.nav.toggleMenu}</span>
           <svg
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
@@ -264,7 +274,7 @@ function isActive(href: string): boolean {
       </header>
 
       <!-- Page content -->
-      <div class="flex-1 p-4 lg:p-6 overflow-y-auto">
+      <div class="flex-1 p-4 lg:p-6">
         <slot />
       </div>
     </main>
@@ -283,33 +293,34 @@ function isActive(href: string): boolean {
           window.location.href = logoutPath;
         });
 
-      // Sync sidebar toggle checkbox with sidebar state on mobile
+      // El overlay (label a pantalla completa) y el hamburger alternan el
+      // checkbox de forma nativa; el script solo gestiona el foco, `inert`
+      // y el cierre con Escape.
       const sidebarToggle = document.getElementById("sidebar-toggle");
       const sidebar = document.getElementById("app-sidebar");
-      const overlay = document.querySelector('label[for="sidebar-toggle"]');
+      const main = document.getElementById("dashboard-main");
+      // Mismo breakpoint que `lg` (64rem), no un ancho en píxeles.
+      const desktop = window.matchMedia("(min-width: 64rem)");
 
-      if (sidebarToggle && sidebar) {
-        // Handle clicks outside sidebar on mobile
-        document.addEventListener("click", (e) => {
-          if (window.innerWidth < 1024) {
-            const isClickInsideSidebar = sidebar.contains(e.target as Node);
-            const isClickOnToggle = e.target === sidebarToggle || 
-              (e.target as Element)?.closest?.('label[for="sidebar-toggle"]');
-            
-            if (!isClickInsideSidebar && !isClickOnToggle && !sidebar.classList.contains("-translate-x-full")) {
-              sidebarToggle.checked = false;
-            }
-          }
-        });
-
-        // Update aria-expanded on toggle
-        sidebarToggle.addEventListener("change", () => {
-          const toggleLabel = document.getElementById("sidebar-toggle-label");
-          if (toggleLabel) {
-            toggleLabel.setAttribute("aria-expanded", String(sidebarToggle.checked));
-          }
-        });
+      function syncSidebarState() {
+        if (!sidebar || !sidebarToggle) return;
+        const offCanvas = !desktop.matches && !sidebarToggle.checked;
+        // Cerrada y fuera de pantalla: `inert` evita que el teclado o un
+        // lector de pantalla entren en enlaces invisibles.
+        sidebar.toggleAttribute("inert", offCanvas);
+        // Drawer abierto: el contenido de fondo tampoco debe ser interactivo.
+        main?.toggleAttribute("inert", !desktop.matches && sidebarToggle.checked);
       }
+
+      sidebarToggle?.addEventListener("change", syncSidebarState);
+      desktop.addEventListener("change", syncSidebarState);
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && sidebarToggle?.checked) {
+          sidebarToggle.checked = false;
+          sidebarToggle.dispatchEvent(new Event("change"));
+        }
+      });
+      syncSidebarState();
     </script>
   </body>
 </html>

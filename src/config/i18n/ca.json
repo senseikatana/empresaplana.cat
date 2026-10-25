@@ -193,7 +193,8 @@
 			"lines": "Línies",
 			"reports": "Reportes",
 			"logout": "Tanca la sessió",
-			"switchRole": "Canvia de rol"
+			"switchRole": "Canvia de rol",
+			"toggleMenu": "Obre el menú"
 		},
 		"client": {
 			"greeting": "Hola, {name}",
@@ -269,7 +270,8 @@
 			"cancel": "Cancel·la",
 			"save": "Desa",
 			"close": "Tanca",
-			"language": "Idioma"
+			"language": "Idioma",
+			"skipToContent": "Ves al contingut"
 		},
 		"gestion": {
 			"nav": {
@@ -1326,6 +1328,8 @@
 			"late": "Tard",
 			"early": "Avançat",
 			"not_passed": "No ha passat",
+			"onTime": "Puntual",
+			"notPassed": "No ha passat",
 			"busId": "Vehicle",
 			"busLabel": "Vehicle",
 			"docType": "Tipus de document",
@@ -1395,6 +1399,7 @@
 			"total": "Registres",
 			"pagination": "Paginació",
 			"previous": "Anterior",
+			"viewAll": "Veure tots",
 			"next": "Següent",
 			"yes": "Sí",
 			"no": "No",

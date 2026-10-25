@@ -193,7 +193,8 @@
 			"lines": "Lines",
 			"reports": "Reports",
 			"logout": "Log out",
-			"switchRole": "Switch role"
+			"switchRole": "Switch role",
+			"toggleMenu": "Open menu"
 		},
 		"client": {
 			"greeting": "Hello, {name}",
@@ -269,7 +270,8 @@
 			"cancel": "Cancel",
 			"save": "Save",
 			"close": "Close",
-			"language": "Language"
+			"language": "Language",
+			"skipToContent": "Skip to content"
 		},
 		"gestion": {
 			"nav": {
@@ -1326,6 +1328,8 @@
 			"late": "Late",
 			"early": "Early",
 			"not_passed": "Not passed",
+			"onTime": "On time",
+			"notPassed": "Not passed",
 			"busId": "Vehicle",
 			"busLabel": "Vehicle",
 			"docType": "Document type",
@@ -1395,6 +1399,7 @@
 			"total": "Records",
 			"pagination": "Pagination",
 			"previous": "Previous",
+			"viewAll": "View all",
 			"next": "Next",
 			"yes": "Yes",
 			"no": "No",

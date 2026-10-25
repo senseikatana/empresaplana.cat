@@ -45,24 +45,41 @@ const columnKeys: Record<ResourceName, string[]> = {
 	mantenimiento: ["serviceOn", "busLabel", "kind", "status", "cost"],
 	escalaciones: ["lineId", "serviceDate", "negativeCount", "threshold", "status", "resolvedBy"],
 };
+// Columnas enum que se traducen con `copy.fields` y, salvo docType, se
+// muestran como píldoras (patrón badge de HyperUI). Una sola lista para que
+// traducción y badge no se desincronicen.
+const enumKeys = ["status", "type", "action", "docType", "severity", "kind", "expiryState"];
+const badgeKeys = enumKeys.filter((key) => key !== "docType");
 const cell = (value: unknown, key?: string): string => {
 	if (value === null || value === undefined) return "—";
 	if (typeof value === "boolean") return value ? common.yes : common.no;
 	if (value instanceof Date) return value.toISOString();
-	if (["status", "type", "action", "docType", "severity", "kind", "expiryState"].includes(key ?? "") && typeof value === "string") return copy.fields[value] ?? value;
+	if (enumKeys.includes(key ?? "") && typeof value === "string") return copy.fields[value] ?? value;
 	return typeof value === "object" ? JSON.stringify(value) : String(value);
 };
 const href = (action: "edit" | "view", id: string | number) => `${base}?${new URLSearchParams({ [action]: String(id), q: query, page: String(page) })}`;
 const pageHref = (page: number) => `${base}?${new URLSearchParams({ q: query, page: String(page), limit: String(limit) })}`;
-const inputClass = "mt-2 min-h-11 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm text-on-surface focus:border-coastal-teal focus:outline-none focus:ring-2 focus:ring-coastal-teal/20 disabled:opacity-70";
+const inputBase = "min-h-11 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm text-on-surface focus:border-coastal-teal focus:outline-none focus:ring-2 focus:ring-coastal-teal/20 disabled:opacity-70";
+const inputClass = `mt-2 ${inputBase}`;
 const readOnly = mode === "view";
 const saved = Astro.url.searchParams.get("saved");
+const negativeState = /expired|expiring|cancel|critical|high|reject|accident|late|notPassed|not_passed/i;
+const badgeClass = (value: unknown) =>
+	`inline-flex whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium ${
+		typeof value === "string" && negativeState.test(value)
+			? "bg-error-container text-on-error-container"
+			: "bg-surface-container-high text-on-surface"
+	}`;
+// `outline` (no `ring`) para que el foco siga visible en forced-colors.
+const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-surface";
+const buttonPrimary = `inline-flex min-h-11 items-center justify-center rounded-md bg-deep-navy px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-deep-navy/90 disabled:opacity-60 ${focusRing}`;
+const buttonSecondary = `inline-flex min-h-11 items-center justify-center rounded-md border border-outline-variant bg-surface-container-lowest px-4 py-2 text-sm font-medium text-on-surface transition-colors hover:bg-surface-container-low disabled:opacity-60 ${focusRing}`;
 ---
 <section class="mx-auto max-w-7xl" data-management-panel data-api={api} data-return={pageHref(page)}>
 	<div class="flex flex-wrap items-center justify-between gap-4">
 		<h1 class="text-3xl font-bold text-deep-navy">{title}</h1>
-		{mode === "list" && writable && <a href={`${base}?new=1`} class="rounded-full bg-deep-navy px-5 py-3 text-sm font-semibold text-white">{common.add}</a>}
-		{mode !== "list" && <a href={pageHref(page)} class="text-sm font-semibold text-deep-navy">{common.back}</a>}
+		{mode === "list" && writable && <a href={`${base}?new=1`} class={buttonPrimary}>{common.add}</a>}
+		{mode !== "list" && <a href={pageHref(page)} class="text-sm font-semibold text-deep-navy hover:underline">{common.back}</a>}
 	</div>
 	<p class="mt-3 text-sm text-on-surface-variant">{common.databaseNote}</p>
 	{["lineas", "horarios-linea", "conexiones"].includes(resource) && <p class="mt-3 rounded-lg bg-surface-container-low p-4 text-sm text-on-surface-variant">{common.syncNote}</p>}
@@ -95,30 +112,41 @@ const saved = Astro.url.searchParams.get("saved");
 			</div>
 			{record && <dl class="mt-5 text-xs text-on-surface-variant">{["createdAt", "updatedAt", "originTown", "destinationTown", "departureTime", "arrivalTime", "duration"].filter((key) => key in record && !fields.some((field) => field.name === key)).map((key) => <div class="mt-2"><dt class="inline font-semibold">{copy.fields[key]}: </dt><dd class="inline">{cell(record[key])}</dd></div>)}</dl>}
 			<div class="mt-6 flex flex-wrap gap-3">
-				{!readOnly && writable && <button type="submit" class="rounded-full bg-deep-navy px-6 py-3 text-sm font-semibold text-white disabled:opacity-60">{common.save}</button>}
-				{readOnly && writable && record && <a href={href("edit", record.id)} class="rounded-full bg-deep-navy px-6 py-3 text-sm font-semibold text-white">{common.edit}</a>}
-				<a href={pageHref(page)} class="rounded-full border border-outline-variant px-6 py-3 text-sm font-semibold text-deep-navy">{common.cancel}</a>
+				{!readOnly && writable && <button type="submit" class={buttonPrimary}>{common.save}</button>}
+				{readOnly && writable && record && <a href={href("edit", record.id)} class={buttonPrimary}>{common.edit}</a>}
+				<a href={pageHref(page)} class={buttonSecondary}>{common.cancel}</a>
 			</div>
 		</form>
 	)}
 	{mode === "list" && <>
 		<form method="GET" action={base} class="mt-6 flex flex-wrap gap-3">
-			<label class="flex-1"><span class="sr-only">{common.search}</span><input type="search" name="q" value={query} maxlength="200" placeholder={common.search} class={inputClass} /></label>
-			<button class="mt-2 rounded-full bg-deep-navy px-5 py-2 text-sm font-semibold text-white">{common.search}</button>
+			<label class="flex-1"><span class="sr-only">{common.search}</span><input type="search" name="q" value={query} maxlength="200" placeholder={common.search} class={inputBase} /></label>
+			<button class={buttonPrimary}>{common.search}</button>
 		</form>
 		<p class="mt-4 text-sm text-on-surface-variant">{common.total}: {total}</p>
-		<div class="mt-4 overflow-x-auto rounded-xl border border-outline-variant bg-surface-container-lowest shadow-ambient">
-			<table class="w-full text-left text-sm">
-				<thead class="bg-surface-container-low text-on-surface-variant"><tr><th scope="col" class="p-4">ID</th>{columnKeys[resource].map((key) => <th scope="col" class="p-4">{copy.fields[key]}</th>)}<th scope="col" class="p-4">{common.actions}</th></tr></thead>
-				<tbody class="divide-y divide-outline-variant">{rows.map((row) => <tr><td class="p-4 font-mono text-xs">{row.id}</td>{columnKeys[resource].map((key) => <td class="max-w-xs break-words p-4">{cell(row[key], key)}</td>)}<td class="p-4"><div class="flex gap-3"><a class="font-semibold text-deep-navy" href={href("view", row.id)}>{common.view}</a>{writable && <><a class="font-semibold text-deep-navy" href={href("edit", row.id)}>{common.edit}</a><button type="button" data-delete-id={row.id} class="font-semibold text-error disabled:opacity-60">{common.delete}</button></>}</div></td></tr>)}
-					{!error && rows.length === 0 && <tr><td colspan={columnKeys[resource].length + 2} class="p-8 text-center text-on-surface-variant">{common.empty}</td></tr>}
+		<div class="mt-4 overflow-x-auto rounded-lg border border-outline-variant bg-surface-container-lowest shadow-ambient">
+			<table class="min-w-full divide-y-2 divide-outline-variant text-sm">
+				<thead class="ltr:text-left rtl:text-right">
+					<tr class="*:font-medium *:text-on-surface">
+						<th scope="col" class="whitespace-nowrap px-3 py-2 text-xs uppercase tracking-wide text-on-surface-variant">ID</th>
+						{columnKeys[resource].map((key) => <th scope="col" class="whitespace-nowrap px-3 py-2 text-xs uppercase tracking-wide text-on-surface-variant">{copy.fields[key]}</th>)}
+						<th scope="col" class="whitespace-nowrap px-3 py-2 text-xs uppercase tracking-wide text-on-surface-variant">{common.actions}</th>
+					</tr>
+				</thead>
+				<tbody class="divide-y divide-outline-variant">
+					{rows.map((row) => <tr class="*:first:font-medium transition-colors hover:bg-surface-container-low">
+						<td class="whitespace-nowrap px-3 py-2 font-mono text-xs">{row.id}</td>
+						{columnKeys[resource].map((key) => <td class="max-w-xs break-words px-3 py-2">{badgeKeys.includes(key) ? <span class={badgeClass(row[key])}>{cell(row[key], key)}</span> : cell(row[key], key)}</td>)}
+						<td class="whitespace-nowrap px-3 py-2"><div class="flex gap-3"><a class="font-semibold text-deep-navy hover:underline" href={href("view", row.id)}>{common.view}</a>{writable && <><a class="font-semibold text-deep-navy hover:underline" href={href("edit", row.id)}>{common.edit}</a><button type="button" data-delete-id={row.id} class="font-semibold text-error hover:underline disabled:opacity-60">{common.delete}</button></>}</div></td>
+					</tr>)}
+					{!error && rows.length === 0 && <tr><td colspan={columnKeys[resource].length + 2} class="px-3 py-8 text-center text-on-surface-variant">{common.empty}</td></tr>}
 				</tbody>
 			</table>
 		</div>
 		<nav aria-label={common.pagination} class="mt-5 flex items-center justify-between gap-4">
-			{page > 1 ? <a href={pageHref(page - 1)} class="font-semibold text-deep-navy">{common.previous}</a> : <span />}
+			{page > 1 ? <a href={pageHref(page - 1)} class={buttonSecondary}>{common.previous}</a> : <span />}
 			<span class="text-sm text-on-surface-variant">{page} / {Math.max(1, Math.ceil(total / limit))}</span>
-			{page * limit < total ? <a href={pageHref(page + 1)} class="font-semibold text-deep-navy">{common.next}</a> : <span />}
+			{page * limit < total ? <a href={pageHref(page + 1)} class={buttonSecondary}>{common.next}</a> : <span />}
 		</nav>
 	</>}
 </section>

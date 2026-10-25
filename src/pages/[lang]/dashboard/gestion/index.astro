@@ -59,10 +59,10 @@ const kpis = [
 	{ label: dict.app.gestion.nav.drivers, value: driversCount, icon: "badge", color: "text-coastal-teal" },
 ];
 const fleetKpis = [
-	{ label: fields.expiredDocuments, value: expiredDocs, icon: "gpp_bad", href: docsHref, alert: expiredDocs > 0, color: expiredDocs > 0 ? "text-error" : "text-coastal-teal" },
-	{ label: fields.expiringDocuments, value: expiringDocs, icon: "event_upcoming", href: docsHref, alert: expiringDocs > 0, color: expiringDocs > 0 ? "text-warning" : "text-coastal-teal" },
-	{ label: fields.openIncidents, value: openIncidents, icon: "report_problem", href: localizedPath("/dashboard/gestion/incidencias", locale), alert: openIncidents > 0, color: openIncidents > 0 ? "text-error" : "text-coastal-teal" },
-	{ label: fields.pendingMaintenance, value: pendingMaintenance, icon: "build", href: localizedPath("/dashboard/gestion/mantenimiento", locale), alert: false, color: "text-coastal-teal" },
+	{ label: fields.expiredDocuments, value: expiredDocs, icon: "gpp_bad", href: docsHref, color: expiredDocs > 0 ? "text-error" : "text-coastal-teal" },
+	{ label: fields.expiringDocuments, value: expiringDocs, icon: "event_upcoming", href: docsHref, color: expiringDocs > 0 ? "text-error" : "text-coastal-teal" },
+	{ label: fields.openIncidents, value: openIncidents, icon: "report_problem", href: localizedPath("/dashboard/gestion/incidencias", locale), color: openIncidents > 0 ? "text-error" : "text-coastal-teal" },
+	{ label: fields.pendingMaintenance, value: pendingMaintenance, icon: "build", href: localizedPath("/dashboard/gestion/mantenimiento", locale), color: "text-coastal-teal" },
 ];
 ---
 
@@ -85,9 +85,9 @@ const fleetKpis = [
 					<div class="flex items-center justify-between">
 						<div>
 							<p class="font-label-md text-label-md text-on-surface-variant">{k.label}</p>
-							<p class="font-headline-lg font-bold text-deep-navy mt-1">{k.value}</p>
+							<p class="font-headline-lg font-bold text-deep-navy mt-1 tabular-nums">{k.value}</p>
 						</div>
-						<span class="material-symbols-outlined {k.color} text-[32px] shrink-0" aria-hidden="true">{k.icon}</span>
+						<span class={`material-symbols-outlined ${k.color} text-[32px] shrink-0`} aria-hidden="true">{k.icon}</span>
 					</div>
 				</article>
 			))}
@@ -98,14 +98,14 @@ const fleetKpis = [
 			{fleetKpis.map((k) => (
 				<a
 					href={k.href}
-					class="flex flex-col gap-4 rounded-xl border border-surface-variant bg-surface-container-lowest p-6 shadow-ambient hover:border-coastal-teal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coastal-teal transition-colors"
+					class="flex flex-col gap-4 rounded-xl border border-surface-variant bg-surface-container-lowest p-6 shadow-ambient hover:border-coastal-teal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-on-surface transition-colors"
 				>
 					<div class="flex items-center justify-between">
 						<div>
 							<p class="font-label-md text-label-md text-on-surface-variant">{k.label}</p>
-							<p class="font-headline-lg font-bold text-deep-navy mt-1">{k.value}</p>
+							<p class="font-headline-lg font-bold text-deep-navy mt-1 tabular-nums">{k.value}</p>
 						</div>
-						<span class="material-symbols-outlined {k.color} text-[32px] shrink-0" aria-hidden="true">{k.icon}</span>
+						<span class={`material-symbols-outlined ${k.color} text-[32px] shrink-0`} aria-hidden="true">{k.icon}</span>
 					</div>
 				</a>
 			))}
@@ -121,7 +121,7 @@ const fleetKpis = [
 					href={docsHref}
 					class="text-sm font-semibold text-coastal-teal hover:underline"
 				>
-					Ver todos
+					{dict.management.common.viewAll}
 				</a>
 			</div>
 			{alerts.length === 0

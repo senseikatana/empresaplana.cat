@@ -193,7 +193,8 @@
 			"lines": "Lignes",
 			"reports": "Rapports",
 			"logout": "Déconnexion",
-			"switchRole": "Changer de rôle"
+			"switchRole": "Changer de rôle",
+			"toggleMenu": "Ouvrir le menu"
 		},
 		"client": {
 			"greeting": "Bonjour, {name}",
@@ -269,7 +270,8 @@
 			"cancel": "Annuler",
 			"save": "Enregistrer",
 			"close": "Fermer",
-			"language": "Langue"
+			"language": "Langue",
+			"skipToContent": "Aller au contenu"
 		},
 		"gestion": {
 			"nav": {
@@ -1326,6 +1328,8 @@
 			"late": "En retard",
 			"early": "En avance",
 			"not_passed": "Non passé",
+			"onTime": "À l'heure",
+			"notPassed": "Non passé",
 			"busId": "Véhicule",
 			"busLabel": "Véhicule",
 			"docType": "Type de document",
@@ -1395,6 +1399,7 @@
 			"total": "Enregistrements",
 			"pagination": "Pagination",
 			"previous": "Précédent",
+			"viewAll": "Voir tout",
 			"next": "Suivant",
 			"yes": "Oui",
 			"no": "Non",
