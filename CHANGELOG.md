@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.7.2] - 2026-11-10
+
+Highlights: fix: bun.lock and package.json: update dependencies and remove unnecessary.
+
+- 🐛 fix: bun.lock and package.json: update dependencies and remove unnecessary `6e94a4c`
+  - `bun.lock`
+  - `package.json`
+- 🚀 feat(dashboard): improve accessibility and management panel UI `a25a49d`
+- 🚀 feat: update dashboard layout and navigation `0b31269`
+- 🐛 fix: update CI workflow tests to allow X-Forwarded-Host and accept any su `edc26a9`
+- 🐛 fix(acl): open the client and employee dashboards to their own role `009d848`
+- 🚀 feat(workflows): add app and index `5c917ed`
+
 ## [0.7.1] - 2026-10-25
 
 Highlights: feat(dashboard): improve accessibility and management panel UI.
